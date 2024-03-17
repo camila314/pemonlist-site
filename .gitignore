@@ -1,4 +1,4 @@
 /target
-/dbschema
+/dbschema/migrations
 **/.DS_Store
 Cargo.lock
