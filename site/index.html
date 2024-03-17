@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Platformer List</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <link href="https://fonts.cdnfonts.com/css/helvetica-neue-56" rel="stylesheet">
+    
+</head>
+<body>
+    <section class="navbar">
+        <div class="nav">
+            <h2><a href="index.html">The Platformer List</a></h2>
+
+            <ul class="navmenu">
+                <li class="navitem">
+                    <a href="/" class="navlink">List</a>
+                </li>
+                <li class="navitem">
+                    <a href="/leaderboard" class="navlink">Leaderboard</a>
+                </li>
+                <li class="navitem">
+                    <a href="/rules" class="navlink">Rules</a>
+                </li>
+                <li class="navitem">
+                    <a href="submit.html" class="navlink">Submit</a>
+                </li>
+                <li class="navitem">
+                    <a href="profile.html" class="navlink">Profile</a>
+                </li>
+            </ul>
+            
+            <div class="navright">
+                <a href="recordaccept.html"><div class="submit">Records</div></a>
+
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+    
+    <section class="main">
+
+        <div class="cardlist">
+            {% for level in levels %}
+                <div class="card transparent">
+                    <div class="cardleft">
+                        <div class="cardtop">
+                            <a class="thumblink" target="_blank" href="https://youtube.com/watch?v={{ level.video_id }}">
+                                <img src="https://img.youtube.com/vi/{{ level.video_id }}/maxresdefault.jpg">
+                            </a>
+                            <div class="cardinfo">
+                                <h2><a href="/level/{{ level.level_id }}">{{ level.name }}</a></h2>
+                                <p>{{ level.creator }}</p>
+                                <a href="submit.html"><div class="submit">Submit</div></a>
+                            </div>
+                        </div>
+                        <div class="cardrecord">
+                            <p><b>#1</b></p>
+                            <div class="cardrecordinfo">
+                                <p>{{ level.record.name }}</p>
+                                <p>{{ level.record.time_format }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="levelplace">
+                        <h2>#{{ loop.index }}</h2>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <div class="sidebar">
+            <div class="transparent">
+                <h2>List Editors</h2>
+                <p>name</p>
+            </div>
+            <div class="transparent">
+                <h2>Changelog</h2>
+                <p>today</p>
+            </div>
+        </div>
+
+    </section>
+
+
+    <iframe src="footer.html" width="100%" height="200px" frameborder="0" scrolling="no"></iframe>
+
+    <script src="script.js"></script>
+</body>
+</html>
