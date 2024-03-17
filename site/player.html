@@ -78,56 +78,21 @@
 
          </div>
          <div class="playerbio">
-            <p>me when i am zoink and i beat tidal wave by onilink and more in geometry dash lmao like the hit mobile game and whatnot</p>
+            <p>we don't have bios yet ...</p>
          </div>
 
          <div class="records transparent">
             <h2>Records</h2>
 
-            <div class="recordentry">
-               <p class="recordrank"><b>#1</b></p>
-               <div class="recordinfo">
-                  <p><a href="player.html">The Abyss</a></p>
-                  <p>00:58:58.938</p>
+            {% for record in player.records %}
+               <div class="recordentry">
+                  <p class="recordrank"><b>#{{ record.rank }}</b></p>
+                  <div class="recordinfo">
+                     <p><a href="player.html">{{ record.level.name }}</a></p>
+                     <p>{{ record.time_format }}</p>
+                  </div>
                </div>
-            </div>
-            <div class="recordentry">
-               <p class="recordrank"><b>#2</b></p>
-               <div class="recordinfo">
-                  <p><a href="player.html">Terminal Heaven</a></p>
-                  <p>00:58:58.938</p>
-               </div>
-            </div>
-            <div class="recordentry">
-               <p class="recordrank"><b>#3</b></p>
-               <div class="recordinfo">
-                  <p><a href="player.html">22 trial</a></p>
-                  <p>00:58:58.938</p>
-               </div>
-            </div>
-            <div class="recordentry">
-               <p class="recordrank"><b>#3</b></p>
-               <div class="recordinfo">
-                  <p><a href="player.html">22 trial</a></p>
-                  <p>00:58:58.938</p>
-               </div>
-            </div>
-            <div class="recordentry">
-               <p class="recordrank"><b>#3</b></p>
-               <div class="recordinfo">
-                  <p><a href="player.html">22 trial</a></p>
-                  <p>00:58:58.938</p>
-               </div>
-            </div>
-            <div class="recordentry">
-               <p class="recordrank"><b>#3</b></p>
-               <div class="recordinfo">
-                  <p><a href="player.html">22 trial</a></p>
-                  <p>00:58:58.938</p>
-               </div>
-            </div>
-
-
+            {% endfor %}
 
          </div>
 
@@ -135,71 +100,16 @@
 
       <div class="listsidebar">
          <div class="transparent" id="playerlist">
+            {% for pl in player.all_players %}
                <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
+                  <p><b>#{{ loop.index }}</b></p>
+                  <a class="playerbarinfo" href="/player/{{ pl.name }}" style="display: flex">
+                     <span>{{ pl.name }}</span>
+                     <span>{{ pl.points }}</span>
+                  </a>
                </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-               <div class="playerbar">
-                  <p><b>#1</b></p>
-                  <div class="playerbarinfo">
-                     <p>eeeeeeeee</p>
-                     <p>2000</p>
-                  </div>
-               </div>
-
-            </div>
+            {% endfor %}
+         </div>
       </div>
 
    </section>

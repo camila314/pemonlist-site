@@ -14,7 +14,6 @@ struct AppState {
     database: EdgeClient
 }
 
-// Serve index.html from `site` directory
 async fn index(State(state): State<AppState>) -> axum::response::Html<String> {
     let mut ctx = Context::new();
 
@@ -57,8 +56,8 @@ async fn level(State(state): State<AppState>, Path(level_id): Path<u64>) -> axum
         points,
         level_id,
         records := (select .entries {
-            name := (select .player.name),
-            time_format := (select to_str(.time, \"HH24:MI:SS.MS\"))
+            name := .player.name,
+            time_format := to_str(.time, \"HH24:MI:SS.MS\")
         } order by .time)
     } filter .level_id = <int64>$0", &(level_id as i64,)).await.unwrap().parse().unwrap();
 
@@ -72,8 +71,17 @@ async fn player(State(state): State<AppState>, Path(username): Path<String>) -> 
     let player: Value = state.database.query_json("select Player {
         name,
         points,
-        verifications := (select Level { name } filter .verifier.name = <str>$0),
-        rank
+        verifications := (select Level { name } filter .verifier = <Player>Player.id),
+        records := (select .entries {
+            level: { name },
+            time_format := (select to_str(.time, \"HH24:MI:SS.MS\")),
+            rank := count((select detached Entry filter Entry.time < .time))
+        } order by .rank limit 5),
+        rank,
+        all_players := (select detached Player {
+            name,
+            points
+        } order by .points desc)
     } filter .name = <str>$0", &(username,)).await.unwrap().parse().unwrap();
 
     ctx.insert("player", &player.as_array().unwrap()[0]);
@@ -84,7 +92,6 @@ async fn submit(State(state): State<AppState>) -> axum::response::Html<String> {
     let mut ctx = Context::new();
     state.template.render("submit.html", &ctx).unwrap().into()
 }
-
 
 #[tokio::main]
 async fn main() {
