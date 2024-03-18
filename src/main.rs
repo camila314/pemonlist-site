@@ -1,6 +1,6 @@
 
 use axum::{routing::get, Router};
-use tower_http::services::{ServeFile};
+use tower_http::services::{ServeDir, ServeFile};
 use tera::{Tera, Context};
 use axum::extract::{State, Path};
 use serde_json::Value;
@@ -109,7 +109,7 @@ async fn main() {
         .route_service("/rules", ServeFile::new("site/rules.html"))
         .route_service("/style.css", ServeFile::new("site/style.css"))
         .route_service("/script.js", ServeFile::new("site/script.js"))
-        //.nest_service("/assets", ServeDir::new("site/assets"))
+        .nest_service("/src", ServeDir::new("site/src"))
         .with_state(state);
 
     // Set up 
