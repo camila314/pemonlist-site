@@ -1,6 +1,6 @@
-use std::str::FromStr;
+
 use axum::{routing::get, Router};
-use tower_http::services::{ServeFile, ServeDir};
+use tower_http::services::{ServeFile};
 use tera::{Tera, Context};
 use axum::extract::{State, Path};
 use serde_json::Value;
@@ -89,7 +89,7 @@ async fn player(State(state): State<AppState>, Path(username): Path<String>) -> 
 }
 
 async fn submit(State(state): State<AppState>) -> axum::response::Html<String> {
-    let mut ctx = Context::new();
+    let ctx = Context::new();
     state.template.render("submit.html", &ctx).unwrap().into()
 }
 
