@@ -3,13 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Platformer List</title>
+    <title>Platformer Demon List</title>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-neue-56">
-    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/src/css/index.min.css">
 </head>
 <body>
-    
+    <!---->
+    <nav>
+        <div>
+            <span>
+                <a href="/"><img src="/src/img/icon-64.png"><h1>Platformer Demon List</h1></a>
+            </span>
+            <span>
+                <a href="/">List</a>
+                <a href="/recordaccept">Records</a>
+                <a href="/leaderboard">Leaderboard</a>
+                <a href="/rules">Rules</a>
+                <a href="/submit">Submit</a>
+                <a href="/profile">Profile</a>
+            </span>
+        </div>
+    </nav>
+    <!---->
+    <main>
+        {% for level in levels %}
+        {{ level.name }} - {{ level.creator }}
+        {% endfor %}
+    </main>
+    <!---->
 </body>
 </html>

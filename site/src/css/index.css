@@ -1,1 +1,63 @@
-/*# sourceMappingURL=index.css.map */
+html {
+  position: absolute;
+  inset: 0px;
+}
+
+body {
+  margin: 0px;
+  color: #dde;
+  background-color: #223;
+  font-family: Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+}
+
+nav {
+  background-color: #112;
+  display: flex;
+  justify-content: center;
+}
+nav div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 20px;
+  height: 70px;
+  max-width: 1150px;
+  flex-grow: 1;
+}
+nav div * {
+  margin: 0px;
+}
+nav div a {
+  text-decoration: none;
+  color: #dde;
+}
+nav div span:first-child a {
+  display: flex;
+  align-items: center;
+}
+nav div span:first-child a img {
+  width: 38px;
+  aspect-ratio: 1/1;
+}
+nav div span:first-child a h1 {
+  margin: 0px 7px;
+}
+nav div span:last-child a {
+  padding: 12px 17px;
+  margin-left: 7px;
+  border-radius: 10px;
+  background-color: #112;
+  border: #334 2px solid;
+  transition: all 50ms ease;
+}
+nav div span:last-child a:hover {
+  background-color: #eef;
+  border: transparent 2px solid;
+  color: #223;
+}
+
+main {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
