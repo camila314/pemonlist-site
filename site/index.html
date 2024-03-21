@@ -13,24 +13,44 @@
     <nav>
         <div>
             <span>
-                <a href="/"><img src="/src/img/icon-64.png"><h1>Platformer Demon List</h1></a>
+                <a href="/">
+                    <img src="/src/img/icon-navbar-92.png">
+                    <span>
+                        <h1>Platformer Demon List</h1>
+                        <span class="swipe"><h1>Platformer Demon List</h1></span>
+                    </span>
+                </a>
             </span>
             <span>
-                <a href="/">List</a>
-                <a href="/recordaccept">Records</a>
-                <a href="/leaderboard">Leaderboard</a>
-                <a href="/rules">Rules</a>
-                <a href="/submit">Submit</a>
-                <a href="/profile">Profile</a>
+                <span class="full">
+                    <a href="/">List</a>
+                    <a href="/recordaccept">Records</a>
+                    <a href="/leaderboard">Leaderboard</a>
+                    <a href="/rules">Rules</a>
+                    <a href="/submit">Submit</a>
+                    <a href="/profile">Profile</a>
+                </span>
+                <button class="overflow material-symbols-outlined">menu</button>
+                <span class="overflow">
+                    <a href="/">List</a>
+                    <a href="/recordaccept">Records</a>
+                    <a href="/leaderboard">Leaderboard</a>
+                    <a href="/rules">Rules</a>
+                    <a href="/submit">Submit</a>
+                    <a href="/profile">Profile</a>
+                </span>
             </span>
         </div>
     </nav>
     <!---->
     <main>
-        {% for level in levels %}
+        {# {% for level in levels %}
         {{ level.name }} - {{ level.creator }}
-        {% endfor %}
+        {% endfor %} #}
     </main>
     <!---->
 </body>
+
+<script src="/src/js/navbar.js"></script>
+
 </html>
