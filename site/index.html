@@ -44,9 +44,22 @@
     </nav>
     <!---->
     <main>
-        {# {% for level in levels %}
-        {{ level.name }} - {{ level.creator }}
-        {% endfor %} #}
+        <div class="container">
+            {% for level in levels %}
+                <div>
+                    <a  class="img"
+                        style="background-image: url('https://img.youtube.com/vi/{{ level.video_id }}/hqdefault.jpg')"
+                        href="https://youtube.com/watch?v={{ level.video_id }}"
+                        target="_blank"
+                    ></a>
+                    <a class="info" href="/level/{{ level.level_id }}">
+                        <h2>{{ level.name }}</h2>
+                        <p>{{ level.creator }}</p>
+                    </a>
+                    <h1>#{{ loop.index }}</h1>
+                </div>
+            {% endfor %}
+        </div>
     </main>
     <!---->
 </body>
