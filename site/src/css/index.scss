@@ -182,12 +182,12 @@ main {
                 top: 10px;
                 right: 10px;
                 color: #556;
-                font-size: 2.5em;
+                font-size: 2em;
             }
 
             .img {
                 width: 35%;
-                min-width: 200px;
+                min-width: 100px;
                 background-position: center;
                 aspect-ratio: 16 / 9;
                 background-size: cover;
@@ -202,7 +202,15 @@ main {
                 z-index: 1;
 
                 h2 {
-                    color: #eef
+                    color: #eef;
+                    font-size: 2em;
+                    margin: 0px;
+                    margin-bottom: 10px;
+                }
+                
+                p {
+                    font-size: 1.5em;
+                    margin: 0px;
                 }
             }
         }
@@ -222,6 +230,24 @@ main {
 @media screen and (max-width: 461px) {
     nav span:first-child span {
         display: none !important;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    main {
+        h1 {
+            font-size: 1.5em !important;
+        }
+
+        .info {
+            h2 {
+                font-size: 1.2em !important;
+            }
+    
+            p {
+                font-size: 1em !important;
+            }
+        }
     }
 }
 
