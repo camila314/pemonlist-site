@@ -1,3 +1,5 @@
+@import url('https://fonts.cdnfonts.com/css/whitney-2');
+
 html {
     position: absolute;
     inset: 0px;
@@ -7,7 +9,7 @@ body {
     margin: 0px;
     color: #dde;
     background-color: #223;
-    font-family: Arial, Helvetica, sans-serif, 'Material Symbols Outlined';
+    font-family: 'Whitney', Arial, Helvetica, sans-serif, 'Material Symbols Outlined';
 }
 
 nav {
@@ -162,7 +164,30 @@ main {
         max-width: 1250px;
         flex-grow: 1;
 
-        div {
+        input {
+            background-color: #334;
+            color: #dde;
+            border: transparent 2px solid;
+            border-radius: 20px;
+            padding: 10px 20px 10px 40px;
+            font-size: 1.5em;
+            width: 60%;
+            margin-bottom: 20px;
+
+            background-image: url("/src/img/search.svg");
+            background-size: 20px;
+            background-repeat: no-repeat;
+            background-position: 10px 50%;
+
+
+        }
+
+        input:focus {
+            outline: none;
+            border: #556 2px solid;
+        }
+
+        > div {
             background-color: #334;
             margin-bottom: 20px;
             padding: 20px;
@@ -176,17 +201,34 @@ main {
                 margin-bottom: 0px;
             }
 
+            h3 {
+                margin: 0px;
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                color: #dde;
+                font-size: 1.5em;
+                padding-bottom: 0;
+
+                img {
+                    height: 1em;
+                    bottom:10px;
+                    vertical-align: baseline;
+                    margin-bottom: -3px;
+                }
+            }
+
             h1 {
                 margin: 0px;
                 position: absolute;
                 top: 10px;
                 right: 10px;
-                color: #556;
+                color: #889;
                 font-size: 2em;
             }
 
             .img {
-                width: 35%;
+                width: 25%;
                 min-width: 100px;
                 background-position: center;
                 aspect-ratio: 16 / 9;
@@ -195,22 +237,52 @@ main {
             }
 
             .info {
+                display: flex;
                 color: #dde;
                 text-decoration: none;
                 flex-grow: 1;
+                flex-direction: column;
                 margin-left: 20px;
+                margin-bottom: 0;
+                padding: 5px 0;
                 z-index: 1;
+                align-items: flex-start;
+                justify-content: space-between;
+                align-self: stretch;
 
-                h2 {
+                a {
                     color: #eef;
                     font-size: 2em;
                     margin: 0px;
                     margin-bottom: 10px;
+                    font-weight: bold;
+                    text-decoration: none;
+                }
+
+                a:hover {
+                    text-decoration: underline;
                 }
                 
                 p {
                     font-size: 1.5em;
                     margin: 0px;
+                }
+
+                button {
+                    align-self: start;
+                    font-size: 1em;
+                    padding: 15px 30px;
+                    border-radius: 30px;
+                    background-color: #eef;
+                    border: #334 2px solid;
+                    color: #112;
+                    cursor: pointer;
+                    transition: background-color 70ms ease-out;
+                    margin-top: 10px;
+                }
+
+                button:hover {
+                    background-color: #aab;
                 }
             }
         }
@@ -239,13 +311,22 @@ main {
             font-size: 1.5em !important;
         }
 
+        h3 {
+            font-size: 1em !important;
+        }
+
         .info {
-            h2 {
+            align-self: center !important;
+            a {
                 font-size: 1.2em !important;
             }
     
             p {
                 font-size: 1em !important;
+            }
+
+            button {
+                display: none;
             }
         }
     }
