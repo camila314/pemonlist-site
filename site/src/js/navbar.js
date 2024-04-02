@@ -15,5 +15,3 @@ document.querySelector('nav button.overflow').addEventListener('click', () => {
     const enabled = document.querySelector('nav span.overflow').classList.toggle('enabled')
     document.querySelector('nav button.overflow').classList.toggle('enabled', enabled)
 })
-
-if ("ontouchstart" in window) document.body.classList.add('touch')

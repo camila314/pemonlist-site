@@ -1,3 +1,5 @@
+@import url('https://fonts.cdnfonts.com/css/whitney-2');
+
 html {
     position: absolute;
     inset: 0px;
@@ -7,7 +9,7 @@ body {
     margin: 0px;
     color: #dde;
     background-color: #223;
-    font-family: Arial, Helvetica, sans-serif, 'Material Symbols Outlined';
+    font-family: 'Whitney', Arial, Helvetica, sans-serif, 'Material Symbols Outlined';
 }
 
 nav {
@@ -18,8 +20,10 @@ nav {
     inset: 0px;
     bottom: unset;
     z-index: 2;
+    // ---------- transparent navbar ----------
     // backdrop-filter: blur(25px) saturate(1.5);
     // background-color: #0018;
+    // ----------------------------------------
     
     div {
         display: flex;
@@ -91,6 +95,9 @@ nav {
                     background-color: #112;
                     border: #334 2px solid;
                     transition: background-color 70ms ease-out;
+                    // ---------- transparent navbar ----------
+                    // background-color: transparent;
+                    // ----------------------------------------
                 }
             }
 
@@ -143,7 +150,7 @@ nav {
                     border-radius: 12px;
 
                     &:nth-child(odd) {
-                        background-color: #080818;
+                        background-color: #001;
                     }
                 }
             }
@@ -162,15 +169,57 @@ main {
         max-width: 1250px;
         flex-grow: 1;
 
-        div {
+        .search {
+            all: revert;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: stretch;
+            align-items: center;
+            border-radius: 10px;
+            background-color: #334;
+            position: relative;
+
+            span {
+                position: absolute;
+                left: 20px;
+                pointer-events: none;
+            }
+
+            textarea {
+                flex-grow: 1;
+                border: none;
+                resize: none;
+                background-color: transparent;
+                height: 20px;
+                padding: 20px;
+                padding-left: calc(24px + 40px);
+                font-size: 17px;
+                font-family: inherit;
+
+                &:focus-visible {
+                    border: none;
+                    outline: none;
+                }
+
+                &::placeholder {
+                    color: #778;
+                }
+            }
+        }
+
+        div:not(.search) {
             background-color: #334;
             margin-bottom: 20px;
             padding: 20px;
             border-radius: 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: stretch;
             position: relative;
+
+            &.hidden {
+                display: none;
+            }
             
             &:last-child {
                 margin-bottom: 0px;
@@ -187,7 +236,7 @@ main {
 
             .img {
                 width: 35%;
-                min-width: 100px;
+                min-width: 120px;
                 background-position: center;
                 aspect-ratio: 16 / 9;
                 background-size: cover;
@@ -198,8 +247,13 @@ main {
                 color: #dde;
                 text-decoration: none;
                 flex-grow: 1;
-                margin-left: 20px;
+                padding-left: 20px;
                 z-index: 1;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                flex-direction: column;
+                position: relative;
 
                 h2 {
                     color: #eef;
@@ -212,6 +266,11 @@ main {
                     font-size: 1.5em;
                     margin: 0px;
                 }
+            }
+
+            .highlight {
+                background: #f76;
+                color: #223;
             }
         }
     }
@@ -236,7 +295,7 @@ main {
 @media screen and (max-width: 700px) {
     main {
         h1 {
-            font-size: 1.5em !important;
+            font-size: 1.3em !important;
         }
 
         .info {
@@ -279,4 +338,8 @@ body.touch {
             color: #223;
         }
     }
+}
+
+.material-symbols-outlined {
+    user-select: none;
 }

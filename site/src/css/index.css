@@ -1,3 +1,4 @@
+@import url("https://fonts.cdnfonts.com/css/whitney-2");
 html {
   position: absolute;
   inset: 0px;
@@ -7,7 +8,7 @@ body {
   margin: 0px;
   color: #dde;
   background-color: #223;
-  font-family: Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+  font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
 }
 
 nav {
@@ -126,7 +127,7 @@ nav div span:last-child span.overflow a {
   border-radius: 12px;
 }
 nav div span:last-child span.overflow a:nth-child(odd) {
-  background-color: #080818;
+  background-color: #001;
 }
 
 main {
@@ -140,20 +141,59 @@ main .container {
   max-width: 1250px;
   flex-grow: 1;
 }
-main .container div {
+main .container .search {
+  all: revert;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #334;
+  position: relative;
+}
+main .container .search span {
+  position: absolute;
+  left: 20px;
+  pointer-events: none;
+}
+main .container .search textarea {
+  flex-grow: 1;
+  border: none;
+  resize: none;
+  background-color: transparent;
+  height: 20px;
+  padding: 20px;
+  padding-left: 64px;
+  font-size: 17px;
+  font-family: inherit;
+}
+main .container .search textarea:focus-visible {
+  border: none;
+  outline: none;
+}
+main .container .search textarea::-moz-placeholder {
+  color: #778;
+}
+main .container .search textarea::placeholder {
+  color: #778;
+}
+main .container div:not(.search) {
   background-color: #334;
   margin-bottom: 20px;
   padding: 20px;
   border-radius: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   position: relative;
 }
-main .container div:last-child {
+main .container div:not(.search).hidden {
+  display: none;
+}
+main .container div:not(.search):last-child {
   margin-bottom: 0px;
 }
-main .container div h1 {
+main .container div:not(.search) h1 {
   margin: 0px;
   position: absolute;
   top: 10px;
@@ -161,30 +201,39 @@ main .container div h1 {
   color: #556;
   font-size: 2em;
 }
-main .container div .img {
+main .container div:not(.search) .img {
   width: 35%;
-  min-width: 100px;
+  min-width: 120px;
   background-position: center;
   aspect-ratio: 16/9;
   background-size: cover;
   border-radius: 10px;
 }
-main .container div .info {
+main .container div:not(.search) .info {
   color: #dde;
   text-decoration: none;
   flex-grow: 1;
-  margin-left: 20px;
+  padding-left: 20px;
   z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  position: relative;
 }
-main .container div .info h2 {
+main .container div:not(.search) .info h2 {
   color: #eef;
   font-size: 2em;
   margin: 0px;
   margin-bottom: 10px;
 }
-main .container div .info p {
+main .container div:not(.search) .info p {
   font-size: 1.5em;
   margin: 0px;
+}
+main .container div:not(.search) .highlight {
+  background: #f76;
+  color: #223;
 }
 
 @media screen and (max-width: 1012px) {
@@ -202,7 +251,7 @@ main .container div .info p {
 }
 @media screen and (max-width: 700px) {
   main h1 {
-    font-size: 1.5em !important;
+    font-size: 1.3em !important;
   }
   main .info h2 {
     font-size: 1.2em !important;
@@ -229,4 +278,10 @@ body.touch nav button.overflow:active, body.touch nav .full a:active {
 body.touch nav span.overflow a:active {
   background-color: #dde !important;
   color: #223;
+}
+
+.material-symbols-outlined {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }/*# sourceMappingURL=index.css.map */

@@ -7,6 +7,8 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="/src/css/index.min.css">
+
+    <meta name="color-scheme" content="dark">
 </head>
 <body>
     <!---->
@@ -45,6 +47,10 @@
     <!---->
     <main>
         <div class="container">
+            <div class="search">
+                <span class="material-symbols-outlined">search</span>
+                <textarea placeholder="Search"></textarea>
+            </div>
             {% for level in levels %}
                 <div>
                     <a  class="img"
@@ -64,6 +70,8 @@
     <!---->
 </body>
 
+<script src="/src/js/main.js"></script>
 <script src="/src/js/navbar.js"></script>
+<script src="/src/js/search.js"></script>
 
 </html>
