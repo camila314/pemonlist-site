@@ -24,7 +24,8 @@ async fn index(State(state): State<AppState>) -> axum::response::Html<String> {
         level_id,
         record := (select .entries {
             name := (select .player.name),
-            time_format := (select to_str(.time, \"HH24:MI:SS.MS\"))
+            time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
+            time_ms := (select to_str(.time, \"MS\"))
         } order by .time limit 1)
     } order by .placement", &()).await.unwrap().parse().unwrap();
 
@@ -107,9 +108,9 @@ async fn main() {
         .route("/player/:username", get(player))
         .route("/submit", get(submit))
         .route_service("/rules", ServeFile::new("site/rules.html"))
-        .route_service("/style.css", ServeFile::new("site/style.css"))
-        .route_service("/script.js", ServeFile::new("site/script.js"))
         .nest_service("/src", ServeDir::new("site/src"))
+        .nest_service("/meta", ServeDir::new("site/meta"))
+        .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
         .with_state(state);
 
     // Set up 

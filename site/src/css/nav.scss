@@ -2,10 +2,11 @@ nav {
     background-color: #112;
     display: flex;
     justify-content: center;
-    position: fixed;
+    position: sticky;
     inset: 0px;
     bottom: unset;
     z-index: 2;
+    width: 100%;
     // ---------- transparent navbar ----------
     // backdrop-filter: blur(25px) saturate(1.5);
     // background-color: #0018;

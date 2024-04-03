@@ -9,9 +9,15 @@
 
     <link rel="stylesheet" href="/src/css/main.min.css">
     <link rel="stylesheet" href="/src/css/nav.min.css">
+    <link rel="stylesheet" href="/src/css/footer.min.css">
     <link rel="stylesheet" href="/src/css/list.min.css">
 
     <meta name="color-scheme" content="dark">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/meta/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/meta/favicon-16x16.png">
+    <link rel="manifest" href="/meta/site.webmanifest">
 </head>
 <body>
     <!---->
@@ -54,8 +60,9 @@
                 <span class="material-symbols-outlined">search</span>
                 <textarea placeholder="Search"></textarea>
             </div>
+            <hr>
             {% for level in levels %}
-                <div>
+                <div class="level">
                     <a  class="img"
                         style="background-image: url('https://img.youtube.com/vi/{{ level.video_id }}/hqdefault.jpg')"
                         href="https://youtube.com/watch?v={{ level.video_id }}"
@@ -66,10 +73,24 @@
                         <p>{{ level.creator }}</p>
                     </a>
                     <h1>#{{ loop.index }}</h1>
+                    {% if level.record %}
+                        <h3>
+                            <span class="name">{{ level.record.name }}</span>
+                            <span class="time"> {{ level.record.time_format }}</span>
+                            <span class="milliseconds">.{{ level.record.time_ms }}</span>
+                            <img class="trophy" src="/src/img/diamondTrophy.png">
+                        </h3>
+                    {% endif %}
                 </div>
             {% endfor %}
+            <div class="empty hidden">No results.</div>
         </div>
     </main>
+    <!---->
+    <footer>
+        <span>© Copyright 2024 pemonlist.com</span>
+        <span>This site is in no way affiliated with RobTop Games AB, all rights reserved.</span>
+    </footer>
     <!---->
 </body>
 

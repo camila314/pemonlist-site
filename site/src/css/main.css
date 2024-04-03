@@ -1,14 +1,19 @@
 @import url("https://fonts.cdnfonts.com/css/whitney-2");
+@import url("https://fonts.cdnfonts.com/css/droid-sans-mono-2");
 html {
-  position: absolute;
-  inset: 0px;
+  overflow-x: hidden;
 }
 
 body {
+  overflow-x: hidden;
   margin: 0px;
   color: #dde;
   background-color: #223;
   font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  inset: 0px;
 }
 
 .material-symbols-outlined {
