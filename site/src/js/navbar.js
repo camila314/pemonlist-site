@@ -18,3 +18,5 @@ document.querySelector('nav button.overflow').addEventListener('click', () => {
     const enabled = document.querySelector('nav span.overflow').classList.toggle('enabled')
     document.querySelector('nav button.overflow').classList.toggle('enabled', enabled)
 })
+
+console.log('suck it mechabrandon')

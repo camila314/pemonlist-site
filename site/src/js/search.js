@@ -9,7 +9,6 @@ String.prototype.highlight = function(term) {
 }
 
 document.querySelector('.search textarea').addEventListener('input', event => {
-    const now = performance.now()
     const term = event.target.value.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&') // escape special regex chars [https://stackoverflow.com/a/3561711]
     const textAdded = (term.length - lastValueLength) > 0
     lastValueLength = term.length
@@ -39,6 +38,4 @@ document.querySelector('.search textarea').addEventListener('input', event => {
     })
 
     document.querySelector('.container .empty').classList.toggle('hidden', !empty)
-
-    console.log(term == '' ? 'refresh' : term, 'took', performance.now() - now + 'ms')
 })
