@@ -20,4 +20,25 @@ body {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+
+hr {
+  background-color: #445;
+  margin: 0px;
+  margin-bottom: 20px;
+  border: none;
+  height: 1px;
+  width: 100%;
+}
+
+main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+  flex-grow: 1;
+}
+main .container {
+  max-width: 1250px;
+  flex-grow: 1;
 }/*# sourceMappingURL=main.css.map */

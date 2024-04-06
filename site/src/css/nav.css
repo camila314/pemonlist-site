@@ -121,7 +121,7 @@ nav div span:last-child span.overflow a:nth-child(odd) {
   background-color: #001;
 }
 
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 900px) {
   nav .full {
     display: none !important;
   }

@@ -1,22 +1,18 @@
 footer {
   background: #112;
-  padding: 0px 40px;
   width: 100%;
-  position: relative;
-  height: 120px;
-  right: 40px;
+  height: 110px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0px 0px 10px 10px #112;
-  margin-top: 20px;
   flex-shrink: 0;
+  font-size: small;
 }
 footer span {
-  margin: 0px 5px;
+  margin: 0px 10px;
   margin-top: 5px;
-  color: #667;
+  color: #556;
   text-align: center;
 }
 footer span:first-child {

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platformer Demon List</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="/src/css/main.min.css">
+    <link rel="stylesheet" href="/src/css/nav.min.css">
+    <link rel="stylesheet" href="/src/css/footer.min.css">
+    <link rel="stylesheet" href="/src/css/level.min.css">
+
+    <meta name="color-scheme" content="dark">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/meta/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/meta/favicon-16x16.png">
+    <link rel="manifest" href="/meta/site.webmanifest">
+</head>
+<body>
+    <!---->
+    <nav>
+        <div>
+            <span>
+                <a href="/">
+                    <img src="/src/img/icon-navbar-92.png">
+                    <span>
+                        <h1>Platformer Demon List</h1>
+                        <span class="swipe"><h1>Platformer Demon List</h1></span>
+                    </span>
+                </a>
+            </span>
+            <span>
+                <span class="full">
+                    <a href="/">List</a>
+                    <a href="/leaderboard">Leaderboard</a>
+                    <a href="/submit">Submit Record</a>
+                    <a href="/rules">Rules</a>
+                    <a href="/profile">Profile</a>
+                </span>
+                <button class="overflow material-symbols-outlined">menu</button>
+                <span class="overflow">
+                    <a href="/">List</a>
+                    <a href="/leaderboard">Leaderboard</a>
+                    <a href="/submit">Submit Record</a>
+                    <a href="/rules">Rules</a>
+                    <a href="/profile">Profile</a>
+                </span>
+            </span>
+        </div>
+    </nav>
+    <!---->
+    <main>
+        <div class="container">
+            <div class="level">
+                <h1>
+                    <span>#{{ level.placement }}</span>
+                    <hr>
+                    <span>{{ level.name }}</span>
+                </h1>
+                <hr>
+                <div class="users">
+                    <span>
+                        <h3>Creator</h3>
+                        <p>{{ level.creator }}</p>
+                    </span>
+                    <span>
+                        <h3>Verifier</h3>
+                        <p>{{ level.verifier.name }}</p>
+                    </span>
+                </div>
+                <section>
+                    <iframe src="http://www.youtube.com/embed/{{ level.video_id }}/" frameborder="0"></iframe>
+                    <div class="info">
+                        <span>
+                            <h3>Records</h3>
+                            <p>{{ level.records_count }}</p>
+                        </span>
+                        <span>
+                            <h3>Points when Completed</h3>
+                            <p>{{ level.points }}</p>
+                        </span>
+                        <span>
+                            <h3>ID</h3>
+                            <p>{{ level.level_id }}</p>
+                        </span>
+                    </div>
+                </section>
+            </div>
+            <!---->
+            {% if level.records_count > 0 %}
+                <div class="records">
+                    <h1>Records</h1>
+                    <div class="table">
+                        {% for record in level.records %}
+                            <a href="
+                                {% if 'https://' in record.video_id %}
+                                    {{ record.video_id }}
+                                {% else %}
+                                    https://youtu.be/{{ record.video_id }}
+                                {% endif %}
+                            " target="_blank">
+                                <span class="rank">
+                                    {% if loop.index == 1 %}
+                                        <img title="#1" src="/src/img/diamondTrophy.png">
+                                    {% elif loop.index == 2 %}
+                                        <img title="#2" src="/src/img/goldTrophy.png">
+                                    {% elif loop.index == 3 %}
+                                        <img title="#3" src="/src/img/silverTrophy.png">
+                                    {% elif loop.index == 4 %}
+                                        <img title="#4" src="/src/img/bronzeTrophy.png">
+                                    {% else %}
+                                        #{{ loop.index }}
+                                    {% endif %}
+                                </span>
+                                <span class="holder">{{ record.name }}</span>
+                                <span class="time">{{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span></span>
+                                <span class="mobile material-symbols-outlined">
+                                    {% if record.mobile %}
+                                        smartphone
+                                    {% else %}
+                                        computer
+                                    {% endif %}
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+    <!---->
+    <footer>
+        <span>© Copyright 2024 pemonlist.com</span>
+        <span>This site is in no way affiliated with RobTop Games AB, all rights reserved.</span>
+    </footer>
+    <!---->
+</body>
+
+<script src="/src/js/main.js"></script>
+<script src="/src/js/navbar.js"></script>
+<script src="/src/js/level.js"></script>
+
+</html>
