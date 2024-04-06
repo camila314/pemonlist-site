@@ -38,7 +38,9 @@ async fn leaderboard(State(state): State<AppState>) -> axum::response::Html<Stri
 
     let players: Value = state.database.query_json("select Player {
         name,
-        points
+        points,
+        rank,
+        device
     } filter .points > 0 order by .points desc", &()).await.unwrap().parse().unwrap();
 
     ctx.insert("players", &players);

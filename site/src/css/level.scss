@@ -153,11 +153,11 @@ main {
             }
     
             .holder {
-                flex-grow: 1;
                 justify-content: flex-start;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 flex-shrink: 1;
+                padding-right: 10px;
             }
 
             .time {
@@ -165,12 +165,18 @@ main {
                 justify-content: flex-end;
                 font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
 
+                .divider {
+                    flex-grow: 1;
+                    margin-right: 10px;
+                    border-top: 1px dashed #445;
+                }
+
                 .ms {
                     color: #778;
                 }
             }
 
-            .mobile {
+            .device {
                 width: 50px;
                 font-size: 30px;
             }
@@ -186,7 +192,7 @@ main {
         backdrop-filter: blur(8px) saturate(0.5);
 
         hr {
-            background-color: #aab8;
+            background-color: #8898;
         }
 
         section .info {
@@ -203,6 +209,10 @@ main {
 
             a {
                 color: #fff;
+
+                .divider {
+                    background-color: #8898;
+                }
 
                 .ms {
                     color: #99a;
@@ -269,6 +279,7 @@ body.touch {
 
         a {
             height: 35px !important;
+            font-size: medium !important;
     
             .rank {
                 width: 35px !important;
@@ -282,7 +293,7 @@ body.touch {
                 margin-right: 5px;
             }
     
-            .mobile {
+            .device {
                 display: none !important;
             }
         }

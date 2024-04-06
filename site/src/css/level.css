@@ -135,21 +135,26 @@ main {
   height: 30px;
 }
 .records .table a .holder {
-  flex-grow: 1;
   justify-content: flex-start;
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 1;
+  padding-right: 10px;
 }
 .records .table a .time {
   flex-grow: 1;
   justify-content: flex-end;
   font-family: "Droid Sans Mono", "Courier New", Courier, monospace;
 }
+.records .table a .time .divider {
+  flex-grow: 1;
+  margin-right: 10px;
+  border-top: 1px dashed #445;
+}
 .records .table a .time .ms {
   color: #778;
 }
-.records .table a .mobile {
+.records .table a .device {
   width: 50px;
   font-size: 30px;
 }
@@ -163,7 +168,7 @@ main {
           backdrop-filter: blur(8px) saturate(0.5);
 }
 .transparent .level hr {
-  background-color: rgba(170, 170, 187, 0.5333333333);
+  background-color: rgba(136, 136, 153, 0.5333333333);
 }
 .transparent .level section .info {
   background-color: rgba(0, 0, 17, 0.2666666667);
@@ -178,6 +183,9 @@ main {
 }
 .transparent .records .table a {
   color: #fff;
+}
+.transparent .records .table a .divider {
+  background-color: rgba(136, 136, 153, 0.5333333333);
 }
 .transparent .records .table a .ms {
   color: #99a;
@@ -221,6 +229,7 @@ body.touch main.transparent .table a:active {
   }
   .records .table a {
     height: 35px !important;
+    font-size: medium !important;
   }
   .records .table a .rank {
     width: 35px !important;
@@ -231,7 +240,7 @@ body.touch main.transparent .table a:active {
   .records .table a .time {
     margin-right: 5px;
   }
-  .records .table a .mobile {
+  .records .table a .device {
     display: none !important;
   }
 }/*# sourceMappingURL=level.css.map */

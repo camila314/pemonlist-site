@@ -1,0 +1,151 @@
+.search {
+  all: revert;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #334;
+  position: relative;
+}
+.search span {
+  position: absolute;
+  left: 20px;
+  pointer-events: none;
+}
+.search textarea {
+  flex-grow: 1;
+  border: none;
+  resize: none;
+  background-color: transparent;
+  height: 20px;
+  padding: 20px;
+  padding-left: 64px;
+  font-size: 17px;
+  font-family: inherit;
+}
+.search textarea:focus-visible {
+  border: none;
+  outline: none;
+}
+.search textarea::-moz-placeholder {
+  color: #778;
+}
+.search textarea::placeholder {
+  color: #778;
+}
+
+.records {
+  padding: 20px;
+  background-color: #334;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.records .highlight {
+  background-color: #f76;
+  color: #223;
+}
+.records.hidden {
+  display: none;
+}
+.records h1 {
+  margin: 0px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.records .table {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 80px);
+  background-color: #223;
+  padding: 20px;
+  border-radius: 10px;
+}
+.records .table a {
+  display: flex;
+  height: 50px;
+  color: #dde;
+  text-decoration: none;
+  font-size: larger;
+  border-radius: 5px;
+}
+.records .table a.hidden {
+  display: none;
+}
+.records .table a span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+.records .table a .rank {
+  width: 50px;
+}
+.records .table a .rank img {
+  height: 30px;
+}
+.records .table a .holder {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  justify-content: flex-start;
+  padding-right: 10px;
+}
+.records .table a .points {
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+.records .table a .points .divider {
+  flex-grow: 1;
+  margin-right: 10px;
+  border-top: 1px dashed #445;
+}
+.records .table a .device {
+  width: 50px;
+  font-size: 30px;
+}
+
+.empty {
+  background-color: #334;
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 10px;
+}
+.empty.hidden {
+  display: none;
+}
+
+body:not(.touch) main .table a:hover {
+  background-color: #334;
+}
+
+body.touch main .table a:active {
+  background-color: #334;
+}
+
+@media screen and (max-width: 600px) {
+  .records .table {
+    width: calc(100% - 40px) !important;
+  }
+  .records .table a {
+    height: 35px !important;
+    font-size: medium !important;
+  }
+  .records .table a .rank {
+    width: 35px !important;
+  }
+  .records .table a .rank img {
+    height: 20px !important;
+  }
+  .records .table a .time {
+    margin-right: 5px;
+  }
+  .records .table a .points {
+    margin-right: 5px;
+  }
+  .records .table a .device {
+    display: none !important;
+  }
+}/*# sourceMappingURL=leaderboard.css.map */

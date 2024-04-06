@@ -1,11 +1,11 @@
 // keep in mind this does not make `levels` a static variable, all values are mutable and change
 // with the page regardless of what is done. Code may look stupid on purpose
-const levels = document.querySelectorAll('.container .level')
+const levels = document.querySelectorAll('.level')
 let lastValueLength = 0
 
 // i am NOT typing this out every time
 String.prototype.highlight = function(term) {
-    return this.replace(new RegExp(`(${term})`, 'ig'), '<span class="highlight">$1</span>')
+    return this.replace(new RegExp(`(\s?)(${term})`, 'ig'), '$1<span class="highlight">$2</span>')
 }
 
 document.querySelector('.search textarea').addEventListener('input', event => {
@@ -37,5 +37,5 @@ document.querySelector('.search textarea').addEventListener('input', event => {
         level.children[1].children[1].innerHTML = author.highlight(term)
     })
 
-    document.querySelector('.container .empty').classList.toggle('hidden', !empty)
+    document.querySelector('.empty').classList.toggle('hidden', !empty)
 })

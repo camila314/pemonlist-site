@@ -5,6 +5,8 @@ module default {
 		}
 	}
 
+	scalar type Device extending enum<Mobile, Desktop, Both>;
+
 	type Player extending Dated {
 		required property name -> str {
 			constraint exclusive;
@@ -13,6 +15,9 @@ module default {
 		multi link entries := .<player[is Entry];
 		points := <int32>sum((select .entries filter .status = Status.Approved).level.points);
 		rank := getrank(<Player>.id);
+		required property device -> Device {
+			default := Device.Both;
+		};
 	}
 
 	scalar type Status extending enum<Submitted, Waiting, Investigating, Approved, Denied>;
@@ -36,8 +41,8 @@ module default {
 		required property change_type -> ChangeType;
 	}
 
-	function getrank(player: Player) -> int32
-		using (<int32>(find(array_agg(Player order by .points desc), player) + 1));
+    function getrank(player: Player) -> int32
+        using (<int32>(<int64>count(Player filter .points > player.points) + 1));
 
 	function getpoints(place: int32) -> int32
 		using (<int32>round(100 * 1000 ^ (1 / (place ^ (-1/3) + 2.178)) - 262.27*math::ln(10.82*place) + 0.639*place));

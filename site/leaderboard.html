@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platformer Demon List</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="/src/css/main.min.css">
+    <link rel="stylesheet" href="/src/css/nav.min.css">
+    <link rel="stylesheet" href="/src/css/footer.min.css">
+    <link rel="stylesheet" href="/src/css/leaderboard.min.css">
+
+    <meta name="color-scheme" content="dark">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/meta/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/meta/favicon-16x16.png">
+    <link rel="manifest" href="/meta/site.webmanifest">
+</head>
+<body>
+    <!---->
+    <nav>
+        <div>
+            <span>
+                <a href="/">
+                    <img src="/src/img/icon-navbar-92.png">
+                    <span>
+                        <h1>Platformer Demon List</h1>
+                        <span class="swipe"><h1>Platformer Demon List</h1></span>
+                    </span>
+                </a>
+            </span>
+            <span>
+                <span class="full">
+                    <a href="/">List</a>
+                    <a href="/leaderboard">Leaderboard</a>
+                    <a href="/submit">Submit Record</a>
+                    <a href="/rules">Rules</a>
+                    <a href="/profile">Profile</a>
+                </span>
+                <button class="overflow material-symbols-outlined">menu</button>
+                <span class="overflow">
+                    <a href="/">List</a>
+                    <a href="/leaderboard">Leaderboard</a>
+                    <a href="/submit">Submit Record</a>
+                    <a href="/rules">Rules</a>
+                    <a href="/profile">Profile</a>
+                </span>
+            </span>
+        </div>
+    </nav>
+    <!---->
+    <main>
+        <div class="container">
+            <div class="search">
+                <span class="material-symbols-outlined">search</span>
+                <textarea placeholder="Search"></textarea>
+            </div>
+            <div class="records">
+                <div class="table">
+                    {% for player in players %}
+                        <a href="/player/{{ player.name }}">
+                            <span class="rank">
+                                {% if player.rank <= 1 %}
+                                    <img title="#{{ player.rank }}" src="/src/img/diamondTrophy.png">
+                                {% elif player.rank <= 5 %}
+                                    <img title="#{{ player.rank }}" src="/src/img/goldTrophy.png">
+                                {% elif player.rank <= 10 %}
+                                    <img title="#{{ player.rank }}" src="/src/img/silverTrophy.png">
+                                {% elif player.rank <= 25 %}
+                                    <img title="#{{ player.rank }}" src="/src/img/bronzeTrophy.png">
+                                {% else %}
+                                    #{{ player.rank }}
+                                {% endif %}
+                            </span>
+                            <span class="holder">{{ player.name }}</span>
+                            <span class="points">
+                                <span class="divider"></span>
+                                {{ player.points }} points
+                            </span>
+                            <span class="device material-symbols-outlined">
+                                {% if player.device == 'Desktop' %}
+                                    computer
+                                {% elif player.device == 'Mobile' %}
+                                    mobile
+                                {% elif player.device == 'Both' %}
+                                    devices
+                                {% endif %}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="empty hidden">No results.</div>
+        </div>
+    </main>
+    <!---->
+    <footer>
+        <span>© Copyright 2024 pemonlist.com</span>
+        <span>This site is in no way affiliated with RobTop Games AB, all rights reserved.</span>
+    </footer>
+    <!---->
+</body>
+
+<script src="/src/js/main.js"></script>
+<script src="/src/js/navbar.js"></script>
+<script src="/src/js/leaderboard.js"></script>
+
+</html>
