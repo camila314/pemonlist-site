@@ -18,10 +18,13 @@ const levelLogger = new Logger('Level')
     }
 })()
 
+const body = document.body
+
 function adjustParallax() {
-    main.style.backgroundPositionY = `${document.body.scrollTop * 0.3}px`
+    const offset = body.scrollTop * 0.3
+    main.style.backgroundPositionY = offset + 'px'
 }
 
-document.body.addEventListener('scroll', adjustParallax, { passive: true })
+body.addEventListener('scroll', adjustParallax, { passive: true })
 
 adjustParallax()
