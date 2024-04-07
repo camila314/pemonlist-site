@@ -92,6 +92,15 @@
                 img {
                     height: 30px;
                 }
+                
+                p {
+                    position: absolute;
+                    margin: 0px;
+                    // https://owumaro.github.io/text-stroke-generator/
+                    text-shadow: rgb(17, 17, 34) 2px 0px 0px, rgb(17, 17, 34) 1.75517px 0.958851px 0px, rgb(17, 17, 34) 1.0806px 1.68294px 0px, rgb(17, 17, 34) 0.141474px 1.99499px 0px, rgb(17, 17, 34) -0.832294px 1.81859px 0px, rgb(17, 17, 34) -1.60229px 1.19694px 0px, rgb(17, 17, 34) -1.97998px 0.28224px 0px, rgb(17, 17, 34) -1.87291px -0.701566px 0px, rgb(17, 17, 34) -1.30729px -1.5136px 0px, rgb(17, 17, 34) -0.421592px -1.95506px 0px, rgb(17, 17, 34) 0.567324px -1.91785px 0px, rgb(17, 17, 34) 1.41734px -1.41108px 0px, rgb(17, 17, 34) 1.92034px -0.558831px 0px;
+                    margin-top: 27px;
+                    font-size: smaller;
+                }
             }
     
             .holder {
@@ -148,19 +157,24 @@ body.touch {
     }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 700px) {
     .records .table {
         width: calc(100% - 40px) !important;
 
         a {
-            height: 35px !important;
+            height: 40px !important;
             font-size: medium !important;
     
             .rank {
-                width: 35px !important;
+                width: 40px !important;
     
                 img {
-                    height: 20px !important;
+                    height: 25px !important;
+                }
+                    
+                p {
+                    font-size: small;
+                    margin-top: 20px !important;
                 }
             }
 

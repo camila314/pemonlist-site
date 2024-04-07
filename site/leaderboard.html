@@ -62,7 +62,11 @@
                 <div class="table">
                     {% for player in players %}
                         <a href="/player/{{ player.name }}">
-                            <span class="rank">
+                            <span title="
+                                {% if player.rank <= 25 %}
+                                    #{{ player.rank }}
+                                {% endif %}
+                            " class="rank">
                                 {% if player.rank <= 1 %}
                                     <img title="#{{ player.rank }}" src="/src/img/diamondTrophy.png">
                                 {% elif player.rank <= 5 %}
@@ -73,6 +77,9 @@
                                     <img title="#{{ player.rank }}" src="/src/img/bronzeTrophy.png">
                                 {% else %}
                                     #{{ player.rank }}
+                                {% endif %}
+                                {% if player.rank <= 25 %}
+                                    <p>#{{ player.rank }}</p>
                                 {% endif %}
                             </span>
                             <span class="holder">{{ player.name }}</span>

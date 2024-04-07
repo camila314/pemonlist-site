@@ -1,5 +1,7 @@
 // this code is copied and modified from list.js
 
+const boardLogger = new Logger('Leaderboard')
+
 // keep in mind this does not make `records` a static variable, all values are mutable and change
 // with the page regardless of what is done. Code may look stupid on purpose
 const records = document.querySelectorAll('.records .table a')
@@ -11,6 +13,8 @@ String.prototype.highlight = function(term) {
 }
 
 document.querySelector('.search textarea').addEventListener('input', event => {
+    const start = performance.now()
+
     const term = event.target.value.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&') // escape special regex chars [https://stackoverflow.com/a/3561711]
     const textAdded = (term.length - lastValueLength) > 0
     lastValueLength = term.length
@@ -41,4 +45,10 @@ document.querySelector('.search textarea').addEventListener('input', event => {
 
     document.querySelector('.records').classList.toggle('hidden', empty)
     document.querySelector('.empty').classList.toggle('hidden', !empty)
+
+    const elapsed = performance.now() - start
+    const status = term == '' ? 'refresh' : `term "${term}"`
+
+    if (elapsed > 30) boardLogger.warn(`${status} took ${elapsed}ms`)
+    else boardLogger.log(`${status} took ${elapsed}ms`)
 })

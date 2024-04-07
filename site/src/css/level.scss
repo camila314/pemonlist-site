@@ -129,56 +129,76 @@ main {
         padding: 20px;
         border-radius: 10px;
 
-        a {
-            display: flex;
-            height: 50px;
-            color: #dde;
-            text-decoration: none;
-            font-size: larger;
+        div {
             border-radius: 5px;
+            font-size: larger;
+            height: 50px;
+            display: flex;
+            align-items: stretch;
 
-            span {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-shrink: 0;
-            }
-    
-            .rank {
-                width: 50px;
-    
-                img {
-                    height: 30px;
-                }
-            }
-    
-            .holder {
-                justify-content: flex-start;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                flex-shrink: 1;
-                padding-right: 10px;
-            }
-
-            .time {
+            hr {
+                all: revert;
+                margin: 0px;
                 flex-grow: 1;
-                justify-content: flex-end;
-                font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
-
-                .divider {
-                    flex-grow: 1;
-                    margin-right: 10px;
-                    border-top: 1px dashed #445;
-                }
-
-                .ms {
-                    color: #778;
-                }
+                border: none;
+                border-top: 1px dashed #445;
+                align-self: center;
             }
 
-            .device {
-                width: 50px;
-                font-size: 30px;
+            a {
+                display: flex;
+                text-decoration: none;
+                flex-shrink: 1;
+
+                span {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-shrink: 0;
+                    text-decoration: none;
+                    color: #dde;
+                }
+        
+                .rank {
+                    width: 50px;
+        
+                    img {
+                        height: 30px;
+                    }
+
+                    p {
+                        position: absolute;
+                        margin: 0px;
+                        // https://owumaro.github.io/text-stroke-generator/
+                        text-shadow: rgb(17, 17, 34) 2px 0px 0px, rgb(17, 17, 34) 1.75517px 0.958851px 0px, rgb(17, 17, 34) 1.0806px 1.68294px 0px, rgb(17, 17, 34) 0.141474px 1.99499px 0px, rgb(17, 17, 34) -0.832294px 1.81859px 0px, rgb(17, 17, 34) -1.60229px 1.19694px 0px, rgb(17, 17, 34) -1.97998px 0.28224px 0px, rgb(17, 17, 34) -1.87291px -0.701566px 0px, rgb(17, 17, 34) -1.30729px -1.5136px 0px, rgb(17, 17, 34) -0.421592px -1.95506px 0px, rgb(17, 17, 34) 0.567324px -1.91785px 0px, rgb(17, 17, 34) 1.41734px -1.41108px 0px, rgb(17, 17, 34) 1.92034px -0.558831px 0px;
+                        margin-top: 27px;
+                        font-size: smaller;
+                    }
+                }
+        
+                .holder {
+                    justify-content: flex-start;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    flex-shrink: 1;
+                    padding-right: 10px;
+                }
+    
+                .time {
+                    padding-left: 10px;
+                    flex-shrink: 0;
+                    justify-content: flex-end;
+                    font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
+    
+                    .ms {
+                        color: #778;
+                    }
+                }
+    
+                .device {
+                    width: 50px;
+                    font-size: 30px;
+                }
             }
         }
     }
@@ -207,15 +227,17 @@ main {
         .table {
             background-color: #0014;
 
-            a {
-                color: #fff;
-
-                .divider {
-                    background-color: #8898;
+            div {
+                hr {
+                    border-top-color: #8898;
                 }
 
-                .ms {
-                    color: #99a;
+                a span {
+                    color: #fff !important;
+    
+                    .ms {
+                        color: #99a;
+                    }
                 }
             }
         }
@@ -224,12 +246,12 @@ main {
 
 body:not(.touch) {
     main {
-        .table a:hover {
+        .table div:hover {
             background-color: #334;
         }
 
         &.transparent {
-            .table a:hover {
+            .table div:hover {
                 background-color: #eef1;
             }
         }
@@ -238,12 +260,12 @@ body:not(.touch) {
 
 body.touch {
     main {
-        .table a:active {
+        .table div:active {
             background-color: #334;
         }
 
         &.transparent {
-            .table a:active {
+            .table div:active {
                 background-color: #eef1;
             }
         }
@@ -265,7 +287,7 @@ body.touch {
     }
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 700px) {
     .level section {
         flex-direction: column !important;
 
@@ -277,24 +299,32 @@ body.touch {
     .records .table {
         width: calc(100% - 40px) !important;
 
-        a {
-            height: 35px !important;
-            font-size: medium !important;
-    
-            .rank {
-                width: 35px !important;
-    
-                img {
-                    height: 20px !important;
-                }
-            }
+        div {
+            height: 40px !important;
 
-            .time {
-                margin-right: 5px;
-            }
+            a {
+                font-size: medium !important;
+        
+                .rank {
+                    width: 40px !important;
+        
+                    img {
+                        height: 20px !important;
+                    }
+                    
+                    p {
+                        font-size: x-small;
+                        margin-top: 20px !important;
+                    }
+                }
     
-            .device {
-                display: none !important;
+                .time {
+                    margin-right: 5px;
+                }
+        
+                .device {
+                    display: none !important;
+                }
             }
         }
     }

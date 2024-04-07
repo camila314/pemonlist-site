@@ -95,39 +95,50 @@
                     <h1>Records</h1>
                     <div class="table">
                         {% for record in level.records %}
-                            <a href="
-                                {% if 'https://' in record.video_id %}
-                                    {{ record.video_id }}
-                                {% else %}
-                                    https://youtu.be/{{ record.video_id }}
-                                {% endif %}
-                            " target="_blank">
-                                <span class="rank">
-                                    {% if loop.index == 1 %}
-                                        <img title="#1" src="/src/img/diamondTrophy.png">
-                                    {% elif loop.index == 2 %}
-                                        <img title="#2" src="/src/img/goldTrophy.png">
-                                    {% elif loop.index == 3 %}
-                                        <img title="#3" src="/src/img/silverTrophy.png">
-                                    {% elif loop.index == 4 %}
-                                        <img title="#4" src="/src/img/bronzeTrophy.png">
+                            <div>
+                                <a href="/player/{{ record.name }}">
+                                    <span  title="
+                                        {% if loop.index <= 4 %}
+                                            #{{ loop.index }}
+                                        {% endif %}
+                                    " class="rank">
+                                        {% if loop.index == 1 %}
+                                            <img src="/src/img/diamondTrophy.png">
+                                        {% elif loop.index == 2 %}
+                                            <img src="/src/img/goldTrophy.png">
+                                        {% elif loop.index == 3 %}
+                                            <img src="/src/img/silverTrophy.png">
+                                        {% elif loop.index == 4 %}
+                                            <img src="/src/img/bronzeTrophy.png">
+                                        {% else %}
+                                            #{{ loop.index }}
+                                        {% endif %}
+                                        {% if loop.index <= 4 %}
+                                            <p>#{{ loop.index }}</p>
+                                        {% endif %}
+                                    </span>
+                                    <span class="holder">{{ record.name }}</span>
+                                </a>
+                                <hr class="divider"></hr>
+                                <a href="
+                                    {% if 'https://' in record.video_id %}
+                                        {{ record.video_id }}
                                     {% else %}
-                                        #{{ loop.index }}
+                                        https://youtu.be/{{ record.video_id }}
                                     {% endif %}
+                                " target="_blank">
+                                    <span class="time">
+                                        {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+                                    </span>
+                                    <span class="device material-symbols-outlined">
+                                        {% if record.mobile %}
+                                            smartphone
+                                        {% else %}
+                                            computer
+                                        {% endif %}
+                                </a>
                                 </span>
-                                <span class="holder">{{ record.name }}</span>
-                                <span class="time">
-                                    <span class="divider"></span>
-                                    {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
-                                </span>
-                                <span class="device material-symbols-outlined">
-                                    {% if record.mobile %}
-                                        smartphone
-                                    {% else %}
-                                        computer
-                                    {% endif %}
-                                </span>
-                            </a>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>

@@ -1,3 +1,5 @@
+const listLogger = new Logger('List')
+
 // keep in mind this does not make `levels` a static variable, all values are mutable and change
 // with the page regardless of what is done. Code may look stupid on purpose
 const levels = document.querySelectorAll('.level')
@@ -9,6 +11,8 @@ String.prototype.highlight = function(term) {
 }
 
 document.querySelector('.search textarea').addEventListener('input', event => {
+    const start = performance.now()
+
     const term = event.target.value.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&') // escape special regex chars [https://stackoverflow.com/a/3561711]
     const textAdded = (term.length - lastValueLength) > 0
     lastValueLength = term.length
@@ -45,4 +49,10 @@ document.querySelector('.search textarea').addEventListener('input', event => {
     })
 
     document.querySelector('.empty').classList.toggle('hidden', !empty)
+
+    const elapsed = performance.now() - start
+    const status = term == '' ? 'refresh' : `term "${term}"`
+
+    if (elapsed > 30) listLogger.warn(`${status} took ${elapsed}ms`)
+    else listLogger.log(`${status} took ${elapsed}ms`)
 })
