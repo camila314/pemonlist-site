@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/src/css/main.min.css">
     <link rel="stylesheet" href="/src/css/nav.min.css">
     <link rel="stylesheet" href="/src/css/footer.min.css">
-    <link rel="stylesheet" href="/src/css/leaderboard.min.css">
+    <link rel="stylesheet" href="/src/css/list.min.css">
 
     <meta name="color-scheme" content="dark">
 
@@ -54,46 +54,7 @@
     <!---->
     <main>
         <div class="container">
-            <div class="search">
-                <span class="material-symbols-outlined">search</span>
-                <textarea placeholder="Search"></textarea>
-            </div>
-            <div class="records">
-                <div class="table">
-                    {% for player in players %}
-                        <a href="/player/{{ player.name }}">
-                            <span class="rank">
-                                {% if player.rank <= 1 %}
-                                    <img title="#{{ player.rank }}" src="/src/img/diamondTrophy.png">
-                                {% elif player.rank <= 5 %}
-                                    <img title="#{{ player.rank }}" src="/src/img/goldTrophy.png">
-                                {% elif player.rank <= 10 %}
-                                    <img title="#{{ player.rank }}" src="/src/img/silverTrophy.png">
-                                {% elif player.rank <= 25 %}
-                                    <img title="#{{ player.rank }}" src="/src/img/bronzeTrophy.png">
-                                {% else %}
-                                    #{{ player.rank }}
-                                {% endif %}
-                            </span>
-                            <span class="holder">{{ player.name }}</span>
-                            <span class="points">
-                                <span class="divider"></span>
-                                {{ player.points }} points
-                            </span>
-                            <span class="device material-symbols-outlined">
-                                {% if player.device == 'Desktop' %}
-                                    computer
-                                {% elif player.device == 'Mobile' %}
-                                    smartphone
-                                {% elif player.device == 'Both' %}
-                                    devices
-                                {% endif %}
-                            </span>
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="empty hidden">No results.</div>
+            
         </div>
     </main>
     <!---->
@@ -106,6 +67,6 @@
 
 <script src="/src/js/main.js"></script>
 <script src="/src/js/navbar.js"></script>
-<script src="/src/js/leaderboard.js"></script>
+<script src="/src/js/list.js"></script>
 
 </html>

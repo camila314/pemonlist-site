@@ -5,7 +5,7 @@ let lastValueLength = 0
 
 // i am NOT typing this out every time
 String.prototype.highlight = function(term) {
-    return this.replace(new RegExp(`(\s?)(${term})`, 'ig'), '$1<span class="highlight">$2</span>')
+    return this.replace(new RegExp(`(${term})`, 'ig'), '<span class="highlight">$1</span>')
 }
 
 document.querySelector('.search textarea').addEventListener('input', event => {
@@ -15,15 +15,12 @@ document.querySelector('.search textarea').addEventListener('input', event => {
 
     let empty = true
 
-    // resetting everything when the search term is empty has no effect when highlighting,
-    // as having to reset the highlights as well is the same if not slower
-
     levels.forEach(level => {
         if (textAdded && level.classList.contains('hidden')) return // skip searching hidden results if text is added
 
-        const placement = level.children[2].innerText
-        const title = level.children[1].children[0].innerText
-        const author = level.children[1].children[1].innerText
+        const placement = level.children[2].innerText.replace(/\n/g, '')
+        const title = level.children[1].children[0].innerText.replace(/\n/g, '')
+        const author = level.children[1].children[1].innerText.replace(/\n/g, '')
         const search = placement + title + author // combine search string for faster checking
 
         const match = search.match(new RegExp(term, 'i')) != null
@@ -31,6 +28,16 @@ document.querySelector('.search textarea').addEventListener('input', event => {
         level.classList.toggle('hidden', !match)
 
         if (match) empty = false
+
+        // much faster way to reset everything than doing it before checking
+        // because we loop through everything anyway
+        if (term == '') {
+            level.children[2].innerHTML = placement
+            level.children[1].children[0].innerHTML = title
+            level.children[1].children[1].innerHTML = author
+
+            return
+        }
 
         level.children[2].innerHTML = placement.highlight(term)
         level.children[1].children[0].innerHTML = title.highlight(term)

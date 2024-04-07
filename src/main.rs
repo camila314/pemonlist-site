@@ -82,9 +82,9 @@ async fn player(State(state): State<AppState>, Path(username): Path<String>) -> 
         records := (select .entries {
             level: { name },
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
-            time_ms := (select to_str(.time, \"MS\"))
-            rank := count((select detached Entry filter Entry.time < .time))
-        } order by .rank limit 5),
+            time_ms := (select to_str(.time, \"MS\")),
+            _rank := count((select detached Entry filter Entry.time < .time))
+        } order by .rank),
         rank,
         all_players := (select detached Player {
             name,

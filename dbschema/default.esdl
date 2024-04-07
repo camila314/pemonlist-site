@@ -14,7 +14,7 @@ module default {
 
 		multi link entries := .<player[is Entry];
 		points := <int32>sum((select .entries filter .status = Status.Approved).level.points);
-		rank := getrank(<Player>.id);
+		rank := getPlayerRank(<Player>.id);
 		required property device -> Device {
 			default := Device.Both;
 		};
@@ -33,6 +33,7 @@ module default {
 
 		required link player -> Player;
 		required link level -> Level;
+		rank := getTimeRank(<Entry>.id)
 	}
 
 	scalar type ChangeType extending enum<Add, Edit, Remove>;
@@ -41,10 +42,13 @@ module default {
 		required property change_type -> ChangeType;
 	}
 
-    function getrank(player: Player) -> int32
+    function getPlayerRank(player: Player) -> int32
         using (<int32>(<int64>count(Player filter .points > player.points) + 1));
 
-	function getpoints(place: int32) -> int32
+	function getTimeRank(entry: Entry) -> int32
+        using (<int32>(<int64>count(Entry filter .time > entry.time) + 1));
+
+	function getPoints(place: int32) -> int32
 		using (<int32>round(100 * 1000 ^ (1 / (place ^ (-1/3) + 2.178)) - 262.27*math::ln(10.82*place) + 0.639*place));
 
 	type Level extending Dated {
@@ -59,7 +63,7 @@ module default {
 			default := (count(Level) + 1);
 		};
 
-		points := getpoints(.placement);
+		points := getPoints(.placement);
 
 		required link verifier -> Player;
 
