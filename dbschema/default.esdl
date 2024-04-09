@@ -46,7 +46,7 @@ module default {
         using (<int32>(<int64>count(Player filter .points > player.points) + 1));
 
 	function getTimeRank(entry: Entry) -> int32
-        using (<int32>(<int64>count(Entry filter .time > entry.time) + 1));
+        using (<int32>(<int64>count(Entry filter .time < entry.time and .level = entry.level) + 1));
 
 	function getPoints(place: int32) -> int32
 		using (<int32>round(100 * 1000 ^ (1 / (place ^ (-1/3) + 2.178)) - 262.27*math::ln(10.82*place) + 0.639*place));

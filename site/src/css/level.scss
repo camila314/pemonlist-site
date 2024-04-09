@@ -161,16 +161,18 @@ main {
         
                 .rank {
                     width: 50px;
+                    user-select: none;
         
                     img {
                         height: 30px;
+                        -webkit-user-drag: none;
                     }
 
                     p {
                         position: absolute;
                         margin: 0px;
                         // https://owumaro.github.io/text-stroke-generator/
-                        text-shadow: rgb(17, 17, 34) 2px 0px 0px, rgb(17, 17, 34) 1.75517px 0.958851px 0px, rgb(17, 17, 34) 1.0806px 1.68294px 0px, rgb(17, 17, 34) 0.141474px 1.99499px 0px, rgb(17, 17, 34) -0.832294px 1.81859px 0px, rgb(17, 17, 34) -1.60229px 1.19694px 0px, rgb(17, 17, 34) -1.97998px 0.28224px 0px, rgb(17, 17, 34) -1.87291px -0.701566px 0px, rgb(17, 17, 34) -1.30729px -1.5136px 0px, rgb(17, 17, 34) -0.421592px -1.95506px 0px, rgb(17, 17, 34) 0.567324px -1.91785px 0px, rgb(17, 17, 34) 1.41734px -1.41108px 0px, rgb(17, 17, 34) 1.92034px -0.558831px 0px;
+                        text-shadow: #112 2px 0px 0px, #112 1.75517px 0.958851px 0px, #112 1.0806px 1.68294px 0px, #112 0.141474px 1.99499px 0px, #112 -0.832294px 1.81859px 0px, #112 -1.60229px 1.19694px 0px, #112 -1.97998px 0.28224px 0px, #112 -1.87291px -0.701566px 0px, #112 -1.30729px -1.5136px 0px, #112 -0.421592px -1.95506px 0px, #112 0.567324px -1.91785px 0px, #112 1.41734px -1.41108px 0px, #112 1.92034px -0.558831px 0px;
                         margin-top: 27px;
                         font-size: smaller;
                     }

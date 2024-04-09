@@ -62,10 +62,10 @@ async fn level(State(state): State<AppState>, Path(level_id): Path<u64>) -> axum
             name := .player.name,
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
             time_ms := (select to_str(.time, \"MS\")),
-            video_id := .video_id,
-            mobile := .mobile
-        } order by .time),
-        records_count := count(.entries)
+            video_id,
+            mobile,
+            rank
+        } order by .time)
     } filter .level_id = <int64>$0", &(level_id as i64,)).await.unwrap().parse().unwrap();
 
     ctx.insert("level", &level.as_array().unwrap()[0]);
@@ -80,16 +80,12 @@ async fn player(State(state): State<AppState>, Path(username): Path<String>) -> 
         points,
         verifications := (select Level { name } filter .verifier = <Player>Player.id),
         records := (select .entries {
-            level: { name },
+            level: { name, level_id },
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
-            time_ms := (select to_str(.time, \"MS\")),
-            _rank := count((select detached Entry filter Entry.time < .time))
+            time_ms := (select to_str(.time, \"MS\"))
         } order by .rank),
         rank,
-        all_players := (select detached Player {
-            name,
-            points
-        } order by .points desc)
+        device
     } filter .name = <str>$0", &(username,)).await.unwrap().parse().unwrap();
 
     ctx.insert("player", &player.as_array().unwrap()[0]);

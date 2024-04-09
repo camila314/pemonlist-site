@@ -54,8 +54,68 @@
     <!---->
     <main>
         <div class="container">
-            <div>
+            <div class="player">
+                <h1>
+                    <span title="
+                        {% if player.rank <= 25 %}
+                            #{{ player.rank }}
+                        {% endif %}
+                    " class="rank">
+                        {% if player.rank <= 1 %}
+                            <img title="#{{ player.rank }}" src="/src/img/diamondTrophy.png">
+                        {% elif player.rank <= 5 %}
+                            <img title="#{{ player.rank }}" src="/src/img/goldTrophy.png">
+                        {% elif player.rank <= 10 %}
+                            <img title="#{{ player.rank }}" src="/src/img/silverTrophy.png">
+                        {% elif player.rank <= 25 %}
+                            <img title="#{{ player.rank }}" src="/src/img/bronzeTrophy.png">
+                        {% else %}
+                            #{{ player.rank }}
+                        {% endif %}
 
+                        {% if player.rank <= 25 %}
+                            <p class="
+                                {% if player.rank <= 1 %}
+                                    diamond
+                                {% elif player.rank <= 5 %}
+                                    gold
+                                {% elif player.rank <= 10 %}
+                                    silver
+                                {% elif player.rank <= 25 %}
+                                    bronze
+                                {% endif %}
+                            ">#{{ player.rank }}</p>
+                        {% endif %}
+                    </span>
+                    <hr>
+                    <span class="name">
+                        {{ player.name }}
+                        <span class="device material-symbols-outlined">
+                            {% if player.device == 'Desktop' %}
+                                computer
+                            {% elif player.device == 'Mobile' %}
+                                smartphone
+                            {% elif player.device == 'Both' %}
+                                devices
+                            {% endif %}
+                        </span>
+                    </span>
+                </h1>
+                <hr>
+                <div class="stats">
+                    <span>
+                        <h3>Score</h3>
+                        <p>{{ player.points }}</p>
+                    </span>
+                    <span>
+                        <h3>Completions</h3>
+                        <p>{{ player.records | length }}</p>
+                    </span>
+                    <span>
+                        <h3>Verifications</h3>
+                        <p>{{ player.verifications | length }}</p>
+                    </span>
+                </div>
             </div>
         </div>
     </main>
