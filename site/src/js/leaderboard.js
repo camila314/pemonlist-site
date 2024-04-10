@@ -4,7 +4,7 @@ const boardLogger = new Logger('Leaderboard')
 
 // keep in mind this does not make `records` a static variable, all values are mutable and change
 // with the page regardless of what is done. Code may look stupid on purpose
-const records = document.querySelectorAll('.records .table a')
+const records = document.querySelectorAll('.players .table a')
 let lastValueLength = 0
 
 // i am NOT typing this out every time
@@ -43,7 +43,7 @@ document.querySelector('.search textarea').addEventListener('input', event => {
         record.children[1].innerHTML = holder.highlight(term)
     })
 
-    document.querySelector('.records').classList.toggle('hidden', empty)
+    document.querySelector('.players').classList.toggle('hidden', empty)
     document.querySelector('.empty').classList.toggle('hidden', !empty)
 
     const elapsed = performance.now() - start
