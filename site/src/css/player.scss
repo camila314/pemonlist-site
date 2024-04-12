@@ -34,7 +34,7 @@
                 margin: 0px;
                 // https://owumaro.github.io/text-stroke-generator/
                 text-shadow: #112 2px 0px 0px, #112 1.75517px 0.958851px 0px, #112 1.0806px 1.68294px 0px, #112 0.141474px 1.99499px 0px, #112 -0.832294px 1.81859px 0px, #112 -1.60229px 1.19694px 0px, #112 -1.97998px 0.28224px 0px, #112 -1.87291px -0.701566px 0px, #112 -1.30729px -1.5136px 0px, #112 -0.421592px -1.95506px 0px, #112 0.567324px -1.91785px 0px, #112 1.41734px -1.41108px 0px, #112 1.92034px -0.558831px 0px;
-                margin-top: 27px;
+                margin-top: 36px;
                 font-size: x-large;
 
                 &.diamond {
@@ -102,8 +102,121 @@
     }
 }
 
-@media screen and (max-width: 700px) {
-    .player {
+.records {
+    padding: 20px;
+    background-color: #334;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
+
+    h1 {
+        margin: 0px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .table {
+        display: flex;
+        flex-direction: column;
+        width: calc(100% - 80px);
+        background-color: #223;
+        padding: 20px;
+        border-radius: 10px;
+
+        div {
+            border-radius: 5px;
+            font-size: larger;
+            height: 50px;
+            display: flex;
+            align-items: stretch;
+
+            hr {
+                all: revert;
+                margin: 0px;
+                flex-grow: 1;
+                border: none;
+                border-top: 1px dashed #445;
+                align-self: center;
+            }
+
+            a {
+                display: flex;
+                text-decoration: none;
+                flex-shrink: 1;
+
+                span {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-shrink: 0;
+                    text-decoration: none;
+                    color: #dde;
+                }
         
+                .placement, .rank {
+                    width: 50px;
+                    user-select: none;
+                }
+        
+                .level {
+                    justify-content: flex-start;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    flex-shrink: 1;
+                    padding-right: 10px;
+                }
+    
+                .time {
+                    padding-left: 10px;
+                    flex-shrink: 0;
+                    justify-content: flex-end;
+                    font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
+    
+                    .ms {
+                        color: #778;
+                    }
+                }
+            }
+        }
+    }
+}
+
+body:not(.touch) {
+    .records {
+        .table div:hover {
+            background-color: #334;
+        }
+    }
+}
+
+body.touch {
+    .records {
+        .table div:active {
+            background-color: #334;
+        }
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .records .table {
+        width: calc(100% - 40px) !important;
+
+        div {
+            height: 40px !important;
+
+            a {
+                font-size: medium !important;
+    
+                .time {
+                    margin-right: 5px;
+                }
+        
+                .device {
+                    display: none !important;
+                }
+            }
+        }
     }
 }

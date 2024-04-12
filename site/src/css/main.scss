@@ -43,3 +43,11 @@ main {
         width: 100%;
     }
 }
+
+a.proper {
+    color: #88f;
+
+    &:visited, &:active {
+        color: #f88;
+    }
+}

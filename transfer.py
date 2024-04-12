@@ -66,16 +66,14 @@ def transfer_level(path, placement):
 				name := <str>$player,
 				device := <Device>Device.Desktop
 			}""", player = record["user"])
-		if not player:
-			print("    nah what")
-			return
 
 		dt = datetime.strptime(record["hz"], "%H:%M:%S.%f")
 		delta = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second, microseconds=dt.microsecond)
 
 		video_id = vid_id(record.get("link", ""))
 		if (video_id == ""):
-			return print(f"    {record['user']}'s record video not set")
+			print(f"    {record['user']}'s record video not set")
+			continue
 
 		client.query_single("""insert Entry {
 			status := Status.Approved,
@@ -105,3 +103,18 @@ client.execute("delete Player")
 
 for placement, level in enumerate(rankings):
 	transfer_level(data_path + "/" + level + ".json", placement + 1)
+
+print("Setting mobile players")
+
+mobile = [
+	'ZainAhmed',
+	'Colouts',
+	'ZynTagY_927',
+	'SWB Pro',
+	'Lexi'
+]
+
+for player in mobile:
+	print(f"    {player}")
+	client.execute("update Player filter .name = <str>$player set { device := Device.Mobile }", player = player)
+	client.execute("update Entry filter .player.name = <str>$player set { mobile := true }", player = player)

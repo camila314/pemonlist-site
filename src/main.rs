@@ -80,10 +80,12 @@ async fn player(State(state): State<AppState>, Path(username): Path<String>) -> 
         points,
         verifications := (select Level { name } filter .verifier = <Player>Player.id),
         records := (select .entries {
-            level: { name, level_id },
+            level: { name, level_id, placement },
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
-            time_ms := (select to_str(.time, \"MS\"))
-        } order by .rank),
+            time_ms := (select to_str(.time, \"MS\")),
+            video_id,
+            rank
+        } order by .level.placement),
         rank,
         device
     } filter .name = <str>$0", &(username,)).await.unwrap().parse().unwrap();
@@ -111,6 +113,8 @@ async fn main() {
         .route("/player/:username", get(player))
         .route("/submit", get(submit))
         .route_service("/rules", ServeFile::new("site/rules.html"))
+        .route_service("/terms", ServeFile::new("site/terms.html"))
+        .route_service("/privacy", ServeFile::new("site/privacy.html"))
         .nest_service("/src", ServeDir::new("site/src"))
         .nest_service("/meta", ServeDir::new("site/meta"))
         .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
