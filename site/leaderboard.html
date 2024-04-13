@@ -52,12 +52,18 @@
         </div>
     </nav>
     <!---->
+    <button class="jump hidden">
+        <span class="material-symbols-outlined">arrow_upward_alt</span>
+        <p>Scroll to Top</p>
+    </button>
+    <!---->
     <main>
         <div class="container">
             <div class="search">
                 <span class="material-symbols-outlined">search</span>
                 <textarea placeholder="Search"></textarea>
             </div>
+            <hr>
             <div class="players">
                 <div class="table">
                     {% for player in players %}
@@ -128,5 +134,6 @@
 <script src="/src/js/main.js"></script>
 <script src="/src/js/navbar.js"></script>
 <script src="/src/js/leaderboard.js"></script>
+<script src="/src/js/jump.js"></script>
 
 </html>
