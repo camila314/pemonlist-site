@@ -1,4 +1,4 @@
-const listLogger = new Logger('List')
+const searchLogger = new Logger('List', 'Search')
 
 // keep in mind this does not make `levels` a static variable, all values are mutable and change
 // with the page regardless of what is done. Code may look stupid on purpose
@@ -53,6 +53,29 @@ document.querySelector('.search textarea').addEventListener('input', event => {
     const elapsed = performance.now() - start
     const status = term == '' ? 'refresh' : `term "${term}"`
 
-    if (elapsed > 30) listLogger.warn(`${status} took ${elapsed}ms`)
-    else listLogger.log(`${status} took ${elapsed}ms`)
+    if (elapsed > 30) searchLogger.warn(`${status} took ${elapsed}ms`)
+    else searchLogger.log(`${status} took ${elapsed}ms`)
 })
+
+const imgLogger = new Logger('List', 'ImageLoader')
+
+document.querySelectorAll('.level .img img').forEach(img => img.onload = handleImageLoad)
+
+async function handleImageLoad(e) {
+    if (e.target.naturalWidth != 120) return
+    const videoid = e.target.src.match(/\/vi\/([^\/]+)/)[1]
+    const res = e.target.src.match(/\/(\w+)default\.jpg$/)[1].toLowerCase()
+    const split = e.target.src.split(/\w+(default\.jpg)$/)
+    split.pop()
+
+    switch (res) {
+        case 'maxres':
+            imgLogger.warn('Video ID', videoid, 'failed to load MAXRES, falling back to SD')
+            e.target.src = split.join('sd')
+            break
+        case 'sd':
+            imgLogger.warn('Video ID', videoid, 'failed to load SD, falling back to HQ')
+            e.target.src = split.join('hq')
+            break
+    }
+}

@@ -52,6 +52,11 @@
         </div>
     </nav>
     <!---->
+    <button class="jump">
+        <span class="material-symbols-outlined">arrow_upward_alt</span>
+        <p>Scroll to Top</p>
+    </button>
+    <!---->
     <main>
         <div class="container">
             <div class="search">
@@ -61,11 +66,12 @@
             <hr>
             {% for level in levels %}
                 <div class="level">
-                    <a  class="img"
-                        style="background-image: url('https://img.youtube.com/vi/{{ level.video_id }}/hqdefault.jpg')"
+                    <a class="img"
                         href="https://youtube.com/watch?v={{ level.video_id }}"
                         target="_blank"
-                    ></a>
+                    >
+                        <img loading="lazy" src="https://img.youtube.com/vi/{{ level.video_id }}/maxresdefault.jpg" alt="{{ level.name }}'s Thumbnail">
+                    </a>
                     <a class="info" href="/level/{{ level.level_id }}">
                         <h2>{{ level.name }}</h2>
                         <p>{{ level.creator }}</p>
@@ -109,5 +115,6 @@
 <script src="/src/js/main.js"></script>
 <script src="/src/js/navbar.js"></script>
 <script src="/src/js/list.js"></script>
+<script src="/src/js/jump.js"></script>
 
 </html>

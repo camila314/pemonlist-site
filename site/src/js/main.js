@@ -1,11 +1,9 @@
 class Logger {
     prefix = ''
-    constructor(prefix = null) {
-        if (!prefix) return
-
-        this.prefix = `[${
-            prefix.split(' ').map(s => (s[0].toUpperCase() + s.substr(1))).join(' ')
-        }]`
+    
+    constructor(...prefixes) {
+        prefixes.map(p => p.split(' ').map(s => (s[0].toUpperCase() + s.substr(1))).join(' '))
+        this.prefix = `[${prefixes.join('] [')}]`
     }
 
     debug(...content) {
