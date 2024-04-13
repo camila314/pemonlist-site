@@ -108,4 +108,9 @@ body.touch {
         opacity: 0;
         pointer-events: none;
     }
+
+    &.low {
+        bottom: unset;
+        position: absolute;
+    }
 }

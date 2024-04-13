@@ -99,6 +99,12 @@ async fn submit(State(state): State<AppState>) -> axum::response::Html<String> {
     state.template.render("submit.html", &ctx).unwrap().into()
 }
 
+async fn profile(State(state): State<AppState>) -> axum::response::Html<String> {
+    let ctx = Context::new();
+
+    state.template.render("profile.html", &ctx).unwrap().into()
+}
+
 #[tokio::main]
 async fn main() {
     let state = AppState { 
@@ -112,12 +118,15 @@ async fn main() {
         .route("/leaderboard", get(leaderboard))
         .route("/player/:username", get(player))
         .route("/submit", get(submit))
+        .route("/profile", get(profile))
+
         .route_service("/rules", ServeFile::new("site/rules.html"))
         .route_service("/terms", ServeFile::new("site/terms.html"))
         .route_service("/privacy", ServeFile::new("site/privacy.html"))
+        .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
+
         .nest_service("/src", ServeDir::new("site/src"))
         .nest_service("/meta", ServeDir::new("site/meta"))
-        .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
         .with_state(state);
 
     // Set up 

@@ -62,13 +62,12 @@ nav {
                     background: linear-gradient(90deg, #fc4, #f76);
                     background-clip: text;
                     -webkit-text-fill-color: transparent;
-                    width: 305px;
                     position: unset;
                 }
             }
 
             &:hover span.swipe {
-                width: 305px;
+                width: 245px;
             }
         }
 
