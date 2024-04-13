@@ -147,6 +147,8 @@ main {
 
             a {
                 display: flex;
+                justify-content: center;
+                align-items: center;
                 text-decoration: none;
                 flex-shrink: 1;
 
@@ -184,6 +186,11 @@ main {
                     text-overflow: ellipsis;
                     flex-shrink: 1;
                     padding-right: 10px;
+                    -webkit-line-clamp: 2;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    max-height: 38px;
+                    overflow-wrap: anywhere;
                 }
     
                 .time {
@@ -302,7 +309,7 @@ body.touch {
         width: calc(100% - 40px) !important;
 
         div {
-            height: 40px !important;
+            height: 45px !important;
 
             a {
                 font-size: medium !important;

@@ -13,7 +13,7 @@ const body = document.body
     jumpButton.addEventListener('click', () => body.scrollTo({ top: 0, behavior: 'smooth' }))
 
     function updateJumpButton() {
-        const shown = body.scrollTop > 120
+        const shown = body.scrollTop > 150
         jumpButton.classList.toggle('hidden', !shown)
     }
 

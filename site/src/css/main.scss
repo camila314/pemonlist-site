@@ -54,7 +54,6 @@ a.proper {
 
 button {
     padding: 12px;
-    margin-left: 7px;
     border-radius: 10px;
     background-color: #112;
     border: #334 2px solid;
@@ -89,9 +88,9 @@ body.touch {
 
 .jump {
     position: fixed;
-    bottom: 20px;
+    bottom: 10px;
+    left: 10px;
     opacity: 1;
-    right: 20px;
     z-index: 2;
     cursor: pointer;
     display: flex;
