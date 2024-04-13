@@ -6,7 +6,7 @@ const body = document.body
 ;(async function() {
     if (!jumpButton) return
 
-    const worthJumping = body.scrollHeight > window.innerHeight * 2
+    const worthJumping = body.scrollHeight > window.innerHeight * 2.5
 
     if (!worthJumping) return jumpLogger.log('Page too short to enable jump button')
 
