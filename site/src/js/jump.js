@@ -12,20 +12,22 @@ const body = document.body
 
     const main = document.querySelector('main')
 
+    main.style.paddingBottom = '72px' // [52px button height] + [10px padding top and bottom]
+
     jumpButton.addEventListener('click', () => body.scrollTo({ top: 0, behavior: 'smooth' }))
 
     const contentHeight = main.clientHeight + 70
-    const footerHeight = main.clientHeight + 8 // i don't know why but it works so shut up
+    const footerHeight = main.clientHeight + 8 // 70 - [52px button height] - [10px padding]
 
-    const shownHeight = window.innerHeight * .3
+    const shownHeight = window.innerHeight * .7
 
     function updateJumpButton() {
         const shown = body.scrollTop > shownHeight
         jumpButton.classList.toggle('hidden', !shown)
 
-        const toLow = contentHeight < body.scrollTop + innerHeight
-        jumpButton.classList.toggle('low', toLow)
-        jumpButton.style.top = toLow ? (footerHeight + 'px') : 'unset'
+        const tooLow = contentHeight < body.scrollTop + innerHeight
+        jumpButton.classList.toggle('low', tooLow)
+        jumpButton.style.top = tooLow ? (footerHeight + 'px') : 'unset'
     }
 
     body.addEventListener('scroll', updateJumpButton, { passive: true })

@@ -7,12 +7,20 @@ edition = "2021"
 
 [dependencies]
 axum = "0.7.4"
+axum-extra = { version = "0.9.3", features = ["cookie"] }
+chrono = "0.4.38"
+dotenv = "0.15.0"
 edgedb-derive = "0.5.1"
 edgedb-protocol = "0.6.0"
 edgedb-tokio = {version = "0.5.0", features = ["derive"]}
+google-oauth = "1.10.2"
+rand = "0.8.5"
+reqwest = "0.12.3"
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.114"
 tera = "1.19.1"
+time = "0.3.36"
 tokio = { version = "1.36.0", features = ["full"] }
 tower = "0.4.13"
 tower-http = { version = "0.5.2", features = ["fs"] }
+url = "2.5.0"

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platformer Demon List</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="/src/css/min/main.min.css">
+    <link rel="stylesheet" href="/src/css/min/nav.min.css">
+    <link rel="stylesheet" href="/src/css/min/footer.min.css">
+    <meta name="color-scheme" content="dark">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/meta/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/meta/favicon-16x16.png">
+    <link rel="manifest" href="/meta/site.webmanifest">
+</head>
+<body>
+    <!---->
+    {% include "template/nav.html" %}
+    <!---->
+    <button class="jump hidden">
+        <span class="material-symbols-outlined">arrow_upward_alt</span>
+        <p>Scroll to Top</p>
+    </button>
+    <!---->
+    <main>
+        <div class="container">
+            <h1>Rules</h1>
+
+            <p>To submit a record on this list, you must have:</p>
+            <ul>
+                <li>
+                    <h4>Achieved the record without the use of hacks.</h4>
+                    <p>Unlimited FPS is allowed, Physics Bypass is prohibited. Usage of Noclip Accuracy may lead to an invalid completion if the endscreen shows more than 0 deaths even though Noclip was not used.</p>
+                </li>
+                <li>
+                    <h4>Achieved the record on the level that is listed on the site.</h4>
+                    <p>Please check the level ID before you submit a record. You are allowed to beat the Low Detail Mode Versions listed in the "Pemonlist LDM" List ingame. It is prohibited to change the levels in any way.</p>
+                </li>
+            </ul>
+            
+            <p>When recording a completion:</p>
+            <ul>
+                <li>
+                    <p>The recording must also show the player hit the end trigger AND the endscreen with the time shown on said endscreen, or the completion will be invalidated.</p>
+                </li>
+                <li>
+                    <p>The recording must have clicks for extreme demon completions.</p>
+                </li>
+                <li>
+                    <p>The completion may not include any exploits (Secret Ways, Bugs, Pause Buffering) - Small skips are fine.</p>
+                </li>
+                <li>
+                    <p>The record may be achieved with the Globed mod active. (Subject to change depending on what gets added in the future of the mod)</p>
+                </li>
+            </ul>
+            
+            <p>Keep in mind:</p>
+            <ul>
+                <li>
+                    <p>The Usage of the "Hitbox on Death" Hack is prohibited for memory levels or levels where it serves a clear advantage over not using it.</p>
+                </li>
+                <li>
+                    <p>The Usage of the "Click Between Frames" Mod is prohibited as it significantly gives an advantage over not using it.</p>
+                </li>
+            </ul>
+        </div>
+    </main>
+    <!---->
+    {% include "template/footer.html" %}
+    <!---->
+</body>
+
+<script src="/src/js/main.js"></script>
+<script src="/src/js/navbar.js"></script>
+<script src="/src/js/jump.js"></script>
+
+</html>

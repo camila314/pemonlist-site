@@ -20,6 +20,30 @@ module default {
 		};
 	}
 
+	type Account {
+		multi link tokens := .<account[is AuthToken];
+
+		required property image -> str {
+			default := "";
+		};
+
+		required property oauth2 -> str;
+		required property email -> str;
+
+		link player -> Player {
+			default := <default::Player>{};
+		};
+	}
+
+	type AuthToken {
+		required property token -> str;
+		required property expires -> datetime {
+			default := <datetime>(datetime_of_statement() + <cal::relative_duration>'7d');
+		};
+
+		required link account -> Account;
+	}
+
 	scalar type Status extending enum<Submitted, Waiting, Investigating, Approved, Denied>;
 
 	type Entry extending Dated {

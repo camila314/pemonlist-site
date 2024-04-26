@@ -35,4 +35,7 @@ const mainLogger = new Logger('Main')
 
 mainLogger.log('suck it mechabrandon')
 
-if ('ontouchstart' in window) document.body.classList.add('touch')
+if ('ontouchstart' in window) {
+    mainLogger.info('device seems to be a touchscreen')
+    document.body.classList.add('touch')
+}
