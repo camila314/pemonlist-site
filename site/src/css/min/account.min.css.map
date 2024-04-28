@@ -1,0 +1,1 @@
+{"version":3,"sources":["..\\account.scss"],"names":[],"mappings":"AACI,eACI,WAAA,CACA,gBAAA","file":"account.min.css","sourcesContent":[".player {\r\n    h1 img {\r\n        height: 48px;\r\n        aspect-ratio: 1/1;\r\n    }\r\n}"]}

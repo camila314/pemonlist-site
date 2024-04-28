@@ -146,7 +146,27 @@ async fn profile(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
             println!("token_cookie: {:?}", value);
 
             let token: Value = state.database.query_json("
-                select AuthToken { account: { id, image, player: { * } } } filter .token = <str>$0
+                select AuthToken {
+                    account: {
+                        id,
+                        image,
+                        player: {
+                            id, 
+                            name,
+                            points,
+                            verifications := (select Level { name } filter .verifier = <Player>AuthToken.account.player.id),
+                            records := (select .entries {
+                                level: { name, level_id, placement },
+                                time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
+                                time_ms := (select to_str(.time, \"MS\")),
+                                video_id,
+                                rank
+                            } order by .level.placement),
+                            rank,
+                            device
+                        }
+                    }
+                } filter .token = <str>$0
             ", &(value.value(),)).await.unwrap().parse().unwrap();
 
             if !token[0]["account"].is_null() {
@@ -223,6 +243,7 @@ async fn profile(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
                 select Account { id } filter .email = <str>$0
             ", &(userdata_json["email"].as_str().unwrap(),)).await.unwrap().parse().unwrap();
 
+                
             let mut account_uuid = account[0]["id"].clone();
 
             println!("fetched uuid: {:?}", account_uuid);
@@ -246,14 +267,12 @@ async fn profile(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
 
             println!("new uuid: {:?}", account_uuid);
 
-            let json = state.database.query_json("
+            state.database.execute("
                 insert AuthToken {
                     token := <str>$0,
                     account := <Account><uuid><str>$1
                 }
-            ", &(token.as_str(), account_uuid.as_str().unwrap())).await;
-
-            println!("{json:?}");
+            ", &(token.as_str(), account_uuid.as_str().unwrap())).await.unwrap();
 
             println!("token: {}", &token);
 

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/src/css/min/main.min.css">
     <link rel="stylesheet" href="/src/css/min/nav.min.css">
     <link rel="stylesheet" href="/src/css/min/footer.min.css">
+    <link rel="stylesheet" href="/src/css/min/player.min.css">
     <meta name="color-scheme" content="dark">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
@@ -28,10 +29,99 @@
     <!---->
     <main>
         <div class="container">
-            <img src="{{ account.image }}" alt="">
+            <div class="player">
+                {% if 'id' in account.player %}
+                    <h1>
+                        <span title="
+                            {% if account.player.rank <= 25 %}
+                                #{{ account.player.rank }}
+                            {% endif %}
+                        " class="rank">
+                            {% if account.player.rank <= 1 %}
+                                <img title="#{{ account.player.rank }}" src="/src/img/diamondTrophy.png">
+                            {% elif account.player.rank <= 5 %}
+                                <img title="#{{ account.player.rank }}" src="/src/img/goldTrophy.png">
+                            {% elif account.player.rank <= 10 %}
+                                <img title="#{{ account.player.rank }}" src="/src/img/silverTrophy.png">
+                            {% elif account.player.rank <= 25 %}
+                                <img title="#{{ account.player.rank }}" src="/src/img/bronzeTrophy.png">
+                            {% else %}
+                                #{{ account.player.rank }}
+                            {% endif %}
+
+                            {% if account.player.rank <= 25 %}
+                                <p class="
+                                    {% if account.player.rank <= 1 %}
+                                        diamond
+                                    {% elif account.player.rank <= 5 %}
+                                        gold
+                                    {% elif account.player.rank <= 10 %}
+                                        silver
+                                    {% elif account.player.rank <= 25 %}
+                                        bronze
+                                    {% endif %}
+                                ">#{{ account.player.rank }}</p>
+                            {% endif %}
+                        </span>
+                        <hr>
+                        <span class="name">
+                            {{ account.player.name }}
+                            <span class="device material-symbols-outlined">
+                                {% if account.player.device == 'Desktop' %}
+                                    computer
+                                {% elif account.player.device == 'Mobile' %}
+                                    smartphone
+                                {% elif account.player.device == 'Both' %}
+                                    devices
+                                {% endif %}
+                            </span>
+                        </span>
+                    </h1>
+                    <hr>
+                    <div class="stats">
+                        <span>
+                            <h3>Score</h3>
+                            <p>{{ account.player.points }}</p>
+                        </span>
+                        <span>
+                            <h3>Completions</h3>
+                            <p>{{ account.player.records | length }}</p>
+                        </span>
+                        <span>
+                            <h3>Verifications</h3>
+                            <p>{{ account.player.verifications | length }}</p>
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
             {% if 'id' in account.player %}
-                {{ account.player.name }}
-                {{ account.player.device }}
+                <div class="records">
+                    <h1>Records</h1>
+                    <div class="table">
+                        {% for record in account.player.records %}
+                            <div>
+                                <a href="/level/{{ record.level.level_id }}">
+                                    <span class="placement">#{{ record.level.placement }}</span>
+                                    <span class="level">{{ record.level.name }}</span>
+                                </a>
+                                <hr class="divider">
+                                <a href="
+                                    {% if 'https://' in record.video_id %}
+                                        {{ record.video_id }}
+                                    {% else %}
+                                        https://youtu.be/{{ record.video_id }}
+                                    {% endif %}
+                                " target="_blank">
+                                    <span class="time">
+                                        {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+                                    </span>
+                                    <span class="rank">#{{ record.rank }}</span>
+                                </a>
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             {% endif %}
         </div>
     </main>

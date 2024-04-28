@@ -99,7 +99,6 @@ rankings = json.load(urllib.request.urlopen(req))
 
 client.execute("delete Entry")
 client.execute("delete Level")
-client.execute("delete Player")
 
 for placement, level in enumerate(rankings):
 	transfer_level(data_path + "/" + level + ".json", placement + 1)
