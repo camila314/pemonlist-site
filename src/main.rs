@@ -135,7 +135,7 @@ async fn profile(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
     .append_pair("scope", "email")
     .append_pair("access_type", "offline")
     .append_pair("response_type", "code")
-    .append_pair("redirect_uri", "https://beta.pemonlist.com/profile")
+    .append_pair("redirect_uri", "https://si8ska1o.pemonlist.com/profile")
     .append_pair("client_id", &client_id)
     .finish();
 
@@ -190,7 +190,7 @@ async fn profile(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
                 ("client_secret", &client_secret),
                 ("code", &value.0.code),
                 ("grant_type", "authorization_code"),
-                ("redirect_uri", "https://beta.pemonlist.com/profile")
+                ("redirect_uri", "https://si8ska1o.pemonlist.com/profile")
             ];
 
             let client = reqwest::Client::new();
