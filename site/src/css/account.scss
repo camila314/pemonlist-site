@@ -1,6 +1,21 @@
 .player {
-    h1 img {
-        height: 48px;
-        aspect-ratio: 1/1;
+    h1 {
+        img {
+            height: 48px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+
+            &.Squircle {
+                border-radius: 15%;
+            }
+
+            &.Square {
+                border-radius: 0px;
+            }
+        }
+
+        .rank {
+            margin-left: 10px;
+        }
     }
 }

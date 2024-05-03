@@ -36,22 +36,22 @@
     }
 }
 
+hr {
+    margin: 0px;
+}
+
 .level {
     background-color: #334;
-    margin-bottom: 20px;
     border-radius: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
     min-height: 70px;
+    margin-top: 20px;
 
     &.hidden {
         display: none;
-    }
-    
-    &:last-child {
-        margin-bottom: 0px;
     }
 
     h1 {

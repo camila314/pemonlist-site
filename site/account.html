@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/src/css/min/nav.min.css">
     <link rel="stylesheet" href="/src/css/min/footer.min.css">
     <link rel="stylesheet" href="/src/css/min/player.min.css">
+    <link rel="stylesheet" href="/src/css/min/account.min.css">
     <meta name="color-scheme" content="dark">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
@@ -30,8 +31,9 @@
     <main>
         <div class="container">
             <div class="player">
-                {% if 'id' in account.player %}
+                {% if account.player %}
                     <h1>
+                        <img src="{{ account.image }}=s48-c" alt="Your profile picture" class="{{ account.profile_shape }}">
                         <span title="
                             {% if account.player.rank <= 25 %}
                                 #{{ account.player.rank }}
@@ -92,9 +94,17 @@
                             <p>{{ account.player.verifications | length }}</p>
                         </span>
                     </div>
+                {% else %}
+                    <h1>
+                        <img src="{{ account.image }}=s48-c" alt="Your profile picture">
+                        <hr>
+                        <span class="name">
+                            Unregistered User
+                        </span>
+                    </h1>
                 {% endif %}
             </div>
-            {% if 'id' in account.player %}
+            {% if account.player %}
                 <div class="records">
                     <h1>Records</h1>
                     <div class="table">

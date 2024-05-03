@@ -13,7 +13,6 @@ dotenv = "0.15.0"
 edgedb-derive = "0.5.1"
 edgedb-protocol = "0.6.0"
 edgedb-tokio = {version = "0.5.0", features = ["derive"]}
-google-oauth = "1.10.2"
 rand = "0.8.5"
 reqwest = "0.12.3"
 serde = { version = "1.0.197", features = ["derive"] }

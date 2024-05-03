@@ -20,11 +20,20 @@ module default {
 		};
 	}
 
+	scalar type ProfileShape extending enum<Circle, Squircle, Square>;
+
 	type Account {
 		multi link tokens := .<account[is AuthToken];
 
+		required property setup -> bool {
+			default := false;
+		};
+
 		required property image -> str {
 			default := "";
+		};
+		required property profile_shape -> ProfileShape {
+			default := ProfileShape.Circle
 		};
 
 		required property oauth2 -> str;

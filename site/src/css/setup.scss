@@ -1,0 +1,132 @@
+main {
+    align-items: center !important;
+
+    .container {
+        max-width: 500px !important;
+    }
+}
+
+.setup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #334;
+    border-radius: 20px;
+    flex-direction: column;
+
+    h2 {
+        margin: 0px;
+        margin-bottom: 10px;
+    }
+
+    form {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+
+        & > label:not(:first-of-type) {
+            margin-top: 10px;
+        }
+
+        label {
+            user-select: none;
+        }
+
+        input, select {
+            margin-top: 10px;
+            padding: 7px;
+            background-color: #334;
+            border: 1px solid #556;
+            border-radius: 4px;
+            color: #dde;
+            height: 33px;
+
+            &[type="text"] {
+                height: 19px
+            }
+
+            &[type="submit"] {
+                cursor: pointer;
+            }
+
+            option {
+                background-color: #223;
+                height: 17px;
+            }
+
+            &:last-child {
+                margin: 0px;
+            }
+        }
+
+        .profile {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+
+            span {
+                display: flex;
+                justify-content: center;
+                align-items: stretch;
+                flex-direction: column;
+                margin-top: 10px;
+
+                &:first-child {
+                    flex-grow: 1;
+                    margin-right: 10px;
+                    justify-self: space-between;
+
+                    select {
+                        margin-top: 10px;
+                    }
+                }
+
+                &:last-child {
+                    padding: 4px;
+                    background-color: #223c;
+                    border-radius: 3px;
+
+                    img {
+                        transition: border-radius 150ms ease-out;
+
+                        &.circle {
+                            border-radius: 50%;
+                        }
+    
+                        &.squircle {
+                            border-radius: 15%;
+                        }
+                    }
+                }
+            }
+        }
+
+        hr {
+            background-color: #556;
+            margin: 15px 0px;
+        }
+    }
+}
+
+.migrate {
+    display: flex;
+    justify-content: center;
+    color: #889;
+    margin: 20px 10px;
+    font-size: smaller;
+
+    p {
+        margin: 0px;
+
+        a:visited {
+            color: #88f;
+        }
+
+        a:active {
+            color: #f88;
+        }
+    }
+}
