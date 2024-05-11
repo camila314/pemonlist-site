@@ -7,7 +7,7 @@ use axum_extra::extract::cookie::{CookieJar, Cookie};
 use tower_http::services::{ServeDir, ServeFile};
 use tera::{Tera, Context};
 use axum::extract::{State, Path, Query};
-use serde_json::Value;
+use serde_json::{json, Value};
 use serde::Deserialize;
 use edgedb_tokio::Client as EdgeClient;
 use time::OffsetDateTime;
@@ -21,6 +21,9 @@ struct AppState {
     template: Tera,
     database: EdgeClient
 }
+
+// const BASE_URL: &str = "http://localhost:3001";
+const BASE_URL: &str = "https://si8ska1o.pemonlist.com";
 
 async fn index(State(state): State<AppState>) -> Html<String> {
     let mut ctx = Context::new();
@@ -120,6 +123,10 @@ async fn rules(State(state): State<AppState>) -> Html<String> {
     state.template.render("rules.html", &Context::new()).unwrap().into()
 }
 
+async fn oauth(State(state): State<AppState>) -> Html<String> {
+    state.template.render("oauth.html", &Context::new()).unwrap().into()
+}
+
 #[derive(Deserialize)]
 struct Oauth2 {
     code: String
@@ -137,7 +144,7 @@ impl Token for edgedb_tokio::Client {
                     id,
                     image,
                     profile_shape,
-                    setup,
+                    status,
                     player: {
                         id, 
                         name,
@@ -159,9 +166,6 @@ impl Token for edgedb_tokio::Client {
     }
 }
 
-// const BASE_URL: &str = "http://localhost:3001";
-const BASE_URL: &str = "https://si8ska1o.pemonlist.com";
-
 async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, mut jar: CookieJar) -> Result<Html<String>, (CookieJar, Redirect)> {
     let mut ctx = Context::new();
 
@@ -179,19 +183,27 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
     let uri = format!("https://accounts.google.com/o/oauth2/v2/auth?{query}").parse::<Uri>().unwrap();
 
     match jar.get("token") {
-        Some(ref value) => {
-            println!("token_cookie: {:?}", value);
-
-            let token = state.database.get_info_from_token(value.value()).await;
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
 
             if !token[0]["account"].is_null() {
                 ctx.insert("account", &token[0]["account"]);
 
-                println!("{:?}", &token[0]["account"]);
-
-                if token[0]["account"]["setup"].as_bool() == Some(false) {
+                if token[0]["account"]["status"].as_str() == Some("None") {
                     return Err((jar, Redirect::to("/account/setup")));
                 }
+
+                let migration: Value = state.database.query_json("
+                    select MigrationRequest {
+                        id,
+                        requested := (select to_str(.created_at, \"FMDD FMMonth, HH24:MI\")),
+                        discord: { global_name, user_id, username, avatar, accent_color, banner }
+                    } filter .account.id = <uuid><str>$0
+                ", &(token[0]["account"]["id"].as_str().unwrap(),)).await.unwrap().parse().unwrap();
+
+                println!("{migration:#?}");
+
+                ctx.insert("migration", &migration[0]);
 
                 return Ok(state.template.render("account.html", &ctx).unwrap().into())
             }
@@ -201,13 +213,11 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
     }
 
     match oauth2 {
-        Some(ref value) => {
-            println!("oauth: {:?}", value.0.code);
-
+        Some(ref oauth2) => {
             let params: [(&str, &str); 5] = [
                 ("client_id", &client_id),
                 ("client_secret", &client_secret),
-                ("code", &value.0.code),
+                ("code", &oauth2.code),
                 ("grant_type", "authorization_code"),
                 ("redirect_uri", &format!("{BASE_URL}/account"))
             ];
@@ -226,16 +236,12 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
 
             let access_token = token_json["access_token"].as_str().unwrap();
 
-            println!("access_token: {}", access_token);
-
             let userdata = client.get("https://www.googleapis.com/oauth2/v3/userinfo")
                 .header("Authorization", format!("Bearer {}", access_token))
                 .send().await.unwrap()
                 .text().await.unwrap();
 
             let userdata_json: Value = serde_json::from_str(userdata.as_str()).unwrap();
-
-            println!("userdata: {:?}", userdata_json);
 
             let token = rand::thread_rng().sample_iter(&Alphanumeric)
                 .take(64)
@@ -257,8 +263,6 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
                 
             let mut account_uuid = account[0]["id"].clone();
 
-            println!("fetched uuid: {:?}", account_uuid);
-
             if account_uuid.is_null() {
                 let created_account: Value = state.database.query_json("
                     insert Account {
@@ -269,14 +273,12 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
                     };
                 ", &(
                     userdata_json["email"].as_str().unwrap(),
-                    &value.0.code,
+                    &oauth2.code,
                     userdata_json["picture"].as_str().unwrap().strip_suffix("=s96-c").unwrap())
                 ).await.unwrap().parse().unwrap();
 
                 account_uuid = created_account[0]["id"].clone();
             }
-
-            println!("new uuid: {:?}", account_uuid);
 
             state.database.execute("
                 insert AuthToken {
@@ -284,8 +286,6 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
                     account := <Account><uuid><str>$1
                 }
             ", &(token.as_str(), account_uuid.as_str().unwrap())).await.unwrap();
-
-            println!("token: {}", &token);
 
             Err((jar, Redirect::to(&"/account")))
         }
@@ -300,16 +300,12 @@ async fn setup(State(state): State<AppState>, jar: CookieJar) -> Result<Html<Str
     let mut ctx = Context::new();
 
     match jar.get("token") {
-        Some(ref value) => {
-            println!("token_cookie: {:?}", value);
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
 
-            let token = state.database.get_info_from_token(value.value()).await;
-
-            if !token[0]["account"].is_null() && token[0]["account"]["setup"].as_bool() == Some(false) {
+            if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
                 ctx.insert("account", &token[0]["account"]);
-                ctx.insert("token", value.value());
-
-                println!("{:?}", &token[0]["account"]);
+                ctx.insert("token", cookie.value());
 
                 return Ok(state.template.render("setup.html", &ctx).unwrap().into());
             }
@@ -321,7 +317,7 @@ async fn setup(State(state): State<AppState>, jar: CookieJar) -> Result<Html<Str
     Err(Redirect::to("/account"))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct SetupInfo {
     token: String,
     username: String,
@@ -330,14 +326,12 @@ struct SetupInfo {
 }
 
 async fn setup_account(State(state): State<AppState>, Form(mut body): Form<SetupInfo>) -> Redirect {
-    let exists: Value = state.database.query_json("
+    let player: Value = state.database.query_json("
         select Player { id } filter .name = <str>$0
     ", &(&body.username,)).await.unwrap().parse().unwrap();
 
-    println!("exists: {exists:#?}");
-
-    if !exists[0]["id"].is_null() {
-        return Redirect::to("/account/migrate")
+    if !player[0]["id"].is_null() {
+        return Redirect::to(&format!("/account/migrate?username={}&profileshape={}&device={}", &body.username, &body.profileshape, &body.device))
     }
 
     let account: Value = state.database.query_json("
@@ -345,8 +339,6 @@ async fn setup_account(State(state): State<AppState>, Form(mut body): Form<Setup
             account: { id }
         } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
     ", &(&body.token,)).await.unwrap().parse().unwrap();
-
-    println!("account: {account:#?}");
 
     if account[0]["account"]["id"].is_null() {
         return Redirect::to("/account")
@@ -362,11 +354,9 @@ async fn setup_account(State(state): State<AppState>, Form(mut body): Form<Setup
         format!("{}{}", &body.device.remove(0).to_uppercase(), &body.device)
     )).await.unwrap().parse().unwrap();
 
-    println!("player: {player:#?}");
-
     state.database.execute("
         update Account filter .id = <uuid><str>$0 set {
-            setup := <bool>true,
+            status := AccountStatus.Done,
             player := <Player><uuid><str>$1,
             profile_shape := <ProfileShape><str>$2
         }
@@ -379,8 +369,171 @@ async fn setup_account(State(state): State<AppState>, Form(mut body): Form<Setup
     Redirect::to("/account")
 }
 
-async fn migrate(State(state): State<AppState>) -> Result<Html<String>, Redirect> {
+#[derive(Debug, Deserialize)]
+struct SetupInfoQuery {
+    username: String,
+    profileshape: String,
+    device: String
+}
+
+async fn migrate(State(state): State<AppState>, info: Option<Query<SetupInfoQuery>>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let mut ctx = Context::new();
+
+    match info {
+        Some(ref query) => {
+            ctx.insert("setupinfo", &json!({
+                "username": &query.username,
+                "profileshape": &query.profileshape,
+                "device": &query.device
+            }))
+        }
+
+        None => {}
+    };
+
+    match jar.get("token") {
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
+
+            if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
+                ctx.insert("account", &token[0]["account"]);
+                ctx.insert("token", cookie.value());
+
+                return Ok(state.template.render("migrate.html", &ctx).unwrap().into());
+            }
+        }
+
+        None => {}
+    }
+
     Err(Redirect::to("/account"))
+}
+
+#[derive(Deserialize)]
+struct MigrateInfo {
+    token: String,
+    username: String,
+    profileshape: String,
+    device: String,
+    discord: String
+}
+
+async fn migrate_account(State(state): State<AppState>, Form(mut body): Form<MigrateInfo>) -> Redirect {
+    let player: Value = state.database.query_json("
+        select Player { id } filter .name = <str>$0
+    ", &(&body.username,)).await.unwrap().parse().unwrap();
+
+    if player[0]["id"].is_null() {
+        return Redirect::to("/account/setup")
+    }
+
+    let account: Value = state.database.query_json("
+        select AuthToken {
+            account: { id }
+        } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+    ", &(&body.token,)).await.unwrap().parse().unwrap();
+
+    if account[0]["account"]["id"].is_null() {
+        return Redirect::to("/account")
+    }
+
+    let client_id = std::env::var("DISCORD_OAUTH2_CLIENT_ID").expect("Must set DISCORD_OAUTH2_CLIENT_ID");
+    let client_secret = std::env::var("DISCORD_OAUTH2_CLIENT_SECRET").expect("Must set DISCORD_OAUTH2_CLIENT_SECRET");
+
+    let params: [(&str, &str); 5] = [
+        ("client_id", &client_id),
+        ("client_secret", &client_secret),
+        ("grant_type", "authorization_code"),
+        ("code", &body.discord),
+        ("redirect_uri", &format!("{BASE_URL}/oauth"))
+    ];
+
+    let client = reqwest::Client::new();
+
+    let token = client.post("https://discord.com/api/v10/oauth2/token")
+        .form(&params)
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .send().await.unwrap()
+        .text().await.unwrap();
+
+    let token_json: Value = serde_json::from_str(&token).unwrap();
+
+    if token_json["access_token"].is_null() {
+        return Redirect::to("/account/migrate")
+    }
+
+    let user = client.get("https://discord.com/api/v10/users/@me")
+        .header("Authorization", format!("Bearer {}", token_json["access_token"].as_str().unwrap()))
+        .send().await.unwrap()
+        .text().await.unwrap();
+
+    let user_json: Value = serde_json::from_str(&user).unwrap();
+
+    if user_json["id"].is_null() {
+        return Redirect::to("/account/migrate")
+    }
+
+    let mut accent_color = "000000".to_string();
+    let mut banner = "";
+
+    if !user_json["accent_color"].is_null() {
+        accent_color = format!("{:06X}", user_json["accent_color"].as_u64().unwrap())
+    }
+
+    if !user_json["banner"].is_null() {
+        banner = user_json["banner"].as_str().unwrap()
+    }
+
+    let discord: Value = state.database.query_required_single_json("
+        insert Discord {
+            user_id := <str>$0,
+            username := <str>$1,
+            global_name := <str>$2,
+            avatar := <str>$3,
+            accent_color := <str>$4,
+            banner := <str>$5
+        }
+    ", &(
+        user_json["id"].as_str().unwrap(),
+        user_json["username"].as_str().unwrap(),
+        user_json["global_name"].as_str().unwrap(),
+        user_json["avatar"].as_str().unwrap(),
+        accent_color.as_str(),
+        banner
+    )).await.unwrap().parse().unwrap();
+
+    state.database.execute("
+        insert MigrationRequest {
+            discord := <Discord><uuid><str>$0,
+            account := <Account><uuid><str>$1,
+            player := <Player><uuid><str>$2
+        }
+    ", &(
+        discord["id"].as_str().unwrap(),
+        account[0]["account"]["id"].as_str().unwrap(),
+        player[0]["id"].as_str().unwrap()
+    )).await.unwrap();
+
+    state.database.execute("
+        update Account filter .id = <uuid><str>$0 set {
+            status := AccountStatus.Migrating,
+            profile_shape := <ProfileShape><str>$1
+        }
+    ", &(
+        account[0]["account"]["id"].as_str().unwrap(),
+        format!("{}{}", &body.profileshape.remove(0).to_uppercase(), &body.profileshape)
+    )).await.unwrap();
+
+    state.database.execute("
+        update Player filter .id = <uuid><str>$0 set {
+            device := <Device><str>$1
+        }
+    ", &(
+        player[0]["id"].as_str().unwrap(),
+        format!("{}{}", &body.device.remove(0).to_uppercase(), &body.device)
+    )).await.unwrap();
+
+    Redirect::to("/account")
 }
 
 #[tokio::main]
@@ -402,9 +555,11 @@ async fn main() {
         .route("/account/setup", get(setup))
         .route("/account/setup", post(setup_account))
         .route("/account/migrate", get(migrate))
+        .route("/account/migrate", post(migrate_account))
         .route("/terms", get(terms))
         .route("/privacy", get(privacy))
         .route("/rules", get(rules))
+        .route("/oauth", get(oauth))
 
         .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
 

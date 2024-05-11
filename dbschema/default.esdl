@@ -21,12 +21,13 @@ module default {
 	}
 
 	scalar type ProfileShape extending enum<Circle, Squircle, Square>;
+	scalar type AccountStatus extending enum<None, Migrating, Done>;
 
-	type Account {
+	type Account extending Dated {
 		multi link tokens := .<account[is AuthToken];
 
-		required property setup -> bool {
-			default := false;
+		required property status -> AccountStatus {
+			default := AccountStatus.None;
 		};
 
 		required property image -> str {
@@ -42,6 +43,14 @@ module default {
 		link player -> Player {
 			default := <default::Player>{};
 		};
+
+		link discord -> Discord {
+			default := <default::Discord>{};
+		};
+
+		required property mod -> bool {
+			default := false;
+		};
 	}
 
 	type AuthToken {
@@ -51,6 +60,25 @@ module default {
 		};
 
 		required link account -> Account;
+	}
+
+	type Discord {
+		required property user_id -> str;
+		required property username -> str;
+		required property global_name -> str;
+		required property avatar -> str;
+		required property accent_color -> str {
+			default := '000000'
+		};
+		required property banner -> str {
+			default := ""
+		};
+	}
+
+	type MigrationRequest extending Dated {
+		required link discord -> Discord;
+		required link account -> Account;
+		required link player -> Player;
 	}
 
 	scalar type Status extending enum<Submitted, Waiting, Investigating, Approved, Denied>;

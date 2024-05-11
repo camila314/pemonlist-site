@@ -33,7 +33,7 @@
             <div class="player">
                 {% if account.player %}
                     <h1>
-                        <img src="{{ account.image }}=s48-c" alt="Your profile picture" class="{{ account.profile_shape }}">
+                        <img src="{{ account.image }}=s48-c" referrerpolicy="no-referrer" alt="Your profile picture" class="{{ account.profile_shape }}">
                         <span title="
                             {% if account.player.rank <= 25 %}
                                 #{{ account.player.rank }}
@@ -96,7 +96,7 @@
                     </div>
                 {% else %}
                     <h1>
-                        <img src="{{ account.image }}=s48-c" alt="Your profile picture">
+                        <img src="{{ account.image }}=s48-c" referrerpolicy="no-referrer" alt="Your profile picture">
                         <hr>
                         <span class="name">
                             Unregistered User
@@ -104,6 +104,40 @@
                     </h1>
                 {% endif %}
             </div>
+            {% if account.status == "Migrating" %}
+                <div class="migration">
+                    <h1>Migration Status</h1>
+                    <div class="content">
+                        <span class="info">
+                            <span>
+                                <h3>Requested:</h3>
+                                <p>{{ migration.requested }}</p>
+                            </span>
+                            <span class="id">
+                                <h3>Request ID:</h3>
+                                <p>{{ migration.id }}</p>
+                            </span>
+                        </span>
+                        <div class="discord 
+                            {% if migration.discord.banner != "" %}
+                                nitro
+                            {% endif %}"
+                            >
+                            <span class="banner" style="
+                                background-color: #{{ migration.discord.accent_color }};
+                                background-image:
+                                    url('https://cdn.discordapp.com/banners/{{ migration.discord.user_id }}/{{ migration.discord.banner }}.gif?size=600'),
+                                    url('https://cdn.discordapp.com/banners/{{ migration.discord.user_id }}/{{ migration.discord.banner }}.png?size=600');
+                            "></span>
+                            <img src="https://cdn.discordapp.com/avatars/{{ migration.discord.user_id }}/{{ migration.discord.avatar }}.webp?size=80" alt="{{ migration.discord.global_name }}">
+                            <span class="inner">
+                                <h1>{{ migration.discord.global_name }}</h1>
+                                <p>{{ migration.discord.username }}</p>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% if account.player %}
                 <div class="records">
                     <h1>Records</h1>
@@ -143,5 +177,6 @@
 <script src="/src/js/main.js"></script>
 <script src="/src/js/navbar.js"></script>
 <script src="/src/js/jump.js"></script>
+<script src="/src/js/account.js"></script>
 
 </html>

@@ -2,7 +2,7 @@ class Logger {
     prefix = ''
     
     constructor(...prefixes) {
-        prefixes.map(p => p.split(' ').map(s => (s[0].toUpperCase() + s.substr(1))).join(' '))
+        prefixes.map(p => p.split(' ').map(s => (s[0].toUpperCase() + s.slice(1))).join(' '))
         this.prefix = `[${prefixes.join('] [')}]`
     }
 
@@ -36,6 +36,20 @@ const mainLogger = new Logger('Main')
 mainLogger.log('suck it mechabrandon')
 
 if ('ontouchstart' in window) {
-    mainLogger.info('device seems to be a touchscreen')
+    mainLogger.info('Device seems to be a touchscreen')
     document.body.classList.add('touch')
 }
+
+const mobileDevices = [ 'android', 'webos', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone' ]
+let mobile = false
+
+if (!navigator.userAgentData) {
+    mainLogger.warn('navigator.userAgentData does not exist, checking against navigator.userAgent')
+
+    mobileDevices.forEach(d => {
+        let m = navigator.userAgent.match(new RegExp(d, 'i')) != null
+        if (m) return mobile = true
+    })
+} else mobile = navigator.userAgentData.mobile
+
+mainLogger.info(`Browser reporting device as a ${mobile ? 'mobile' : 'desktop'} device`)

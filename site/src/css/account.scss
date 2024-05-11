@@ -19,3 +19,139 @@
         }
     }
 }
+
+.migration {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #334;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-bottom: 5px;
+
+    h1 {
+        margin: 0px;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+
+    .content {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        width: calc(100% + 30px);
+        max-width: 1100px;
+    
+        .info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            flex-grow: 0;
+    
+            span {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 15px;
+                flex-grow: 1;
+    
+                * {
+                    margin: 0px;
+                    font-size: medium;
+                    text-align: center;
+                }
+    
+                h3 {
+                    margin-bottom: 5px;
+                }
+    
+                &.id p {
+                    font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
+                    cursor: pointer;
+                }
+            }
+        }
+    
+        .discord {
+            margin: 15px;
+            border-radius: 8px;
+            width: 350px;
+            background-color: #232428;
+            position: relative;
+            overflow: hidden;
+            flex-grow: 0;
+            flex-shrink: 0;
+            max-width: calc(100% - 40px);
+    
+            .banner {
+                display: block;
+                width: 100%;
+                height: 60px;
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: cover;
+            }
+    
+            img {
+                outline: 5px solid #232428;
+                border-radius: 50%;
+                position: absolute;
+                top: 16px;
+                left: 22px;
+            }
+
+            &.nitro {
+                .banner {
+                    height: 120px;
+                }
+
+                img {
+                    top: 76px;
+                }
+            }
+    
+            .inner {
+                display: block;
+                background-color: #111214;
+                border-radius: 8px;
+                width: calc(100% - 56px);
+                height: calc(100% - 154px);
+                margin: 16px;
+                margin-top: 54px;
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
+    
+                * {
+                    margin: 0px;
+                }
+    
+                h1 {
+                    font-size: 20px;
+                    line-height: 1.2;
+                    font-weight: 600;
+                }
+    
+                p {
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}
+
+.copied {
+    position: absolute;
+    padding: 5px 7px;
+    font-size: smaller;
+    border-radius: 5px;
+    background-color: #112;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
