@@ -42,17 +42,14 @@ main {
             border: 1px solid #556;
             border-radius: 4px;
             color: #dde;
-            height: 40px;
+            height: 24px;
             transition: background-color 70ms ease-out;
             font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
             font-size: medium;
 
-            &[type="text"] {
-                height: 19px
-            }
-
             &[type="submit"] {
                 cursor: pointer;
+                height: 40px;
             }
 
             &[name="discord"] {
@@ -74,6 +71,10 @@ main {
             &:last-child {
                 margin: 0px;
             }
+        }
+        
+        select {
+            height: 40px;
         }
 
         .profile {

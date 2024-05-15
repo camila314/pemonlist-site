@@ -1,13 +1,27 @@
 const id = document.querySelector('.info .id p')
 
 id.addEventListener('click', async e => {
-    const bounding = id.getBoundingClientRect()
+    const exists = document.querySelector('.copied')
+
+    if (exists) exists.remove()
 
     const copied = document.createElement('div')
+    copied.classList.value = 'copied'
+    copied.innerText = 'Copied!'
 
-    copied.className = 'copied'
-    copied.style.bottom = bounding.y - 3 + 'px'
-    copied.style.left = bounding.x + (bounding.width / 2) + 'px'
+    await navigator.clipboard.writeText(id.firstChild.data)
 
-    document.body.appendChild(copied)
+    document.querySelector('.info .id').appendChild(copied)
+    await new Promise(r => requestAnimationFrame(r))
+    copied.classList.toggle('open')
+
+    await new Promise(r => setTimeout(r, 2200))
+
+    copied.style.transitionTimingFunction = 'cubic-bezier(0.55, 0.06, 0.68, 0.19)'
+    await new Promise(r => requestAnimationFrame(r))
+    copied.classList.toggle('open')
+
+    await new Promise(r => setTimeout(r, 200))
+
+    copied.remove()
 })

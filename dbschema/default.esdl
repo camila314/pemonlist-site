@@ -109,8 +109,11 @@ module default {
 	function getTimeRank(entry: Entry) -> int32
         using (<int32>(<int64>count(Entry filter .time < entry.time and .level = entry.level) + 1));
 
+	# function getPoints(place: int32) -> int32
+	# 	 using (<int32>round(100.423 * 1000 ^ (1 / (place ^ (-1/3) + 2.178)) - 262.27*math::ln(10.82*place) + 0.639*place) if place < 200 else <int32>15);
+
 	function getPoints(place: int32) -> int32
-		using (<int32>round(100 * 1000 ^ (1 / (place ^ (-1/3) + 2.178)) - 262.27*math::ln(10.82*place) + 0.639*place));
+		using (<int32>math::ceil(32 * (place ^ (-1.33)) - 85.989 * (place ^ 0.2924) + 311.28 * (1.001495 ^ place)) if place < 200 else <int32>15);
 
 	type Level extending Dated {
 		required property name -> str;

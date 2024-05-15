@@ -1,18 +1,27 @@
-
-use axum::{routing::{get, post}, Router, response::{Redirect, Html}, http::uri::Uri, extract::Form};
-use url::form_urlencoded;
-use reqwest;
-use dotenv::dotenv;
-use axum_extra::extract::cookie::{CookieJar, Cookie};
-use tower_http::services::{ServeDir, ServeFile};
-use tera::{Tera, Context};
-use axum::extract::{State, Path, Query};
-use serde_json::{json, Value};
-use serde::Deserialize;
-use edgedb_tokio::Client as EdgeClient;
-use time::OffsetDateTime;
+use axum::extract::{Path, Query, State};
+use axum::{
+    extract::Form,
+    http::uri::Uri,
+    response::{Html, Redirect},
+    routing::{get, post},
+    Router,
+};
+use axum_extra::extract::cookie::{Cookie, CookieJar};
 use chrono::Utc;
+use dotenv::dotenv;
+use edgedb_tokio::Client as EdgeClient;
+use futures::executor::block_on;
 use rand::{distributions::Alphanumeric, Rng};
+use reqwest;
+use serde::Deserialize;
+use serde_json::{json, Value};
+use std::sync::RwLock;
+use std::thread;
+use std::time::Instant;
+use tera::{Context, Tera};
+use time::OffsetDateTime;
+use tower_http::services::{ServeDir, ServeFile};
+use url::form_urlencoded;
 
 mod db;
 
@@ -44,17 +53,61 @@ async fn index(State(state): State<AppState>) -> Html<String> {
     state.template.render("index.html", &ctx).unwrap().into()
 }
 
+static LEADERBOARD_CACHE: RwLock<Value> = RwLock::new(json!([]));
+static RECORDS: RwLock<u64> = RwLock::new(0);
+
 async fn leaderboard(State(state): State<AppState>) -> Html<String> {
     let mut ctx = Context::new();
 
-    let players: Value = state.database.query_json("select Player {
-        name,
-        points,
-        rank,
-        device
-    } filter .points > 0 order by .points desc", &()).await.unwrap().parse().unwrap();
+    let mut players = LEADERBOARD_CACHE.read().unwrap().clone();
 
-    ctx.insert("players", &players);
+    if players.clone().as_array().unwrap().is_empty() {
+        players = state.database.query_json("select Player {
+            name,
+            points,
+            rank,
+            device
+        } filter .points > 0 order by .points desc", &()).await.unwrap().parse().unwrap();
+
+        let mut guard = LEADERBOARD_CACHE.write().unwrap();
+        *guard = players.clone();
+    } else {
+        let records: u64 = state.database.query_required_single_json("
+            select count((select Entry))
+        ", &()).await.unwrap().parse::<Value>().unwrap().as_u64().unwrap();
+
+        if records != RECORDS.read().unwrap().clone() {
+            thread::spawn(move || {
+                let start = Instant::now();
+                println!("Leaderboard Thread - Started");
+
+                println!("Leaderboard Thread - {} records backed up", records - RECORDS.read().unwrap().clone());
+
+                let players = state.database.query_json("select Player {
+                    name,
+                    points,
+                    rank,
+                    device
+                } filter .points > 0 order by .points desc", &());
+
+                let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
+
+                println!("Leaderboard Thread - Got `Player` query");
+
+                let mut guard = LEADERBOARD_CACHE.write().unwrap();
+                *guard = new_players.clone();
+                drop(guard);
+
+                let mut guard = RECORDS.write().unwrap();
+                *guard = records.clone();
+                drop(guard);
+                
+                println!("Leaderboard Thread - Finished: {}s", start.elapsed().as_secs_f64());
+            });
+        }
+    }
+
+    ctx.insert("players", &players.clone());
     state.template.render("leaderboard.html", &ctx).unwrap().into()
 }
 

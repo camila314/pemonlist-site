@@ -69,9 +69,45 @@
                     margin-bottom: 5px;
                 }
     
-                &.id p {
-                    font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
-                    cursor: pointer;
+                &.id {
+                    position: relative;
+                    
+                    p {
+                        font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
+                        cursor: pointer;
+                        display: flex;
+
+                        .material-symbols-outlined {
+                            opacity: 0;
+                            width: 0px;
+                            position: relative;
+                            left: 10px;
+                        }
+
+                        &:hover .material-symbols-outlined {
+                            opacity: 1;
+                        }
+                    }
+
+                    .copied {
+                        position: absolute;
+                        padding: 5px 7px;
+                        font-size: smaller;
+                        border-radius: 5px;
+                        background-color: #112;
+                        transform: translateY(0px) scale(0.95);
+                        pointer-events: none;
+                        opacity: 0;
+                        transition: all 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+                        z-index: 1;
+                        bottom: -26px;
+
+                        &.open {
+                            opacity: 1;
+                            transform: translateY(3px) scale(1);
+                            scale: 1;
+                        }
+                    }
                 }
             }
         }
@@ -144,14 +180,4 @@
             }
         }
     }
-}
-
-.copied {
-    position: absolute;
-    padding: 5px 7px;
-    font-size: smaller;
-    border-radius: 5px;
-    background-color: #112;
-    transform: translateX(-50%);
-    pointer-events: none;
 }

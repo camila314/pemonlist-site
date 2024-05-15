@@ -27,7 +27,19 @@ class Logger {
     }
 
     table(...content) {
-        console.table(`%c ${this.prefix}`, 'color:rgb(175,0,175)', ...content)
+        console.table(...content)
+    }
+    
+    group(...content) {
+        console.group(`%c ${this.prefix}`, 'color:rgb(175,0,175)', ...content)
+    }
+    
+    groupCollapsed(...content) {
+        console.groupCollapsed(`%c ${this.prefix}`, 'color:rgb(175,0,175)', ...content)
+    }
+
+    groupEnd() {
+        console.groupEnd()
     }
 }
 

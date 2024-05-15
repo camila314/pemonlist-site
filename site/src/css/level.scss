@@ -18,6 +18,7 @@ main {
         align-items: center;
         flex-wrap: wrap;
         justify-content: center;
+        white-space: break-spaces;
 
         span {
             flex-shrink: 1;
@@ -54,6 +55,7 @@ main {
             * {
                 margin: 0px;
                 font-size: large;
+                white-space: break-spaces;
             }
 
             h3 {
@@ -191,6 +193,7 @@ main {
                     -webkit-box-orient: vertical;
                     max-height: 38px;
                     overflow-wrap: anywhere;
+                    white-space: break-spaces;
                 }
     
                 .time {

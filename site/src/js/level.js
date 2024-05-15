@@ -11,7 +11,7 @@ const levelLogger = new Logger('Level')
         loader.src = image.url
         await new Promise(resolve => loader.onload = resolve)
 
-        levelLogger.log('loader image loaded')
+        levelLogger.log('Image loaded to cache')
 
         main.classList.add('transparent')
         main.style.background = `url('${image.url}')`
