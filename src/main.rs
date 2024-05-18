@@ -31,8 +31,43 @@ struct AppState {
     database: EdgeClient
 }
 
-// const BASE_URL: &str = "http://localhost:3001";
-const BASE_URL: &str = "https://si8ska1o.pemonlist.com";
+const BASE_URL: &str = "http://localhost:3001";
+// const BASE_URL: &str = "https://si8ska1o.pemonlist.com";
+
+trait Token {
+    async fn get_info_from_token(&self, token_string: &str) -> Value;
+}
+
+impl Token for edgedb_tokio::Client {
+    async fn get_info_from_token(&self, token_string: &str) -> Value {
+        self.query_json("
+            select AuthToken {
+                account: {
+                    id,
+                    image,
+                    profile_shape,
+                    status,
+                    player: {
+                        id, 
+                        name,
+                        points,
+                        verifications := (select Level { name } filter .verifier = <Player>AuthToken.account.player.id),
+                        records := (select .entries {
+                            level: { name, level_id, placement },
+                            time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
+                            time_ms := (select to_str(.time, \"MS\")),
+                            video_id,
+                            rank
+                        } order by .level.placement),
+                        rank,
+                        device
+                    }
+                }
+            } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+        ", &(token_string,)).await.unwrap().parse().unwrap()
+    }
+}
+
 
 async fn index(State(state): State<AppState>) -> Html<String> {
     let mut ctx = Context::new();
@@ -54,7 +89,7 @@ async fn index(State(state): State<AppState>) -> Html<String> {
 }
 
 static LEADERBOARD_CACHE: RwLock<Value> = RwLock::new(json!([]));
-static RECORDS: RwLock<u64> = RwLock::new(0);
+static RECORDS: RwLock<i64> = RwLock::new(0);
 
 async fn leaderboard(State(state): State<AppState>) -> Html<String> {
     let mut ctx = Context::new();
@@ -72,9 +107,9 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
         let mut guard = LEADERBOARD_CACHE.write().unwrap();
         *guard = players.clone();
     } else {
-        let records: u64 = state.database.query_required_single_json("
+        let records: i64 = state.database.query_required_single_json("
             select count((select Entry))
-        ", &()).await.unwrap().parse::<Value>().unwrap().as_u64().unwrap();
+        ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
 
         if records != RECORDS.read().unwrap().clone() {
             thread::spawn(move || {
@@ -158,10 +193,95 @@ async fn player(State(state): State<AppState>, Path(username): Path<String>) -> 
     state.template.render("player.html", &ctx).unwrap().into()
 }
 
-async fn submit(State(state): State<AppState>) -> Html<String> {
-    let ctx = Context::new();
+async fn submit(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let mut ctx = Context::new();
 
-    state.template.render("submit.html", &ctx).unwrap().into()
+    match jar.get("token") {
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
+
+            if token[0]["account"].is_null() || token[0]["account"]["status"].as_str() != Some("Done") {
+                return Err(Redirect::to("/account"));
+            }
+
+            ctx.insert("token", cookie.value());
+        }
+
+        None => {
+            return Err(Redirect::to("/account"));
+        }
+    }
+
+    let levels: Value = state.database.query_json("select Level {
+        name, level_id, placement
+    } order by .placement", &()).await.unwrap().parse().unwrap();
+
+    ctx.insert("levels", &levels);
+    Ok(state.template.render("submit.html", &ctx).unwrap().into())
+}
+
+#[derive(Deserialize)]
+struct RecordInfo {
+    token: String,
+    timeplain: String,
+    levelid: String,
+    videoid: String,
+    raw: String,
+    device: String
+}
+
+async fn submit_record(State(state): State<AppState>, Form(body): Form<RecordInfo>) -> Result<Html<String>, Redirect> {
+    let account: Value = state.database.query_json("
+        select AuthToken {
+            account: { id, player: { id } }
+        } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+    ", &(&body.token,)).await.unwrap().parse().unwrap();
+
+    if account[0]["account"]["id"].is_null() {
+        return Err(Redirect::to("/account"));
+    }
+
+    let mut video_id = &body.videoid;
+
+    if video_id.is_empty() {
+        video_id = &body.raw
+    }
+
+    let entry: Value = state.database.query_json("
+        select Entry { id } filter
+            .video_id = <str>$0 and
+            .player = <Player><uuid><str>$1 and
+            .level = (select Level filter .level_id = <int64><str>$2)
+    ", &(
+        video_id,
+        account[0]["account"]["player"]["id"].as_str().unwrap(),
+        &body.levelid
+    )).await.unwrap().parse().unwrap();
+
+    if !entry[0]["id"].is_null() {
+        return Ok(state.template.render("duplicate.html", &Context::new()).unwrap().into());
+    }
+
+    state.database.query_json("
+        insert Entry {
+            status := Status.Waiting,
+            video_id := <str>$0,
+            raw_video := <str>$1,
+            player := <Player><uuid><str>$2,
+            level := (select Level filter .level_id = <int64><str>$3),
+            time := <duration><str>$4,
+            mobile := <bool>$5
+        }
+    ", &(
+        video_id,
+        &body.raw,
+        account[0]["account"]["player"]["id"].as_str().unwrap(),
+        &body.levelid,
+        &body.timeplain,
+        &body.device == "mobile"
+    )).await.unwrap().parse::<Value>().unwrap();
+
+    Ok(state.template.render("submitted.html", &Context::new()).unwrap().into())
 }
 
 async fn terms(State(state): State<AppState>) -> Html<String> {
@@ -183,40 +303,6 @@ async fn oauth(State(state): State<AppState>) -> Html<String> {
 #[derive(Deserialize)]
 struct Oauth2 {
     code: String
-}
-
-trait Token {
-    async fn get_info_from_token(&self, token_string: &str) -> Value;
-}
-
-impl Token for edgedb_tokio::Client {
-    async fn get_info_from_token(&self, token_string: &str) -> Value {
-        self.query_json("
-            select AuthToken {
-                account: {
-                    id,
-                    image,
-                    profile_shape,
-                    status,
-                    player: {
-                        id, 
-                        name,
-                        points,
-                        verifications := (select Level { name } filter .verifier = <Player>AuthToken.account.player.id),
-                        records := (select .entries {
-                            level: { name, level_id, placement },
-                            time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
-                            time_ms := (select to_str(.time, \"MS\")),
-                            video_id,
-                            rank
-                        } order by .level.placement),
-                        rank,
-                        device
-                    }
-                }
-            } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
-        ", &(token_string,)).await.unwrap().parse().unwrap()
-    }
 }
 
 async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, mut jar: CookieJar) -> Result<Html<String>, (CookieJar, Redirect)> {
@@ -422,7 +508,7 @@ async fn setup_account(State(state): State<AppState>, Form(mut body): Form<Setup
     Redirect::to("/account")
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct SetupInfoQuery {
     username: String,
     profileshape: String,
@@ -604,6 +690,7 @@ async fn main() {
         .route("/leaderboard", get(leaderboard))
         .route("/player/:username", get(player))
         .route("/submit", get(submit))
+        .route("/submit", post(submit_record))
         .route("/account", get(account))
         .route("/account/setup", get(setup))
         .route("/account/setup", post(setup_account))

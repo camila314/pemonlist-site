@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/src/css/min/main.min.css">
     <link rel="stylesheet" href="/src/css/min/nav.min.css">
     <link rel="stylesheet" href="/src/css/min/footer.min.css">
+    <link rel="stylesheet" href="/src/css/min/submit.min.css">
     <meta name="color-scheme" content="dark">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
@@ -27,7 +28,63 @@
     </button>
     <!---->
     <main>
-        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" autoplay="1" controls="0"></iframe>
+        <!-- <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" autoplay="1" controls="0"></iframe> -->
+        <div class="container">
+            <div class="form">
+                <h1>Submit</h1>
+                <p>Be sure to <a class="proper" href="/rules">read the rules</a> before submitting!</p>
+                <form action="/submit" method="post">
+                    <input type="hidden" name="token" value="{{ token }}" />
+                    <span class="beside">
+                        <span>
+                            <label for="time">Time</label>
+                            <div class="timewrapper">
+                                <div type="text" name="time" id="time" data-placeholder="0:00:00.000" contenteditable></div>
+                            </div>
+                            <input type="text" name="timeplain" id="timeplain" required>
+                        </span>
+                        <span>
+                            <label for="level">Level</label>
+                            <input type="text" list="levels" name="level" id="level" required>
+                            <input type="hidden" name="levelid" id="levelid">
+                            <datalist id="levels">
+                                {% for level in levels %}
+                                    <option label="#{{ level.placement }} - {{ level.level_id }}" value="{{ level.name }}" attr-level-id="{{ level.level_id }}"></option>
+                                {% endfor %}
+                            </datalist>
+                        </span>
+                    </span>
+                    <span class="video">
+                        <span>
+                            <label for="video">YouTube URL</label>
+                            <input type="url" name="video" id="video" placeholder="https://youtube.com/watch" required>
+                            <input type="hidden" name="videoid" id="videoid">
+                            <label for="raw">Raw Footage URL</label>
+                            <input type="url" name="raw" id="raw" placeholder="https://youtube.com/watch">
+                        </span>
+                        <span class="default">
+                            <div class="select">
+                                <span class="selected">Video</span>
+                                <span>Raw</span>
+                            </div>
+                            <div class="preview">
+                                <p data-index="1">Your video will appear here.</p>
+                                <p data-index="2">Processing...</p>
+                                <iframe src="" frameborder="0"></iframe>
+                                <p data-index="3">Sorry, that's not a valid YouTube video.</p>
+                            </div>
+                        </span>
+                    </span>
+                    <label for="device">Device</label>
+                    <select id="device" name="device">
+                        <option value="desktop">Desktop</option>
+                        <option value="mobile">Mobile</option>
+                    </select>
+                    <hr>
+                    <input type="submit" value="Submit Record">
+                </form>
+            </div>
+        </div>
     </main>
     <!---->
     {% include "template/footer.html" %}
@@ -37,5 +94,6 @@
 <script src="/src/js/main.js"></script>
 <script src="/src/js/navbar.js"></script>
 <script src="/src/js/jump.js"></script>
+<script src="/src/js/submit.js"></script>
 
 </html>

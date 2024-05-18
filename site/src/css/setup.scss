@@ -58,8 +58,8 @@ main {
                 height: 1px;
                 border: none;
                 outline: none;
-                color: transparent;
                 pointer-events: none;
+                z-index: -1;
             }
 
             option {

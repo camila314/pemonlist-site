@@ -85,6 +85,7 @@ module default {
 
 	type Entry extending Dated {
 		required property video_id -> str;
+		property raw_video -> str;
 		required property time -> duration;
 
 		required property status -> Status;
@@ -113,7 +114,7 @@ module default {
 	# 	 using (<int32>round(100.423 * 1000 ^ (1 / (place ^ (-1/3) + 2.178)) - 262.27*math::ln(10.82*place) + 0.639*place) if place < 200 else <int32>15);
 
 	function getPoints(place: int32) -> int32
-		using (<int32>math::ceil(32 * (place ^ (-1.33)) - 85.989 * (place ^ 0.2924) + 311.28 * (1.001495 ^ place)) if place < 200 else <int32>15);
+		using (<int32>math::ceil(32 * (place ^ (-1.33)) - 85.989 * (place ^ 0.2924) + 311.28 * (1.001495 ^ place)) if place < 200 else <int32>0);
 
 	type Level extending Dated {
 		required property name -> str;
