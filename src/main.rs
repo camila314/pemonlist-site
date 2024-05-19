@@ -32,7 +32,7 @@ struct AppState {
 }
 
 // const BASE_URL: &str = "http://localhost:3001";
-const BASE_URL: &str = "https://si8ska1o.pemonlist.com";
+const BASE_URL: &str = "https://pemonlist.com";
 
 trait Token {
     async fn get_info_from_token(&self, token_string: &str) -> Value;
