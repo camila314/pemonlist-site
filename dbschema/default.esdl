@@ -12,8 +12,9 @@ module default {
 			constraint exclusive;
 		};
 
-		multi link entries := .<player[is Entry];
-		points := <int32>sum((select .entries filter .status = Status.Approved).level.points);
+		multi link entries := (select .<player[is Entry] filter .status = Status.Approved);
+		multi link unverified_entries := (select .<player[is Entry] filter .status != Status.Approved);
+		points := <int32>sum((select .entries).level.points);
 		rank := getPlayerRank(<Player>.id);
 		required property device -> Device {
 			default := Device.Both;
@@ -108,7 +109,7 @@ module default {
         using (<int32>(<int64>count(Player filter .points > player.points) + 1));
 
 	function getTimeRank(entry: Entry) -> int32
-        using (<int32>(<int64>count(Entry filter .time < entry.time and .level = entry.level) + 1));
+        using (<int32>(<int64>count(Entry filter .time < entry.time and .level = entry.level and .status = Status.Approved) + 1));
 
 	# function getPoints(place: int32) -> int32
 	# 	 using (<int32>round(100.423 * 1000 ^ (1 / (place ^ (-1/3) + 2.178)) - 262.27*math::ln(10.82*place) + 0.639*place) if place < 200 else <int32>15);

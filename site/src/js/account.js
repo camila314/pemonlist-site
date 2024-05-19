@@ -1,6 +1,6 @@
 const id = document.querySelector('.info .id p')
 
-id.addEventListener('click', async e => {
+if (id != null) id.addEventListener('click', async e => {
     const exists = document.querySelector('.copied')
 
     if (exists) exists.remove()

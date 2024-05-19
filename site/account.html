@@ -31,6 +31,12 @@
     <main>
         <div class="container">
             <div class="player">
+                <div class="pages">
+                    {% if account.mod %}
+                        <a href="/mod" class="material-symbols-outlined">shield_person</a>
+                    {% endif %}
+                    <!-- <a href="/account/options" class="material-symbols-outlined">manage_accounts</a> -->
+                </div>
                 {% if account.player %}
                     <h1>
                         <img src="{{ account.image }}=s48-c" referrerpolicy="no-referrer" alt="Your profile picture" class="{{ account.profile_shape }}">
@@ -139,33 +145,88 @@
                 </div>
             {% endif %}
             {% if account.player %}
-                <div class="records">
-                    <h1>Records</h1>
-                    <div class="table">
-                        {% for record in account.player.records %}
-                            <div>
-                                <a href="/level/{{ record.level.level_id }}">
-                                    <span class="placement">#{{ record.level.placement }}</span>
-                                    <span class="level">{{ record.level.name }}</span>
-                                </a>
-                                <hr class="divider">
-                                <a href="
-                                    {% if 'https://' in record.video_id %}
-                                        {{ record.video_id }}
-                                    {% else %}
-                                        https://youtu.be/{{ record.video_id }}
-                                    {% endif %}
-                                " target="_blank">
-                                    <span class="time">
-                                        {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+                {% if account.player.records %}
+                    <div class="records">
+                        <h1>Records</h1>
+                        <div class="table">
+                            {% for record in account.player.records %}
+                                <div>
+                                    <a href="/level/{{ record.level.level_id }}">
+                                        <span class="placement">#{{ record.level.placement }}</span>
+                                        <span class="level">{{ record.level.name }}</span>
+                                    </a>
+                                    <hr class="divider">
+                                    <a href="
+                                        {% if 'https://' in record.video_id %}
+                                            {{ record.video_id }}
+                                        {% else %}
+                                            https://youtu.be/{{ record.video_id }}
+                                        {% endif %}
+                                    " target="_blank">
+                                        <span class="time">
+                                            {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+                                        </span>
+                                        <span class="rank">#{{ record.rank }}</span>
+                                    </a>
                                     </span>
-                                    <span class="rank">#{{ record.rank }}</span>
-                                </a>
-                                </span>
-                            </div>
-                        {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
+                {% endif %}
+                {% if account.player.unverified_records %}
+                    <div class="unverified">
+                        <h1>Pending Records</h1>
+                        <div class="table">
+                            {% for record in account.player.unverified_records %}
+                                <div>
+                                    <a href="/level/{{ record.level.level_id }}">
+                                        <span class="placement">#{{ record.level.placement }}</span>
+                                        <span class="level">{{ record.level.name }}</span>
+                                    </a>
+                                    <hr class="divider">
+                                    <a href="
+                                        {% if 'https://' in record.video_id %}
+                                            {{ record.video_id }}
+                                        {% else %}
+                                            https://youtu.be/{{ record.video_id }}
+                                        {% endif %}
+                                    " target="_blank">
+                                        <span class="time">
+                                            {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+                                        </span>
+                                    </a>
+                                    <span class="status material-symbols-outlined">
+                                        {% if record.status == 'Submitted' %}
+                                            schedule
+                                        {% elif record.status == 'Waiting' %}
+                                            schedule
+                                        {% elif record.status == 'Investigating' %}
+                                            search
+                                        {% elif record.status == 'Approved' %}
+                                            check
+                                        {% elif record.status == 'Denied' %}
+                                            close
+                                        {% endif %}
+                                        <div class="tooltip">
+                                            {% if record.status == 'Submitted' %}
+                                                Record is waiting for approval.
+                                            {% elif record.status == 'Waiting' %}
+                                                Record is waiting for approval.
+                                            {% elif record.status == 'Investigating' %}
+                                                Record is being investigated.
+                                            {% elif record.status == 'Approved' %}
+                                                Record has been approved.
+                                            {% elif record.status == 'Denied' %}
+                                                Record has been denied.
+                                            {% endif %}
+                                        </div>
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </main>

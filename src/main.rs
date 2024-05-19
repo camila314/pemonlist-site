@@ -31,8 +31,8 @@ struct AppState {
     database: EdgeClient
 }
 
-const BASE_URL: &str = "http://localhost:3001";
-// const BASE_URL: &str = "https://si8ska1o.pemonlist.com";
+// const BASE_URL: &str = "http://localhost:3001";
+const BASE_URL: &str = "https://si8ska1o.pemonlist.com";
 
 trait Token {
     async fn get_info_from_token(&self, token_string: &str) -> Value;
@@ -47,6 +47,7 @@ impl Token for edgedb_tokio::Client {
                     image,
                     profile_shape,
                     status,
+                    mod,
                     player: {
                         id, 
                         name,
@@ -58,6 +59,13 @@ impl Token for edgedb_tokio::Client {
                             time_ms := (select to_str(.time, \"MS\")),
                             video_id,
                             rank
+                        } order by .level.placement),
+                        unverified_records := (select .unverified_entries {
+                            level: { name, level_id, placement },
+                            time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
+                            time_ms := (select to_str(.time, \"MS\")),
+                            video_id,
+                            status
                         } order by .level.placement),
                         rank,
                         device
@@ -81,7 +89,7 @@ async fn index(State(state): State<AppState>) -> Html<String> {
             name := (select .player.name),
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
             time_ms := (select to_str(.time, \"MS\"))
-        } order by .time limit 1)
+        } filter .status = Status.Approved  order by .time limit 1)
     } order by .placement", &()).await.unwrap().parse().unwrap();
 
     ctx.insert("levels", &levels);
@@ -108,7 +116,7 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
         *guard = players.clone();
     } else {
         let records: i64 = state.database.query_required_single_json("
-            select count((select Entry))
+            select count((select Entry filter .status = Status.Approved))
         ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
 
         if records != RECORDS.read().unwrap().clone() {
@@ -164,14 +172,14 @@ async fn level(State(state): State<AppState>, Path(level_id): Path<u64>) -> Html
             video_id,
             mobile,
             rank
-        } order by .time)
+        } filter .status = Status.Approved order by .time)
     } filter .level_id = <int64>$0", &(level_id as i64,)).await.unwrap().parse().unwrap();
 
     ctx.insert("level", &level.as_array().unwrap()[0]);
     state.template.render("level.html", &ctx).unwrap().into()
 }
 
-async fn player(State(state): State<AppState>, Path(username): Path<String>) -> Html<String> {
+async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): Path<String>) -> Result<Html<String>, Redirect> {
     let mut ctx = Context::new();
 
     let player: Value = state.database.query_json("select Player {
@@ -189,8 +197,28 @@ async fn player(State(state): State<AppState>, Path(username): Path<String>) -> 
         device
     } filter .name = <str>$0", &(username,)).await.unwrap().parse().unwrap();
 
+    match jar.get("token") {
+        Some(ref cookie) => {
+            let token = state.database.query_json("
+                select AuthToken {
+                    account: { player: { name } }
+                } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+            ", &(cookie.value(),)).await.unwrap().parse::<Value>().unwrap();
+
+            if !token[0]["account"]["player"]["name"].is_null() {
+                let names_match = token[0]["account"]["player"]["name"].as_str().unwrap() == player[0]["name"].as_str().unwrap();
+
+                if names_match {
+                    return Err(Redirect::to("/account"));
+                }
+            }
+        }
+
+        None => {}
+    }
+
     ctx.insert("player", &player.as_array().unwrap()[0]);
-    state.template.render("player.html", &ctx).unwrap().into()
+    Ok(state.template.render("player.html", &ctx).unwrap().into())
 }
 
 async fn submit(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
@@ -339,8 +367,6 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
                         discord: { global_name, user_id, username, avatar, accent_color, banner }
                     } filter .account.id = <uuid><str>$0
                 ", &(token[0]["account"]["id"].as_str().unwrap(),)).await.unwrap().parse().unwrap();
-
-                println!("{migration:#?}");
 
                 ctx.insert("migration", &migration[0]);
 
@@ -675,6 +701,141 @@ async fn migrate_account(State(state): State<AppState>, Form(mut body): Form<Mig
     Redirect::to("/account")
 }
 
+async fn modpage(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let mut ctx = Context::new();
+
+    match jar.get("token") {
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
+
+            if !token[0]["account"].is_null() && token[0]["account"]["mod"].as_bool().unwrap() {
+                ctx.insert("account", &token[0]["account"]);
+
+                return Ok(state.template.render("mod.html", &ctx).unwrap().into());
+            }
+        }
+
+        None => {}
+    }
+
+    Err(Redirect::to("/account"))
+}
+
+async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let mut ctx = Context::new();
+
+    match jar.get("token") {
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
+
+            let records = state.database.query_json("
+                select Entry {
+                    id,
+                    video_id,
+                    raw_video,
+                    time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
+                    time_ms := (select to_str(.time, \"MS\")),
+                    status,
+                    mobile,
+                    player: {
+                        name,
+                        account := (select .<player[is Account] {
+                            image,
+                            profile_shape,
+                            discord: { global_name, user_id, username, avatar }
+                        } limit 1)
+                    },
+                    level: { name, placement, video_id, level_id }
+                } filter .status != Status.Approved and .status != Status.Denied order by .created_at asc
+            ", &()).await.unwrap().parse::<Value>().unwrap();
+
+            ctx.insert("records", &records.as_array().unwrap());
+
+            if !token[0]["account"].is_null() && token[0]["account"]["mod"].as_bool().unwrap() {
+                ctx.insert("account", &token[0]["account"]);
+                ctx.insert("token", cookie.value());
+
+                return Ok(state.template.render("modrecords.html", &ctx).unwrap().into());
+            }
+        }
+
+        None => {}
+    }
+
+    Err(Redirect::to("/account"))
+}
+
+#[derive(Deserialize)]
+struct EntryEdit {
+    entryid: String,
+    token: String,
+    time: String,
+    status: String
+}
+
+async fn edit_record(State(state): State<AppState>, Form(mut body): Form<EntryEdit>) -> Redirect {
+    let token = state.database.query_json("
+        select AuthToken {
+            account: { id, mod }
+        } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+    ", &(&body.token,)).await.unwrap().parse::<Value>().unwrap();
+
+    if token[0]["account"]["id"].is_null() {
+        return Redirect::to("/account");
+    }
+
+    if token[0]["account"]["mod"].as_bool() == Some(false) {
+        return Redirect::to("/");
+    }
+
+    state.database.execute("
+        update Entry filter .id = <uuid><str>$0 set {
+            time := <duration><str>$1,
+            status := <Status><str>$2
+        }
+    ", &(
+        &body.entryid,
+        &body.time,
+        format!("{}{}", &body.status.remove(0).to_uppercase(), &body.status)
+    )).await.unwrap();
+
+    let records: i64 = state.database.query_required_single_json("
+        select count((select Entry filter .status = Status.Approved))
+    ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
+
+    if records != RECORDS.read().unwrap().clone() {
+        thread::spawn(move || {
+            let start = Instant::now();
+            println!("Leaderboard Thread - Started");
+
+            println!("Leaderboard Thread - {} records backed up", records - RECORDS.read().unwrap().clone());
+
+            let players = state.database.query_json("select Player {
+                name,
+                points,
+                rank,
+                device
+            } filter .points > 0 order by .points desc", &());
+
+            let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
+
+            println!("Leaderboard Thread - Got `Player` query");
+
+            let mut guard = LEADERBOARD_CACHE.write().unwrap();
+            *guard = new_players.clone();
+            drop(guard);
+
+            let mut guard = RECORDS.write().unwrap();
+            *guard = records.clone();
+            drop(guard);
+            
+            println!("Leaderboard Thread - Finished: {}s", start.elapsed().as_secs_f64());
+        });
+    }
+
+    Redirect::to("/mod/records")
+}
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
@@ -696,6 +857,9 @@ async fn main() {
         .route("/account/setup", post(setup_account))
         .route("/account/migrate", get(migrate))
         .route("/account/migrate", post(migrate_account))
+        .route("/mod", get(modpage))
+        .route("/mod/records", get(mod_records))
+        .route("/mod/records", post(edit_record))
         .route("/terms", get(terms))
         .route("/privacy", get(privacy))
         .route("/rules", get(rules))

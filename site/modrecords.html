@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platformer Demon List</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="/src/css/min/main.min.css">
+    <link rel="stylesheet" href="/src/css/min/footer.min.css">
+    <link rel="stylesheet" href="/src/css/min/nav.min.css">
+    <link rel="stylesheet" href="/src/css/min/mod.min.css">
+    <link rel="stylesheet" href="/src/css/min/modrecords.min.css">
+
+    <meta name="color-scheme" content="dark">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/meta/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/meta/favicon-16x16.png">
+    <link rel="manifest" href="/meta/site.webmanifest">
+</head>
+<body>
+    <!---->
+    {% include "template/nav.html" %}
+    <!---->
+    <main>
+        <div class="container">
+            <div class="select">
+                <a href="/mod/records">Records</a>
+                <a href="/mod/users">Users</a>
+                <a href="/mod/level">Level</a>
+            </div>
+            <hr>
+            {% for record in records %}
+                <div class="record">
+                    <span>
+                        <div class="user">
+                            <a href="/player/{{ record.player.name }}" target="_blank" class="player">
+                                {% if record.player.account %}
+                                    <img src="{{ record.player.account.image }}=s48-c" referrerpolicy="no-referrer" alt="{{ record.player.name }}'s profile picture" class="{{ account.profile_shape }}">
+                                {% endif %}
+                                <p>{{ record.player.name }}</p>
+                            </a>
+                            {% if record.player.account.discord %}
+                                <a href="https://discordapp.com/users/{{ record.player.account.discord.user_id }}" target="_blank" class="discord">
+                                    <img src="https://cdn.discordapp.com/avatars/{{ record.player.account.discord.user_id }}/{{ record.player.account.discord.avatar }}.webp?size=48" referrerpolicy="no-referrer" alt="{{ record.player.account.discord.global_name }}'s Discord profile picture">
+                                    <p>{{ record.player.account.discord.global_name }} <span class="username">@{{ record.player.account.discord.username }}</span></p>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="video">
+                            {% if record.raw_video %}
+                                <span class="select">
+                                    <button data-url="
+                                        {%- if 'https://' in record.video_id -%}
+                                            {{ record.video_id }}
+                                        {%- else -%}
+                                            https://www.youtube-nocookie.com/embed/{{ record.video_id }}/
+                                        {%- endif -%}
+                                    " class="selected">Video</button>
+                                    <button data-url="{{ record.raw_video }}">Raw</button>
+                                </span>
+                            {% endif %}
+                            <span class="preview">
+                                {% if not record.raw_video %}
+                                    {% if 'https://' in record.video_id %}
+                                        <a href="{{ record.video_id }}" target="_blank">View video <span class="material-symbols-outlined">open_in_new</span></a>
+                                    {% else %}
+                                        <iframe src="https://www.youtube-nocookie.com/embed/{{ record.video_id }}/" frameborder="0" loading="lazy"></iframe>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="" target="_blank">View video<span class="material-symbols-outlined">open_in_new</span></a>
+                                    <iframe src="" frameborder="0" loading="lazy"></iframe>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </span>
+                    <form action="/mod/records" method="post">
+                        <input type="hidden" name="entryid" value="{{ record.id }}">
+                        <input type="hidden" name="token" value="{{ token }}">
+                        <div class="info">
+                            <a href="/level/{{ record.level.level_id }}" target="_blank" class="level">
+                                <h1>{{ record.level.name }}</h1>
+                                <p>#{{ record.level.placement }} - {{ record.level.level_id }}</p>
+                            </a>
+                            <input type="text" name="time" value="{{ record.time_format }}.{{ record.time_ms }}" id="time" required>
+                        </div>
+                        <div class="submit">
+                            <select name="status">
+                                <option value="waiting"
+                                    {%- if record.status == "Waiting" -%}
+                                        selected
+                                    {%- endif -%}
+                                >Waiting</option>
+                                <option value="investigating"
+                                    {%- if record.status == "Investigating" -%}
+                                        selected
+                                    {%- endif -%}
+                                >Investigating</option>
+                                <option value="denied"
+                                    {%- if record.status == "Denied" -%}
+                                        selected
+                                    {%- endif -%}
+                                >Denied</option>
+                                <option value="approved"
+                                    {%- if record.status == "Approved" -%}
+                                        selected
+                                    {%- endif -%}
+                                >Approved</option>
+                            </select>
+                            <input type="submit" value="Update Record" disabled>
+                        </div>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+    <!---->
+    {% include "template/footer.html" %}
+    <!---->
+</body>
+
+<script src="/src/js/main.js"></script>
+<script src="/src/js/navbar.js"></script>
+<script src="/src/js/jump.js"></script>
+<script src="/src/js/modrecords.js"></script>
+
+</html>

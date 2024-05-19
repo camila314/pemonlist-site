@@ -45,7 +45,7 @@ class Logger {
 
 const mainLogger = new Logger('Main')
 
-mainLogger.log('suck it mechabrandon')
+// mainLogger.log('suck it mechabrandon')
 
 if ('ontouchstart' in window) {
     mainLogger.info('Device seems to be a touchscreen')
@@ -65,3 +65,41 @@ if (!navigator.userAgentData) {
 } else mobile = navigator.userAgentData.mobile
 
 mainLogger.info(`Browser reporting device as a ${mobile ? 'mobile' : 'desktop'} device`)
+
+function getVideoIDFromURL(url) {
+    let parsedURL = new URL(url)
+
+    // converting other URLs
+    if (parsedURL.pathname == '/oembed')
+        parsedURL = new URL(parsedURL.searchParams.get('url'))
+
+    if (parsedURL.pathname == '/attribution_link')
+        parsedURL = new URL(parsedURL.searchParams.get('u'), 'https://youtube.com')
+
+
+    // youtube.com/watch?v=dQw4w9WgXcQ
+    if (parsedURL.searchParams.get('v')) {
+        return parsedURL.searchParams.get('v')
+    }
+
+    // youtube.com/?vi=dQw4w9WgXcQ
+    if (parsedURL.searchParams.get('vi')) {
+        return parsedURL.searchParams.get('vi')
+    }
+
+    // checks for URL slugs like youtube.com/watch/dQw4w9WgXcQ or youtube.com/v/dQw4w9WgXcQ
+    for (const slug of [ 'embed', 'e', 'shorts', 'live', 'watch', 'v', 'vi' ]) {
+        const match = parsedURL.pathname.match(new RegExp(`/${slug}/(.+)$`))
+        if (match) return match[1].split('&')[0] // split protects `vi` from returning feature parameter
+    }
+
+    // youtube.com/user/GitHub#p/a/u/1/lalOy8Mbfdc
+    if (parsedURL.hash.match(/#p\/(?:a\/)?u\/\d+\/.+$/)) {
+        return parsedURL.hash.match(/#p\/(?:a\/)?u\/\d+\/(.+)$/)[1].split('?')[0] // split protects from returning rel parameter
+    }
+
+    // youtu.be/dQw4w9WgXcQ
+    if (parsedURL.hostname.match(/youtu\.be/)) {
+        return parsedURL.pathname.slice(1).split('&')[0] // split protects from returning feature parameter
+    }
+}
