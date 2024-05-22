@@ -23,16 +23,14 @@ use time::OffsetDateTime;
 use tower_http::services::{ServeDir, ServeFile};
 use url::form_urlencoded;
 
-mod db;
-
 #[derive(Clone)]
 struct AppState {
     template: Tera,
     database: EdgeClient
 }
 
-// const BASE_URL: &str = "http://localhost:3001";
-const BASE_URL: &str = "https://pemonlist.com";
+// const BASE_URL: &str = "https://pemonlist.com";
+const BASE_URL: &str = "http://localhost:8111";
 
 trait Token {
     async fn get_info_from_token(&self, token_string: &str) -> Value;
@@ -276,38 +274,59 @@ async fn submit_record(State(state): State<AppState>, Form(body): Form<RecordInf
     }
 
     let entry: Value = state.database.query_json("
-        select Entry { id } filter
-            .video_id = <str>$0 and
-            .player = <Player><uuid><str>$1 and
+        select Entry { id, faster := .time > <duration><str>$0 } filter
+            .video_id = <str>$1 and
             .level = (select Level filter .level_id = <int64><str>$2)
     ", &(
+        &body.timeplain,
         video_id,
-        account[0]["account"]["player"]["id"].as_str().unwrap(),
         &body.levelid
     )).await.unwrap().parse().unwrap();
 
-    if !entry[0]["id"].is_null() {
+    if !entry[0]["id"].is_null() && entry[0]["faster"].as_bool() != Some(true) {
         return Ok(state.template.render("duplicate.html", &Context::new()).unwrap().into());
     }
 
-    state.database.query_json("
-        insert Entry {
-            status := Status.Waiting,
-            video_id := <str>$0,
-            raw_video := <str>$1,
-            player := <Player><uuid><str>$2,
-            level := (select Level filter .level_id = <int64><str>$3),
-            time := <duration><str>$4,
-            mobile := <bool>$5
-        }
-    ", &(
-        video_id,
-        &body.raw,
-        account[0]["account"]["player"]["id"].as_str().unwrap(),
-        &body.levelid,
-        &body.timeplain,
-        &body.device == "mobile"
-    )).await.unwrap().parse::<Value>().unwrap();
+    if entry[0]["id"].is_null() {
+        state.database.execute("
+            insert Entry {
+                status := Status.Waiting,
+                video_id := <str>$0,
+                raw_video := <str>$1,
+                player := <Player><uuid><str>$2,
+                level := (select Level filter .level_id = <int64><str>$3),
+                time := <duration><str>$4,
+                mobile := <bool>$5
+            }
+        ", &(
+            video_id,
+            &body.raw,
+            account[0]["account"]["player"]["id"].as_str().unwrap(),
+            &body.levelid,
+            &body.timeplain,
+            &body.device == "mobile"
+        )).await.unwrap();
+    } else {
+        state.database.execute("
+            update Entry filter .id = <uuid><str>$0 set {
+                status := Status.Waiting,
+                video_id := <str>$1,
+                raw_video := <str>$2,
+                player := <Player><uuid><str>$3,
+                level := (select Level filter .level_id = <int64><str>$4),
+                time := <duration><str>$5,
+                mobile := <bool>$6
+            }
+        ", &(
+            entry[0]["id"].as_str().unwrap(),
+            video_id,
+            &body.raw,
+            account[0]["account"]["player"]["id"].as_str().unwrap(),
+            &body.levelid,
+            &body.timeplain,
+            &body.device == "mobile"
+        )).await.unwrap();
+    }
 
     Ok(state.template.render("submitted.html", &Context::new()).unwrap().into())
 }
@@ -836,6 +855,148 @@ async fn edit_record(State(state): State<AppState>, Form(mut body): Form<EntryEd
     Redirect::to("/mod/records")
 }
 
+async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let mut ctx = Context::new();
+
+    match jar.get("token") {
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
+
+            let records = state.database.query_json("
+                select MigrationRequest {
+                    id,
+                    account: {
+                        profile_circle,
+                        image
+                    },
+                    player: {
+                        name
+                    },
+                    discord: {
+                        global_name,
+                        user_id,
+                        avatar,
+                        username
+                    }
+                } filter .account.status = AccountStatus.Migrating order by .created_at asc
+            ", &()).await.unwrap().parse::<Value>().unwrap();
+
+            ctx.insert("requests", &records.as_array().unwrap());
+
+            if !token[0]["account"].is_null() && token[0]["account"]["mod"].as_bool().unwrap() {
+                ctx.insert("account", &token[0]["account"]);
+                ctx.insert("token", cookie.value());
+
+                return Ok(state.template.render("modusers.html", &ctx).unwrap().into());
+            }
+        }
+
+        None => {}
+    }
+
+    Err(Redirect::to("/account"))
+}
+
+async fn settings(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let mut ctx = Context::new();
+
+    match jar.get("token") {
+        Some(ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
+
+            ctx.insert("token", cookie.value());
+
+            if token[0]["account"].is_null() {
+                return Err(Redirect::to("/account"));
+            }
+
+            ctx.insert("account", &token[0]["account"]);
+
+            if token[0]["account"]["status"].as_str() != Some("Done") {
+                return Err(Redirect::to("/account"));
+            }
+        }
+
+        None => {}
+    }
+
+    Ok(state.template.render("settings.html", &ctx).unwrap().into())
+}
+
+#[derive(Deserialize)]
+struct AccountSettings {
+    token: String,
+    method: String,
+    name: Option<String>,
+    device: Option<String>,
+    profileshape: Option<String>
+}
+
+async fn account_settings(State(state): State<AppState>, Form(body): Form<AccountSettings>) -> Redirect {
+    match body.method.clone().as_str() {
+        "update" => {
+            let info = state.database.query_json("
+                select AuthToken { id, account: { id, player } } filter .token = <str>$0
+            ", &(&body.token,)).await.unwrap().parse::<Value>().unwrap();
+
+            if info[0]["id"].is_null() {
+                return Redirect::to("/account");
+            }
+
+            let mut device = body.device.clone().unwrap();
+            let mut profileshape = body.profileshape.clone().unwrap();
+
+            println!("{info:#?}");
+
+            state.database.execute("
+                update Player filter .id = <uuid><str>$0 set {
+                    name := <str>$1,
+                    device := <Device><str>$2
+                };
+                update Account filter .id = <uuid><str>$3 set {
+                    profile_shape := <ProfileShape><str>$4
+                }
+            ", &(
+                info[0]["account"]["player"]["id"].as_str().unwrap(),
+                &body.name.unwrap(),
+                format!("{}{}", device.remove(0).to_uppercase(), &device),
+                info[0]["account"]["id"].as_str().unwrap(),
+                format!("{}{}", profileshape.remove(0).to_uppercase(), &profileshape)
+            )).await.unwrap();
+        }
+
+        "logout" => {
+            state.database.execute("
+                delete AuthToken filter .token = <str>$0
+            ", &(&body.token,)).await.unwrap();
+
+            return Redirect::to("/");
+        }
+
+        "delete" => {
+            let info = state.database.query_json("
+                select AuthToken { id, account: { id, player } } filter .token = <str>$0
+            ", &(&body.token,)).await.unwrap().parse::<Value>().unwrap();
+
+            if info[0]["id"].is_null() {
+                return Redirect::to("/");
+            }
+
+            state.database.execute("
+                delete AuthToken filter .account.id = <uuid><str>$0;
+                delete MigrationRequest filter .account.id = <uuid><str>$0;
+                delete Account filter .id = <uuid><str>$0
+            ", &(info[0]["account"]["id"].as_str().unwrap(),)).await.unwrap();
+
+            return Redirect::to("/");
+        }
+
+        _ => {}
+    }
+
+    Redirect::to("/account/settings")
+}
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
@@ -853,6 +1014,8 @@ async fn main() {
         .route("/submit", get(submit))
         .route("/submit", post(submit_record))
         .route("/account", get(account))
+        .route("/account/settings", get(settings))
+        .route("/account/settings", post(account_settings))
         .route("/account/setup", get(setup))
         .route("/account/setup", post(setup_account))
         .route("/account/migrate", get(migrate))
@@ -860,6 +1023,7 @@ async fn main() {
         .route("/mod", get(modpage))
         .route("/mod/records", get(mod_records))
         .route("/mod/records", post(edit_record))
+        .route("/mod/users", get(mod_users))
         .route("/terms", get(terms))
         .route("/privacy", get(privacy))
         .route("/rules", get(rules))
@@ -873,6 +1037,6 @@ async fn main() {
 
     // Set up 
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8111").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }

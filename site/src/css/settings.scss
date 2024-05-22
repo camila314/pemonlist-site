@@ -1,0 +1,274 @@
+main {
+    align-items: center !important;
+
+    .container {
+        max-width: 700px !important;
+    }
+}
+
+.main {
+    background-color: #334;
+    padding: 20px;
+    border-radius: 20px;
+
+    h1 {
+        text-align: center;
+        margin: 0px;
+        margin-bottom: 20px;
+    }
+
+    div {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-direction: column;
+
+        &:not(:last-of-type) {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin: 0px;
+            margin-bottom: 20px;
+        }
+
+        span {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        form {
+            max-width: 100%;
+        }
+    }
+
+    .update {
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            flex-direction: column;
+            width: 100%;
+
+            label {
+                user-select: none;
+
+                &:not(:first-of-type) {
+                    margin-top: 15px;
+                }
+            }
+
+            input, select {
+                padding: 10px 7px;
+                margin-top: 10px;
+                background-color: #334;
+                border: 1px solid #556;
+                border-radius: 4px;
+                color: #dde;
+                font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+                font-size: medium;
+
+                option {
+                    background-color: #223;
+                    color: #dde;
+                }
+
+                &[type="submit"] {
+                    cursor: pointer;
+                }
+
+                &:last-child {
+                    margin-top: 15px;
+                }
+            }
+
+            select {
+                padding: 9px 7px;
+                user-select: none;
+            }
+
+            .profile {
+                display: flex;
+                justify-content: space-between;
+                align-items: stretch;
+
+                div {
+                    display: flex;
+                    justify-content: center;
+                    align-items: stretch;
+                    flex-direction: column;
+                    margin-top: 15px;
+
+                    &.select {
+                        flex-grow: 1;
+                        margin-right: 10px;
+                        justify-self: space-between;
+                        margin-bottom: 0px;
+
+                        select {
+                            margin-top: 10px;
+                        }
+                    }
+    
+                    &.img {
+                        padding: 4px;
+                        background-color: #223c;
+                        border-radius: 3px;
+        
+                        img {
+                            transition: border-radius 150ms ease-out;
+        
+                            &.circle {
+                                border-radius: 50%;
+                            }
+        
+                            &.squircle {
+                                border-radius: 15%;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .actions {
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        form {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            max-width: 100%;
+
+            &:not(:last-of-type) {
+                margin-right: 10px;
+            }
+    
+            input {
+                max-width: 100%;
+                padding: 12px 17px;
+                border-radius: 7px;
+                border: 1px solid #667;
+                cursor: pointer;
+                background: #334;
+                transition: background-color 70ms ease-out;
+                color: #dde;
+                
+                &.delete {
+                    border-color: #e44;
+                }
+            }
+        }
+    }
+}
+
+.cover {
+    position: absolute;
+    inset: 0px;
+    background-color: #1120;
+    transition: background-color 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    &.visible {
+        background-color: #1128;
+    }
+
+    .confirmation {
+        position: absolute;
+        padding: 20px;
+        font-size: medium;
+        border-radius: 20px;
+        background-color: #334;
+        transition: all 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+        z-index: 1;
+        left: 50%;
+        top: 50%;
+        white-space: normal;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        flex-direction: column;
+        opacity: 0;
+        transform: translate(-50%, -54%) scale(0.95);
+        width: 350px;
+        max-width: calc(100% - 80px);
+    
+        &.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        h1, p {
+            margin: 0px;
+            text-align: center;
+        }
+
+        .disclaimer {
+            color: #99a;
+            font-size: small;
+            margin-top: 10px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        span {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            button {
+                width: 35%;
+                border: 1px solid #556;
+                background-color: #334;
+                cursor: pointer;
+                color: #dde;
+
+                &.yes {
+                    border-color: #e44;
+                }
+            }
+        }
+    }
+}
+
+body:not(.touch) {
+    .delete:hover {
+        background-color: #e44;
+        color: #223;
+    }
+
+    .confirmation button:hover {
+        background-color: #334 !important;
+
+        &.yes {
+            background-color: #e44 !important;
+            color: #223;
+        }
+    }
+}
+
+body.touch {
+    .delete:active {
+        background-color: #e44;
+        color: #223;
+    }
+
+    .confirmation button:active {
+        background-color: #334 !important;
+
+        &.yes {
+            background-color: #e44 !important;
+            color: #223;
+        }
+    }
+}

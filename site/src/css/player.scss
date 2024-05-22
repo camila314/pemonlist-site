@@ -144,6 +144,7 @@
         background-color: #223;
         padding: 20px;
         border-radius: 10px;
+        margin-bottom: 20px;
 
         div {
             border-radius: 5px;
@@ -246,7 +247,6 @@
                     .tooltip {
                         opacity: 1;
                         transform: translateY(-3px) scale(1);
-                        scale: 1;
                     }
                 }
             }
@@ -274,6 +274,7 @@ body.touch {
     .records, .unverified {
         .table {
             width: calc(100% - 40px) !important;
+            margin-bottom: 0px !important;
     
             div {
                 height: 45px !important;

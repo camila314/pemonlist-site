@@ -156,7 +156,7 @@ submit.addEventListener('click', () => {
     else video.removeAttribute('required')
 
     const rawid = getVideoIDFromURL(raw.value)
-    if (rawid) videoid.value = rawid
+    if (rawid && videoid.value.length == 0) videoid.value = rawid
 
     submit.click()
 })

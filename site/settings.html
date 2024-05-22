@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platformer Demon List</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="/src/css/min/main.min.css">
+    <link rel="stylesheet" href="/src/css/min/footer.min.css">
+    <link rel="stylesheet" href="/src/css/min/nav.min.css">
+    <link rel="stylesheet" href="/src/css/min/settings.min.css">
+
+    <meta name="color-scheme" content="dark">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/meta/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/meta/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/meta/favicon-16x16.png">
+    <link rel="manifest" href="/meta/site.webmanifest">
+</head>
+<body>
+    <!---->
+    {% include "template/nav.html" %}
+    <!---->
+    <main>
+        <div class="container">
+            <div class="main">
+                <h1>Account Settings</h1>
+                <!---->
+                <div class="update">
+                    <h2>Update Account</h2>
+                    <form action="/account/settings" method="post">
+                        <input type="hidden" name="method" value="update">
+                        <input type="hidden" name="token" value="{{ token }}">
+
+                        <label for="name">Name</label>
+                        <input type="text" name="name" id="name" value="{{ account.player.name }}">
+                        <label for="device">Device</label>
+                        <select name="device" id="device">
+                            <option value="desktop"
+                                {%- if account.player.device == "Desktop" -%}
+                                    selected
+                                {%- endif -%}
+                            >Desktop</option>
+                            <option value="mobile"
+                                {%- if account.player.device == "Mobile" -%}
+                                    selected
+                                {%- endif -%}
+                            >Mobile</option>
+                            <option value="both"
+                                {%- if account.player.device == "Both" -%}
+                                    selected
+                                {%- endif -%}
+                            >Both</option>
+                        </select>
+                        <span class="profile">
+                            <div class="select">
+                                <label for="profileshape">Profile Shape</label>
+                                <select name="profileshape" id="profileshape">
+                                    <option value="circle"
+                                        {%- if account.profile_shape == "Circle" -%}
+                                            selected
+                                        {%- endif -%}
+                                    >Circle</option>
+                                    <option value="squircle"
+                                        {%- if account.profile_shape == "Squircle" -%}
+                                            selected
+                                        {%- endif -%}
+                                    >Squircle</option>
+                                    <option value="square"
+                                        {%- if account.profile_shape == "Square" -%}
+                                            selected
+                                        {%- endif -%}
+                                    >Square</option>
+                                </select>
+                            </div>
+                            <div class="img">
+                                <img src="{{ account.image }}=s64-c" referrerpolicy="no-referrer" alt="Your profile picture" class="
+                                {%- if account.profile_shape == "Circle" -%}
+                                    circle
+                                {%- elif account.profile_shape == "Squircle" -%}
+                                    squircle
+                                {%- endif -%}
+                                ">
+                            </div>
+                        </span>
+                        <input type="submit" value="Update Account">
+                    </form>
+                </div>
+                <!---->
+                <div class="actions">
+                    <h2>Account Actions</h2>
+                    <span>
+                        <form action="/account/settings" method="post">
+                            <input type="hidden" name="method" value="logout">
+                            <input type="hidden" name="token" value="{{ token }}">
+                            <input type="submit" value="Log Out" class="logout">
+                        </form>
+                        <form action="/account/settings" method="post">
+                            <input type="hidden" name="method" value="delete">
+                            <input type="hidden" name="token" value="{{ token }}">
+                            <input type="submit" value="Delete Account" class="delete">
+                        </form>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!---->
+    {% include "template/footer.html" %}
+    <!---->
+</body>
+
+<script src="/src/js/main.js"></script>
+<script src="/src/js/nav.js"></script>
+<script src="/src/js/jump.js"></script>
+<script src="/src/js/settings.js"></script>
+
+</html>

@@ -130,6 +130,7 @@ main {
         background-color: #223;
         padding: 20px;
         border-radius: 10px;
+        margin-bottom: 20px;
 
         div {
             border-radius: 5px;
@@ -310,6 +311,7 @@ body.touch {
     
     .records .table {
         width: calc(100% - 40px) !important;
+        margin-bottom: 0px !important;
 
         div {
             height: 45px !important;

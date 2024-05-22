@@ -48,7 +48,6 @@ main {
             border-radius: 4px;
             color: #dde;
             height: 24px;
-            transition: background-color 70ms ease-out;
             font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
             font-size: medium;
 
@@ -137,6 +136,7 @@ main {
             display: flex;
             justify-content: space-between;
             align-items: stretch;
+            margin-bottom: 15px;
 
             span {
                 display: flex;

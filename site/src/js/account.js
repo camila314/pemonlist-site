@@ -12,16 +12,16 @@ if (id != null) id.addEventListener('click', async e => {
     await navigator.clipboard.writeText(id.firstChild.data)
 
     document.querySelector('.info .id').appendChild(copied)
-    await new Promise(r => requestAnimationFrame(r))
+    await frame()
     copied.classList.toggle('open')
 
-    await new Promise(r => setTimeout(r, 2200))
+    await ms(2200)
 
     copied.style.transitionTimingFunction = 'cubic-bezier(0.55, 0.06, 0.68, 0.19)'
-    await new Promise(r => requestAnimationFrame(r))
+    await frame()
     copied.classList.toggle('open')
 
-    await new Promise(r => setTimeout(r, 200))
+    await ms(200)
 
     copied.remove()
 })

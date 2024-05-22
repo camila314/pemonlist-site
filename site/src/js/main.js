@@ -103,3 +103,9 @@ function getVideoIDFromURL(url) {
         return parsedURL.pathname.slice(1).split('&')[0] // split protects from returning feature parameter
     }
 }
+
+const ms = async (ms) => await new Promise(r => setTimeout(r, ms))
+const frame = async () => await new Promise(r => requestAnimationFrame(r))
+
+const cookies = {}
+document.cookie.split('; ').forEach(c => cookies[c.split('=')[0]] = decodeURIComponent(c.split('=')[1]))

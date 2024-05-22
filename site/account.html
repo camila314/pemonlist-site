@@ -35,7 +35,9 @@
                     {% if account.mod %}
                         <a href="/mod" class="material-symbols-outlined">shield_person</a>
                     {% endif %}
-                    <!-- <a href="/account/options" class="material-symbols-outlined">manage_accounts</a> -->
+                    {% if account.mod %}
+                    <a href="/account/settings" class="material-symbols-outlined">manage_accounts</a>
+                    {% endif %}
                 </div>
                 {% if account.player %}
                     <h1>
@@ -236,7 +238,7 @@
 </body>
 
 <script src="/src/js/main.js"></script>
-<script src="/src/js/navbar.js"></script>
+<script src="/src/js/nav.js"></script>
 <script src="/src/js/jump.js"></script>
 <script src="/src/js/account.js"></script>
 
