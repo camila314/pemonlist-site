@@ -19,7 +19,6 @@
                     <h2>Update Account</h2>
                     <form action="/account/settings" method="post">
                         <input type="hidden" name="method" value="update">
-                        <input type="hidden" name="token" value="{{ token }}">
 
                         <label for="name">Name</label>
                         <input type="text" name="name" id="name" value="{{ account.player.name }}">
@@ -81,12 +80,10 @@
                     <span>
                         <form action="/account/settings" method="post">
                             <input type="hidden" name="method" value="logout">
-                            <input type="hidden" name="token" value="{{ token }}">
                             <input type="submit" value="Log Out" class="logout">
                         </form>
                         <form action="/account/settings" method="post">
                             <input type="hidden" name="method" value="delete">
-                            <input type="hidden" name="token" value="{{ token }}">
                             <input type="submit" value="Delete Account" class="delete">
                         </form>
                     </span>
