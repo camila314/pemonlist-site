@@ -9,10 +9,7 @@ main {
     padding: 10px 20px;
     background-color: #334;
     border-radius: 20px;
-
-    &:not(:last-of-type) {
-        margin-bottom: 20px;
-    }
+    margin-top: 20px;
 
     span, form {
         display: flex;

@@ -1,6 +1,11 @@
 .container {
-    h1, h2 {
+    h1, h2, h4 {
         color: #eef;
+    }
+
+    h4 {
+        margin: 0px;
+        margin-bottom: -10px;
     }
 
     h3 {
@@ -10,11 +15,11 @@
         font-size: small;
     }
 
-    :first-child {
+    &>:first-child {
         margin-top: 0px;
     }
 
-    :last-child {
+    &>:last-child {
         margin-bottom: 0px;
     }
 }

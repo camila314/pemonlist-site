@@ -1,0 +1,8 @@
+Sitemap: https://pemonlist.com/
+Sitemap: https://pemonlist.com/leaderboard
+Sitemap: https://pemonlist.com/terms
+Sitemap: https://pemonlist.com/privacy
+Sitemap: https://pemonlist.com/rules
+
+User-agent: *
+Allow: /

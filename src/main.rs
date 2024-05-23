@@ -29,8 +29,8 @@ struct AppState {
     database: EdgeClient
 }
 
-// const BASE_URL: &str = "https://pemonlist.com";
-const BASE_URL: &str = "http://localhost:8111";
+const BASE_URL: &str = "https://pemonlist.com";
+// const BASE_URL: &str = "http://localhost:8111";
 
 trait Token {
     async fn get_info_from_token(&self, token_string: &str) -> Value;
@@ -1030,6 +1030,7 @@ async fn main() {
         .route("/oauth", get(oauth))
 
         .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
+        .route_service("/robots.txt", ServeFile::new("site/robots.txt"))
 
         .nest_service("/src", ServeDir::new("site/src"))
         .nest_service("/meta", ServeDir::new("site/meta"))
