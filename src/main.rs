@@ -11,7 +11,7 @@ use dotenv::dotenv;
 use edgedb_tokio::Client as EdgeClient;
 use futures::executor::block_on;
 use rand::{distributions::Alphanumeric, Rng};
-use reqwest;
+use reqwest::{self, StatusCode};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::sync::RwLock;
@@ -148,7 +148,7 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
     state.template.render("leaderboard.html", &ctx).unwrap().into()
 }
 
-async fn level(State(state): State<AppState>, Path(level_id): Path<u64>) -> Html<String> {
+async fn level(State(state): State<AppState>, Path(level_id): Path<u64>) -> (StatusCode, Html<String>) {
     let mut ctx = Context::new();
 
     let level: Value = state.database.query_json("select Level {
@@ -169,11 +169,18 @@ async fn level(State(state): State<AppState>, Path(level_id): Path<u64>) -> Html
         } filter .status = Status.Approved order by .time)
     } filter .level_id = <int64>$0", &(level_id as i64,)).await.unwrap().parse().unwrap();
 
+    if level[0]["name"].is_null() {
+        let mut ctx = Context::new();
+        ctx.insert("status", "400: Bad Request");
+
+        return (StatusCode::BAD_REQUEST, state.template.render("fallback.html", &ctx).unwrap().into())
+    }
+
     ctx.insert("level", &level.as_array().unwrap()[0]);
-    state.template.render("level.html", &ctx).unwrap().into()
+    (StatusCode::OK, state.template.render("level.html", &ctx).unwrap().into())
 }
 
-async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): Path<String>) -> Result<Html<String>, Redirect> {
+async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): Path<String>) -> Result<(StatusCode, Html<String>), Redirect> {
     let mut ctx = Context::new();
 
     let player: Value = state.database.query_json("select Player {
@@ -190,6 +197,13 @@ async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): P
         rank,
         device
     } filter .name = <str>$0", &(username,)).await.unwrap().parse().unwrap();
+
+    if player[0]["name"].is_null() {
+        let mut ctx = Context::new();
+        ctx.insert("status", "400: Bad Request");
+
+        return Ok((StatusCode::BAD_REQUEST, state.template.render("fallback.html", &ctx).unwrap().into()))
+    }
 
     match jar.get("token") {
         Some(ref cookie) => {
@@ -212,7 +226,7 @@ async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): P
     }
 
     ctx.insert("player", &player.as_array().unwrap()[0]);
-    Ok(state.template.render("player.html", &ctx).unwrap().into())
+    Ok((StatusCode::OK, state.template.render("player.html", &ctx).unwrap().into()))
 }
 
 async fn submit(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
@@ -1072,6 +1086,14 @@ async fn main() {
 
         .nest_service("/src", ServeDir::new("site/src"))
         .nest_service("/meta", ServeDir::new("site/meta"))
+
+        .fallback(|State(state): State<AppState>| async move {    
+            let mut ctx = Context::new();
+            ctx.insert("status", "404: Not Found");
+            
+            (StatusCode::NOT_FOUND, Html::<String>::from(state.template.render("fallback.html", &ctx).unwrap()))
+        })
+
         .with_state(state);
 
     // Set up 

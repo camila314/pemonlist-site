@@ -13,10 +13,20 @@ footer {
     span {
         margin: 0px 10px;
         margin-top: 5px;
-        color: #556;
+        color: #667;
         text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        
+        svg {
+            margin-right: 5px;
+        }
 
         &:last-child {
+            position: relative;
+            top: 0.5px;
             margin-bottom: 5px;
         }
 
@@ -28,13 +38,14 @@ footer {
             margin-top: 10px;
 
             a {
-                color: #556;
+                color: #667;
                 margin-right: 10px;
                 height: 16px;
 
                 svg {
                     position: relative;
                     top: 1px;
+                    margin: 0px;
                 }
 
                 &:last-child {

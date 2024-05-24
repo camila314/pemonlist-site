@@ -1,6 +1,15 @@
 const jumpLogger = new Logger('Jump')
 
-const jumpButton = document.querySelector('.jump')
+const jumpButton = document.createElement('button')
+jumpButton.classList.value = 'jump hidden'
+
+const icon = document.createElement('span')
+icon.className = 'material-symbols-outlined'
+icon.innerText = 'arrow_upward_alt'
+
+const text = document.createElement('p')
+text.innerText = 'Scroll to Top'
+
 const body = document.body
 
 ;(async function() {

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!---->
+    {% include "template/meta.html" %}
+    <!---->
+    <link rel="stylesheet" href="/src/css/min/fallback.min.css">
+</head>
+<body>
+    <!---->
+    {% include "template/nav.html" %}
+    <!---->
+    <main>
+        <div class="container">
+            <h1>Whoops!</h1>
+            <span>
+                <p>The requested URL could not be properly retrieved. If you entered an incorrect URL, please check your spelling and try again.</p>
+                <p>Not your fault? Feel free to message the developer!</p>
+                <pre>{{ status }}</pre>
+            </span>
+        </div>
+    </main>
+    <!---->
+    {% include "template/footer.html" %}
+    <!---->
+</body>
+
+<!---->
+{% include "template/include.html" %}
+<!---->
+
+</html>

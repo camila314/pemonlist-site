@@ -11,11 +11,6 @@
     <!---->
     {% include "template/nav.html" %}
     <!---->
-    <button class="jump hidden">
-        <span class="material-symbols-outlined">arrow_upward_alt</span>
-        <p>Scroll to Top</p>
-    </button>
-    <!---->
     <main>
         <div class="container">
             <div class="player">
@@ -225,9 +220,10 @@
     <!---->
 </body>
 
-<script src="/src/js/main.js"></script>
-<script src="/src/js/nav.js"></script>
-<script src="/src/js/jump.js"></script>
+<!---->
+{% include "template/include.html" %}
+<!---->
 <script src="/src/js/account.js"></script>
+<script src="/src/js/jump.js"></script>
 
 </html>

@@ -10,11 +10,6 @@
     <!---->
     {% include "template/nav.html" %}
     <!---->
-    <button class="jump hidden">
-        <span class="material-symbols-outlined">arrow_upward_alt</span>
-        <p>Scroll to Top</p>
-    </button>
-    <!---->
     <main>
         <!-- <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" autoplay="1" controls="0"></iframe> -->
         <div class="container">
@@ -78,9 +73,10 @@
     <!---->
 </body>
 
-<script src="/src/js/main.js"></script>
-<script src="/src/js/nav.js"></script>
-<script src="/src/js/jump.js"></script>
+<!---->
+{% include "template/include.html" %}
+<!---->
 <script src="/src/js/submit.js"></script>
+<script src="/src/js/jump.js"></script>
 
 </html>
