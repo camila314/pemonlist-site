@@ -12,6 +12,8 @@ text.innerText = 'Scroll to Top'
 
 const body = document.body
 
+body.appendChild(jumpButton)
+
 ;(async function() {
     if (!jumpButton) return
 
