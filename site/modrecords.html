@@ -16,7 +16,7 @@
             <div class="select">
                 <a href="/mod/records">Records</a>
                 <a href="/mod/users">Users</a>
-                <a href="/mod/level">Level</a>
+                <a href="/mod/level">Levels</a>
             </div>
             {% for record in records %}
                 <div class="record">
@@ -24,7 +24,7 @@
                         <div class="user">
                             <a href="/player/{{ record.player.name }}" target="_blank" class="player">
                                 {% if record.player.account %}
-                                    <img src="{{ record.player.account.image }}=s48-c" referrerpolicy="no-referrer" alt="{{ record.player.name }}'s profile picture" class="{{ account.profile_shape }}">
+                                    <img src="{{ record.player.account.image }}=s48-c" referrerpolicy="no-referrer" alt="{{ record.player.name }}'s profile picture" class="{{ record.player.account.profile_shape }}">
                                 {% endif %}
                                 <p>{{ record.player.name }}</p>
                             </a>

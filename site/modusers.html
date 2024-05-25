@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!---->
+    {% include "template/meta.html" %}
+    <!---->
+    <link rel="stylesheet" href="/src/css/min/mod.min.css">
+    <link rel="stylesheet" href="/src/css/min/modusers.min.css">
+</head>
+<body>
+    <!---->
+    {% include "template/nav.html" %}
+    <!---->
+    <main>
+        <div class="container">
+            <div class="select">
+                <a href="/mod/records">Records</a>
+                <a href="/mod/users">Users</a>
+                <a href="/mod/level">Levels</a>
+            </div>
+            {% for request in requests %}
+                <div class="request">
+                    <span>
+                        <div class="user">
+                            <a href="/player/{{ request.player.name }}" target="_blank" class="player">
+                                <img src="{{ request.account.image }}=s48-c" referrerpolicy="no-referrer" alt="{{ request.player.name }}'s profile picture" class="{{ request.account.profile_shape }}">
+                                <p>{{ request.player.name }}</p>
+                            </a>
+                            <a href="https://discordapp.com/users/{{ request.discord.user_id }}" target="_blank" class="discord">
+                                <img src="https://cdn.discordapp.com/avatars/{{ request.discord.user_id }}/{{ request.discord.avatar }}.webp?size=48" referrerpolicy="no-referrer" alt="{{ request.discord.global_name }}'s Discord profile picture">
+                                <p>{{ request.discord.global_name }} <span class="username">@{{ request.discord.username }}</span></p>
+                            </a>
+                        </div>
+                    </span>
+                    <form action="/mod/users" method="post">
+                        <input type="hidden" name="migrationid" value="{{ request.id }}">
+                        <input type="hidden" name="status" value="accept">
+                        <div class="submit">
+                            <input type="submit" value="Accept">
+                            <input type="submit" value="Deny" class="deny">
+                        </div>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+    <!---->
+    {% include "template/footer.html" %}
+    <!---->
+</body>
+
+<!---->
+{% include "template/include.html" %}
+<!---->
+<script src="/src/js/modusers.js"></script>
+<script src="/src/js/jump.js"></script>
+
+</html>

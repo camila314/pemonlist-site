@@ -26,7 +26,7 @@ main {
                 display: flex;
                 align-items: center;
                 justify-content: flex-start;
-                width: 200px;
+                width: 250px;
                 border-radius: 10px;
                 padding: 10px;
                 color: #dde;
@@ -259,7 +259,7 @@ main.touch {
     }
 }
 
-@media screen and (max-width: 1250px) {
+@media screen and (max-width: 1300px) {
     .record {
         justify-content: center;
         align-items: center;

@@ -206,7 +206,7 @@ async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): P
     }
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.query_json("
                 select AuthToken {
                     account: { player: { name } }
@@ -233,7 +233,7 @@ async fn submit(State(state): State<AppState>, jar: CookieJar) -> Result<Html<St
     let mut ctx = Context::new();
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             if token[0]["account"].is_null() || token[0]["account"]["status"].as_str() != Some("Done") {
@@ -388,7 +388,7 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
     let uri = format!("https://accounts.google.com/o/oauth2/v2/auth?{query}").parse::<Uri>().unwrap();
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             if !token[0]["account"].is_null() {
@@ -416,7 +416,7 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
     }
 
     match oauth2 {
-        Some(ref oauth2) => {
+        Some (ref oauth2) => {
             let params: [(&str, &str); 5] = [
                 ("client_id", &client_id),
                 ("client_secret", &client_secret),
@@ -503,7 +503,7 @@ async fn setup(State(state): State<AppState>, jar: CookieJar) -> Result<Html<Str
     let mut ctx = Context::new();
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
@@ -538,6 +538,7 @@ async fn setup_account(State(state): State<AppState>, jar: CookieJar, Form(mut b
             return Redirect::to("/account")
         }
     }
+
     let player: Value = state.database.query_json("
         select Player { id } filter .name = <str>$0
     ", &(&body.username,)).await.unwrap().parse().unwrap();
@@ -592,7 +593,7 @@ async fn migrate(State(state): State<AppState>, info: Option<Query<SetupInfoQuer
     let mut ctx = Context::new();
 
     match info {
-        Some(ref query) => {
+        Some (ref query) => {
             ctx.insert("setupinfo", &json!({
                 "username": &query.username,
                 "profileshape": &query.profileshape,
@@ -604,7 +605,7 @@ async fn migrate(State(state): State<AppState>, info: Option<Query<SetupInfoQuer
     };
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
@@ -762,7 +763,7 @@ async fn modpage(State(state): State<AppState>, jar: CookieJar) -> Result<Html<S
     let mut ctx = Context::new();
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             if !token[0]["account"].is_null() && token[0]["account"]["mod"].as_bool().unwrap() {
@@ -782,7 +783,7 @@ async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Ht
     let mut ctx = Context::new();
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             let records = state.database.query_json("
@@ -841,17 +842,17 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
         }
     }
 
-    let token = state.database.query_json("
+    let info = state.database.query_json("
         select AuthToken {
             account: { id, mod }
         } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
     ", &(token,)).await.unwrap().parse::<Value>().unwrap();
 
-    if token[0]["account"]["id"].is_null() {
+    if info[0]["account"]["id"].is_null() {
         return Redirect::to("/account");
     }
 
-    if token[0]["account"]["mod"].as_bool() == Some(false) {
+    if info[0]["account"]["mod"].as_bool() == Some(false) {
         return Redirect::to("/");
     }
 
@@ -907,14 +908,14 @@ async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html
     let mut ctx = Context::new();
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             let records = state.database.query_json("
                 select MigrationRequest {
                     id,
                     account: {
-                        profile_circle,
+                        profile_shape,
                         image
                     },
                     player: {
@@ -944,11 +945,88 @@ async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html
     Err(Redirect::to("/account"))
 }
 
+#[derive(Debug, Deserialize)]
+struct UserEdit {
+    migrationid: String,
+    status: String
+}
+
+async fn update_user(State(state): State<AppState>, jar: CookieJar, Form(body): Form<UserEdit>) -> Redirect {
+    let token: &str;
+
+    match jar.get("token") {
+        Some (ref cookie) => {
+            token = cookie.value()
+        }
+
+        None => {
+            return Redirect::to("/account")
+        }
+    }
+
+    let info = state.database.query_json("
+        select AuthToken {
+            account: { id, mod }
+        } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+    ", &(token,)).await.unwrap().parse::<Value>().unwrap();
+
+    if info[0]["account"]["id"].is_null() {
+        return Redirect::to("/account");
+    }
+
+    if info[0]["account"]["mod"].as_bool() == Some(false) {
+        return Redirect::to("/");
+    }
+
+    let request = state.database.query_json("
+        select MigrationRequest {
+            discord: { id },
+            account: { id },
+            player: { id }
+        } filter .id = <uuid><str>$0
+    ", &(&body.migrationid,)).await.unwrap().parse::<Value>().unwrap();
+
+    match body.status.clone().as_str() {
+        "accept" => {
+            state.database.execute("
+                delete MigrationRequest filter .id = <uuid><str>$0;
+                update Account filter .id = <uuid><str>$1 set {
+                    discord := <Discord><uuid><str>$2,
+                    player := <Player><uuid><str>$3,
+                    status := AccountStatus.Done
+                }
+            ", &(
+                &body.migrationid,
+                request[0]["account"]["id"].as_str().unwrap(),
+                request[0]["discord"]["id"].as_str().unwrap(),
+                request[0]["player"]["id"].as_str().unwrap()
+            )).await.unwrap();
+        }
+
+        "deny" => {
+            state.database.execute("
+                delete AuthToken filter .account.id = <uuid><str>$1;
+                delete MigrationRequest filter .id = <uuid><str>$0;
+                delete Account filter .id = <uuid><str>$1;
+                delete Discord filter .id = <uuid><str>$2
+            ", &(
+                &body.migrationid,
+                request[0]["account"]["id"].as_str().unwrap(),
+                request[0]["discord"]["id"].as_str().unwrap()
+            )).await.unwrap();
+        }
+
+        _ => {}
+    }
+
+    Redirect::to("/mod/users")
+}
+
 async fn settings(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
     let mut ctx = Context::new();
 
     match jar.get("token") {
-        Some(ref cookie) => {
+        Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
             if token[0]["account"].is_null() {
@@ -977,73 +1055,77 @@ struct AccountSettings {
 }
 
 async fn account_settings(State(state): State<AppState>, jar: CookieJar, Form(body): Form<AccountSettings>) -> Redirect {
+    let token: &str;
+
     match jar.get("token") {
-        Some(ref cookie) => {
-            match body.method.clone().as_str() {
-                "update" => {
-                    let info = state.database.query_json("
-                        select AuthToken { id, account: { id, player } } filter .token = <str>$0
-                    ", &(cookie.value(),)).await.unwrap().parse::<Value>().unwrap();
-        
-                    if info[0]["id"].is_null() {
-                        return Redirect::to("/account");
-                    }
-        
-                    let mut device = body.device.clone().unwrap();
-                    let mut profileshape = body.profileshape.clone().unwrap();
-        
-                    println!("{info:#?}");
-        
-                    state.database.execute("
-                        update Player filter .id = <uuid><str>$0 set {
-                            name := <str>$1,
-                            device := <Device><str>$2
-                        };
-                        update Account filter .id = <uuid><str>$3 set {
-                            profile_shape := <ProfileShape><str>$4
-                        }
-                    ", &(
-                        info[0]["account"]["player"]["id"].as_str().unwrap(),
-                        &body.name.unwrap(),
-                        format!("{}{}", device.remove(0).to_uppercase(), &device),
-                        info[0]["account"]["id"].as_str().unwrap(),
-                        format!("{}{}", profileshape.remove(0).to_uppercase(), &profileshape)
-                    )).await.unwrap();
-                }
-        
-                "logout" => {
-                    state.database.execute("
-                        delete AuthToken filter .token = <str>$0
-                    ", &(cookie.value(),)).await.unwrap();
-        
-                    return Redirect::to("/");
-                }
-        
-                "delete" => {
-                    let info = state.database.query_json("
-                        select AuthToken { id, account: { id, player } } filter .token = <str>$0
-                    ", &(&cookie.value(),)).await.unwrap().parse::<Value>().unwrap();
-        
-                    if info[0]["id"].is_null() {
-                        return Redirect::to("/");
-                    }
-        
-                    state.database.execute("
-                        delete AuthToken filter .account.id = <uuid><str>$0;
-                        delete MigrationRequest filter .account.id = <uuid><str>$0;
-                        delete Account filter .id = <uuid><str>$0
-                    ", &(info[0]["account"]["id"].as_str().unwrap(),)).await.unwrap();
-        
-                    return Redirect::to("/");
-                }
-        
-                _ => {}
-            }
+        Some (ref cookie) => {
+            token = cookie.value()
         }
 
         None => {
             return Redirect::to("/account");
         }
+    }
+
+    match body.method.clone().as_str() {
+        "update" => {
+            let info = state.database.query_json("
+                select AuthToken { id, account: { id, player } } filter .token = <str>$0
+            ", &(token,)).await.unwrap().parse::<Value>().unwrap();
+
+            if info[0]["id"].is_null() {
+                return Redirect::to("/account");
+            }
+
+            let mut device = body.device.clone().unwrap();
+            let mut profileshape = body.profileshape.clone().unwrap();
+
+            println!("{info:#?}");
+
+            state.database.execute("
+                update Player filter .id = <uuid><str>$0 set {
+                    name := <str>$1,
+                    device := <Device><str>$2
+                };
+                update Account filter .id = <uuid><str>$3 set {
+                    profile_shape := <ProfileShape><str>$4
+                }
+            ", &(
+                info[0]["account"]["player"]["id"].as_str().unwrap(),
+                &body.name.unwrap(),
+                format!("{}{}", device.remove(0).to_uppercase(), &device),
+                info[0]["account"]["id"].as_str().unwrap(),
+                format!("{}{}", profileshape.remove(0).to_uppercase(), &profileshape)
+            )).await.unwrap();
+        }
+
+        "logout" => {
+            state.database.execute("
+                delete AuthToken filter .token = <str>$0
+            ", &(token,)).await.unwrap();
+
+            return Redirect::to("/");
+        }
+
+        "delete" => {
+            let info = state.database.query_json("
+                select AuthToken { id, account: { id, player } } filter .token = <str>$0
+            ", &(token,)).await.unwrap().parse::<Value>().unwrap();
+
+            if info[0]["id"].is_null() {
+                return Redirect::to("/");
+            }
+
+            state.database.execute("
+                delete AuthToken filter .account.id = <uuid><str>$0;
+                delete MigrationRequest filter .account.id = <uuid><str>$0;
+                delete Account filter .id = <uuid><str>$0
+            ", &(info[0]["account"]["id"].as_str().unwrap(),)).await.unwrap();
+
+            return Redirect::to("/");
+        }
+
+        _ => {}
     }
 
     Redirect::to("/account/settings")
@@ -1076,6 +1158,7 @@ async fn main() {
         .route("/mod/records", get(mod_records))
         .route("/mod/records", post(edit_record))
         .route("/mod/users", get(mod_users))
+        .route("/mod/users", post(update_user))
         .route("/terms", get(terms))
         .route("/privacy", get(privacy))
         .route("/rules", get(rules))
