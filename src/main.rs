@@ -1,9 +1,9 @@
-use axum::extract::{Host, Path, Query, State, Form};
 use axum::{
+    extract::{Form, Host, Path, Query, State},
     http::uri::Uri,
     response::{Html, Redirect},
     routing::{get, post},
-    Router,
+    Router
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use chrono::Utc;
@@ -16,7 +16,6 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use std::sync::RwLock;
 use std::thread;
-use std::time::Instant;
 use tera::{Context, Tera};
 use time::OffsetDateTime;
 use tower_http::services::{ServeDir, ServeFile};
@@ -115,11 +114,6 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
 
         if records != RECORDS.read().unwrap().clone() {
             thread::spawn(move || {
-                let start = Instant::now();
-                println!("Leaderboard Thread - Started");
-
-                println!("Leaderboard Thread - {} records backed up", records - RECORDS.read().unwrap().clone());
-
                 let players = state.database.query_json("select Player {
                     name,
                     points,
@@ -129,8 +123,6 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
 
                 let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
 
-                println!("Leaderboard Thread - Got `Player` query");
-
                 let mut guard = LEADERBOARD_CACHE.write().unwrap();
                 *guard = new_players.clone();
                 drop(guard);
@@ -138,8 +130,6 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
                 let mut guard = RECORDS.write().unwrap();
                 *guard = records.clone();
                 drop(guard);
-                
-                println!("Leaderboard Thread - Finished: {}s", start.elapsed().as_secs_f64());
             });
         }
     }
@@ -415,88 +405,92 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
         None => {}
     }
 
+    let code: &str;
+
     match oauth2 {
         Some (ref oauth2) => {
-            let params: [(&str, &str); 5] = [
-                ("client_id", &client_id),
-                ("client_secret", &client_secret),
-                ("code", &oauth2.code),
-                ("grant_type", "authorization_code"),
-                ("redirect_uri", &format!("https://{host}/account"))
-            ];
-
-            let client = reqwest::Client::new();
-            let token = client.post("https://oauth2.googleapis.com/token")
-                .form(&params)
-                .send().await.unwrap()
-                .text().await.unwrap();
-
-            let token_json: Value = serde_json::from_str(token.as_str()).unwrap();
-
-            if token_json["access_token"].is_null() {
-                return Err((jar, Redirect::to(&uri.to_string())));
-            }
-
-            let access_token = token_json["access_token"].as_str().unwrap();
-
-            let userdata = client.get("https://www.googleapis.com/oauth2/v3/userinfo")
-                .header("Authorization", format!("Bearer {}", access_token))
-                .send().await.unwrap()
-                .text().await.unwrap();
-
-            let userdata_json: Value = serde_json::from_str(userdata.as_str()).unwrap();
-
-            let token = rand::thread_rng().sample_iter(&Alphanumeric)
-                .take(64)
-                .map(char::from)
-                .collect::<String>();            
-
-            jar = jar.add(
-                Cookie::build((
-                    "token",
-                    token.to_string()
-                ))
-                .expires(OffsetDateTime::from_unix_timestamp(Utc::now().timestamp() + (7 * 24 * 60 * 60)).unwrap()) 
-            );
-
-            let account: Value = state.database.query_json("
-                select Account { id } filter .email = <str>$0
-            ", &(userdata_json["email"].as_str().unwrap(),)).await.unwrap().parse().unwrap();
-
-                
-            let mut account_uuid = account[0]["id"].clone();
-
-            if account_uuid.is_null() {
-                let created_account: Value = state.database.query_json("
-                    insert Account {
-                        email :=  <str>$0,
-                        oauth2 :=  <str>$1,
-                        image :=  <str>$2,
-                        player := <default::Player>{}
-                    };
-                ", &(
-                    userdata_json["email"].as_str().unwrap(),
-                    &oauth2.code,
-                    userdata_json["picture"].as_str().unwrap().strip_suffix("=s96-c").unwrap())
-                ).await.unwrap().parse().unwrap();
-
-                account_uuid = created_account[0]["id"].clone();
-            }
-
-            state.database.execute("
-                insert AuthToken {
-                    token := <str>$0,
-                    account := <Account><uuid><str>$1
-                }
-            ", &(token.as_str(), account_uuid.as_str().unwrap())).await.unwrap();
-
-            Err((jar, Redirect::to(&"/account")))
+            code = &oauth2.code.as_str();
         }
 
         None => {
-            Err((jar, Redirect::to(&uri.to_string())))
+            return Err((jar, Redirect::to(&uri.to_string())))
         }
     }
+
+    let params: [(&str, &str); 5] = [
+        ("client_id", &client_id),
+        ("client_secret", &client_secret),
+        ("code", code),
+        ("grant_type", "authorization_code"),
+        ("redirect_uri", &format!("https://{host}/account"))
+    ];
+
+    let client = reqwest::Client::new();
+    let token = client.post("https://oauth2.googleapis.com/token")
+        .form(&params)
+        .send().await.unwrap()
+        .text().await.unwrap();
+
+    let token_json: Value = serde_json::from_str(token.as_str()).unwrap();
+
+    if token_json["access_token"].is_null() {
+        return Err((jar, Redirect::to(&uri.to_string())));
+    }
+
+    let access_token = token_json["access_token"].as_str().unwrap();
+
+    let userdata = client.get("https://www.googleapis.com/oauth2/v3/userinfo")
+        .header("Authorization", format!("Bearer {}", access_token))
+        .send().await.unwrap()
+        .text().await.unwrap();
+
+    let userdata_json: Value = serde_json::from_str(userdata.as_str()).unwrap();
+
+    let token = rand::thread_rng().sample_iter(&Alphanumeric)
+        .take(64)
+        .map(char::from)
+        .collect::<String>();            
+
+    jar = jar.add(
+        Cookie::build((
+            "token",
+            token.to_string()
+        ))
+        .expires(OffsetDateTime::from_unix_timestamp(Utc::now().timestamp() + (7 * 24 * 60 * 60)).unwrap()) 
+    );
+
+    let account: Value = state.database.query_json("
+        select Account { id } filter .email = <str>$0
+    ", &(userdata_json["email"].as_str().unwrap(),)).await.unwrap().parse().unwrap();
+
+        
+    let mut account_uuid = account[0]["id"].clone();
+
+    if account_uuid.is_null() {
+        let created_account: Value = state.database.query_json("
+            insert Account {
+                email :=  <str>$0,
+                oauth2 :=  <str>$1,
+                image :=  <str>$2,
+                player := <default::Player>{}
+            };
+        ", &(
+            userdata_json["email"].as_str().unwrap(),
+            code,
+            userdata_json["picture"].as_str().unwrap().strip_suffix("=s96-c").unwrap())
+        ).await.unwrap().parse().unwrap();
+
+        account_uuid = created_account[0]["id"].clone();
+    }
+
+    state.database.execute("
+        insert AuthToken {
+            token := <str>$0,
+            account := <Account><uuid><str>$1
+        }
+    ", &(token.as_str(), account_uuid.as_str().unwrap())).await.unwrap();
+
+    Err((jar, Redirect::to(&"/account")))
 }
 
 async fn setup(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
@@ -804,7 +798,7 @@ async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Ht
                         } limit 1)
                     },
                     level: { name, placement, video_id, level_id }
-                } filter .status != Status.Approved and .status != Status.Denied order by .created_at asc
+                } filter .status != Status.Approved and .status != Status.Denied order by .created_at desc
             ", &()).await.unwrap().parse::<Value>().unwrap();
 
             ctx.insert("records", &records.as_array().unwrap());
@@ -873,11 +867,6 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
 
     if records != RECORDS.read().unwrap().clone() {
         thread::spawn(move || {
-            let start = Instant::now();
-            println!("Leaderboard Thread - Started");
-
-            println!("Leaderboard Thread - {} records backed up", records - RECORDS.read().unwrap().clone());
-
             let players = state.database.query_json("select Player {
                 name,
                 points,
@@ -887,8 +876,6 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
 
             let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
 
-            println!("Leaderboard Thread - Got `Player` query");
-
             let mut guard = LEADERBOARD_CACHE.write().unwrap();
             *guard = new_players.clone();
             drop(guard);
@@ -896,8 +883,6 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
             let mut guard = RECORDS.write().unwrap();
             *guard = records.clone();
             drop(guard);
-            
-            println!("Leaderboard Thread - Finished: {}s", start.elapsed().as_secs_f64());
         });
     }
 
@@ -927,7 +912,7 @@ async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html
                         avatar,
                         username
                     }
-                } filter .account.status = AccountStatus.Migrating order by .created_at asc
+                } filter .account.status = AccountStatus.Migrating order by .created_at desc
             ", &()).await.unwrap().parse::<Value>().unwrap();
 
             ctx.insert("requests", &records.as_array().unwrap());
@@ -1079,8 +1064,6 @@ async fn account_settings(State(state): State<AppState>, jar: CookieJar, Form(bo
 
             let mut device = body.device.clone().unwrap();
             let mut profileshape = body.profileshape.clone().unwrap();
-
-            println!("{info:#?}");
 
             state.database.execute("
                 update Player filter .id = <uuid><str>$0 set {

@@ -70,14 +70,15 @@ main {
         display: flex;
 
         iframe {
-            height: 500px;
             border-radius: 10px;
             margin: 20px 0px;
             aspect-ratio: 16 / 9;
+            margin-bottom: 0px;
+            flex-grow: 1;
         }
     
         .info {
-            width: calc(100% - 40px);
+            width: 300px;
             padding: 10px 20px;
             background-color: #223;
             border-radius: 10px;
@@ -85,6 +86,7 @@ main {
             flex-wrap: wrap;
             margin: 20px;
             margin-right: 0px;
+            margin-bottom: 0px;
     
             span {
                 display: flex;
@@ -285,13 +287,12 @@ body.touch {
     }
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1000px) {
     .level section {
         flex-direction: column !important;
 
         iframe {
-            width: 100%;
-            height: unset !important;
+            margin-bottom: 20px;
         }
 
         .info {

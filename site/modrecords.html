@@ -53,12 +53,15 @@
                                     {% if 'https://' in record.video_id %}
                                         <a href="{{ record.video_id }}" target="_blank">View video <span class="material-symbols-outlined">open_in_new</span></a>
                                     {% else %}
-                                        <iframe src="https://www.youtube-nocookie.com/embed/{{ record.video_id }}/" frameborder="0" loading="lazy"></iframe>
+                                        <iframe src="https://www.youtube-nocookie.com/embed/{{ record.video_id }}/" frameborder="0" loading="lazy" style="display: none"></iframe>
+                                        <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview">
                                     {% endif %}
                                 {% else %}
-                                    <a href="" target="_blank">View video<span class="material-symbols-outlined">open_in_new</span></a>
-                                    <iframe src="" frameborder="0" loading="lazy"></iframe>
+                                    <a href="" target="_blank" style="display: none">View video<span class="material-symbols-outlined">open_in_new</span></a>
+                                    <iframe src="" frameborder="0" loading="lazy" style="display: none"></iframe>
+                                    <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview">
                                 {% endif %}
+                                <img src="/src/img/youtube.svg" alt="YouTube" class="open">
                             </span>
                         </div>
                     </span>

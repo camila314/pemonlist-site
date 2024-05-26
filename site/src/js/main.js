@@ -90,17 +90,23 @@ function getVideoIDFromURL(url) {
     // checks for URL slugs like youtube.com/watch/dQw4w9WgXcQ or youtube.com/v/dQw4w9WgXcQ
     for (const slug of [ 'embed', 'e', 'shorts', 'live', 'watch', 'v', 'vi' ]) {
         const match = parsedURL.pathname.match(new RegExp(`/${slug}/(.+)$`))
-        if (match) return match[1].split('&')[0] // split protects `vi` from returning feature parameter
+        if (match) return match[1]
+            .split('&')[0] // protects `vi` from returning feature parameter
+            .replace(/^\/?([^\/]+)\/?.*$/, '$1') // removes preceding or trailing slug(s)
     }
 
     // youtube.com/user/GitHub#p/a/u/1/lalOy8Mbfdc
     if (parsedURL.hash.match(/#p\/(?:a\/)?u\/\d+\/.+$/)) {
-        return parsedURL.hash.match(/#p\/(?:a\/)?u\/\d+\/(.+)$/)[1].split('?')[0] // split protects from returning rel parameter
+        return parsedURL.hash.match(/#p\/(?:a\/)?u\/\d+\/(.+)$/)[1]
+            .split('?')[0] // protects from returning rel parameter
+            .replace(/^\/?([^\/]+)\/?.*$/, '$1') // removes preceding or trailing slug(s)
     }
 
     // youtu.be/dQw4w9WgXcQ
     if (parsedURL.hostname.match(/youtu\.be/)) {
-        return parsedURL.pathname.slice(1).split('&')[0] // split protects from returning feature parameter
+        return parsedURL.pathname.slice(1)
+            .split('&')[0] // protects from returning feature parameter
+            .replace(/^\/?([^\/]+)\/?.*$/, '$1') // removes preceding or trailing slug(s)
     }
 }
 
