@@ -47,9 +47,12 @@ const mainLogger = new Logger('Main')
 
 // mainLogger.log('suck it mechabrandon')
 
+let touch = false
+
 if ('ontouchstart' in window) {
     mainLogger.info('Device seems to be a touchscreen')
     document.body.classList.add('touch')
+    touch = true
 }
 
 const mobileDevices = [ 'android', 'webos', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone' ]
@@ -67,7 +70,11 @@ if (!navigator.userAgentData) {
 mainLogger.info(`Browser reporting device as a ${mobile ? 'mobile' : 'desktop'} device`)
 
 function getVideoIDFromURL(url) {
-    let parsedURL = new URL(url)
+    let parsedURL = null
+
+    try { parsedURL = new URL(url) } catch { return undefined }
+
+    if (parsedURL.hostname)
 
     // converting other URLs
     if (parsedURL.pathname == '/oembed')
@@ -115,3 +122,36 @@ const frame = async () => await new Promise(r => requestAnimationFrame(r))
 
 const cookies = {}
 document.cookie.split('; ').forEach(c => cookies[c.split('=')[0]] = decodeURIComponent(c.split('=')[1]))
+
+// fix level datalist duplicates
+
+const duplicates = []
+
+document.querySelectorAll('datalist#levels').forEach(d => [...d.children].forEach(o => {
+    let count = d.querySelectorAll(`option[value="${o.value}"]`).length
+    if (count <= 1) return
+    duplicates.push(o)
+}))
+
+duplicates.forEach(o => {
+    o.value += ` (${o.dataset.levelId})`
+    o.label = o.label.match(/^(#\d+)/)[1]
+})
+
+function createFormAndPost(action, payload = {}) {
+    const form = document.createElement('form')
+    form.method = 'post'
+    form.action = action
+
+    Object.keys(payload).forEach(k => {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = k
+        input.value = payload[k]
+
+        form.appendChild(input)
+    })
+
+    document.body.appendChild(form)
+    form.submit()
+}

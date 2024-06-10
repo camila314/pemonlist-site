@@ -92,10 +92,13 @@ records.forEach(r => {
 })
 
 document.querySelectorAll('.submit select').forEach(s => s.addEventListener('change', e => {
-    const submit = e.target.parentElement.children[1]
+    const submit = e.target.parentElement.lastElementChild
     const selected = e.target.querySelector('option[selected=""]').value
+    const denied = e.target.value == 'denied'
+    const reason = e.target.parentElement.querySelector('input[name="reason"]')
 
     submit.disabled = selected == e.target.value
+    reason.type = denied ? 'text' : 'hidden'
 }))
 
 let scrollTimeout = false
@@ -117,4 +120,4 @@ document.body.addEventListener('scroll', () => {
 
     scrollTimeout = true
     setTimeout(() => scrollTimeout = false, 200)
-})
+}, { passive: true })

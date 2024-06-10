@@ -1,7 +1,14 @@
+const username = document.getElementById('username')
 const img = document.querySelector('.profile img')
 const code = document.querySelector('input[name="discord"]')
 const cont = document.querySelector('input[type="submit"]')
 const discord = document.querySelector('.discord')
+
+username.addEventListener('input', e => {
+    e.target.setCustomValidity('')
+    
+    if (e.target.value.trim().length > 25) return e.target.setCustomValidity('Your username must be 25 characters or less.\nPreceding or trailing whitespace will be trimmed.')
+})
 
 document.querySelector('.profile select').addEventListener('change', e => img.classList.value = e.target.value)
 

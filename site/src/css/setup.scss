@@ -27,7 +27,7 @@ main {
         flex-direction: column;
         width: 100%;
 
-        & > label:not(:first-of-type) {
+        > label:not(:first-of-type) {
             margin-top: 10px;
         }
 

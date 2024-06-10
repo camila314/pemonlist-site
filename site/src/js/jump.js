@@ -28,8 +28,21 @@ body.appendChild(jumpButton)
 
     jumpButton.addEventListener('click', () => body.scrollTo({ top: 0, behavior: 'smooth' }))
 
-    const contentHeight = main.clientHeight + 70
-    const footerHeight = main.clientHeight + 8 // 70 - [52px button height] - [10px padding]
+    let contentHeight = main.clientHeight + 70
+    let footerHeight = main.clientHeight + 8 // 70 - [52px button height] - [10px padding]
+
+    let lastClientHeight = 0
+
+    // snap to proper place after window it resized
+    window.addEventListener('resize', () => {
+        if (main.clientHeight == lastClientHeight) return
+
+        contentHeight = main.clientHeight + 70
+        footerHeight = main.clientHeight + 8
+        updateJumpButton()
+
+        lastClientHeight = main.clientHeight
+    }, { passive: true })
 
     const shownHeight = window.innerHeight * .7
 

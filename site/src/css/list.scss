@@ -1,44 +1,9 @@
-.search {
-    all: revert;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: stretch;
-    align-items: center;
-    border-radius: 10px;
-    background-color: #334;
-    position: relative;
-
-    span {
-        position: absolute;
-        left: 20px;
-        pointer-events: none;
-    }
-
-    textarea {
-        flex-grow: 1;
-        border: none;
-        resize: none;
-        background-color: transparent;
-        height: 20px;
-        padding: 20px;
-        padding-left: calc(24px + 40px);
-        font-size: 17px;
-        font-family: inherit;
-
-        &:focus-visible {
-            border: none;
-            outline: none;
-        }
-
-        &::placeholder {
-            color: #778;
-            user-select: none;
-        }
-    }
-}
-
 hr {
     margin: 0px;
+}
+
+.container div:not(.search) {
+    margin-top: 20px;
 }
 
 .level {
@@ -49,7 +14,6 @@ hr {
     align-items: center;
     position: relative;
     min-height: 70px;
-    margin-top: 20px;
 
     &.hidden {
         display: none;
@@ -163,9 +127,11 @@ hr {
 
 .empty {
     background-color: #334;
-    margin-bottom: 20px;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 
     &.hidden {
         display: none;

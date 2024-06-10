@@ -2,6 +2,10 @@ main {
     align-items: flex-start !important;
 }
 
+.select a:nth-child(1) {
+    background-color: #556;
+}
+
 .record {
     display: flex;
     justify-content: space-between;
@@ -209,6 +213,10 @@ main {
             align-self: stretch;
             justify-content: space-between;
 
+            > :not(:last-child) {
+                margin-bottom: 10px;
+            }
+
             select {
                 padding: 7px;
                 height: 40px;
@@ -216,7 +224,6 @@ main {
                 border: 1px solid #556;
                 border-radius: 4px;
                 color: #dde;
-                margin-bottom: 10px;
                 font-size: medium;
                 font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
 
@@ -228,22 +235,29 @@ main {
             }
 
             input {
-                padding: 7px;
-                height: 40px;
+                padding: 10px 7px;
                 background-color: #334;
                 border: 1px solid #556;
                 border-radius: 4px;
                 color: #dde;
                 font-size: medium;
                 font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
-                cursor: pointer;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+
+                &[type="submit"] {
+                    cursor: pointer;
+                    height: 40px;
+                }
                 
                 &[disabled] {
                     opacity: 0.5;
                     cursor: not-allowed;
+                }
+
+                &::placeholder {
+                    color: #778;
                 }
             }
         }

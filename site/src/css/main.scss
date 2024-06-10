@@ -61,32 +61,6 @@ button {
     transition: background-color 70ms ease-out;
 }
 
-body:not(.touch) {
-    button:hover {
-        background-color: #eef !important;
-        border: transparent 2px solid;
-        color: #223;
-    }
-
-    button:hover {
-        background-color: #dde !important;
-        color: #223;
-    }
-}
-
-body.touch {
-    button:active {
-        background-color: #eef !important;
-        border: transparent 2px solid;
-        color: #223;
-    }
-
-    button:active {
-        background-color: #dde !important;
-        color: #223;
-    }
-}
-
 .jump {
     position: fixed;
     bottom: 10px;
@@ -113,5 +87,113 @@ body.touch {
     &.low {
         bottom: unset;
         position: absolute;
+    }
+}
+
+.cover {
+    position: fixed;
+    inset: 0px;
+    background-color: #1120;
+    transition: background-color 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    &.visible {
+        background-color: #1128;
+    }
+
+    .modal {
+        position: fixed;
+        padding: 20px;
+        font-size: medium;
+        border-radius: 20px;
+        background-color: #334;
+        transition: all 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+        z-index: 1;
+        left: 50%;
+        top: 50%;
+        white-space: normal;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        flex-direction: column;
+        opacity: 0;
+        transform: translate(-50%, -54%) scale(0.95);
+        width: 350px;
+        max-width: calc(100% - 80px);
+    
+        &.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        h1, p {
+            margin: 0px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        span {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            button {
+                width: 35%;
+                border: 1px solid #556;
+                background-color: #334;
+                cursor: pointer;
+                color: #dde;
+
+                &.catastrophic {
+                    border-color: #e44;
+                }
+            }
+        }
+    }
+}
+
+body:not(.touch) {
+    button:hover {
+        background-color: #eef !important;
+        color: #223;
+    }
+
+    .modal button:hover {
+        background-color: #334 !important;
+        color: #dde;
+
+        &.catastrophic {
+            background-color: #e44 !important;
+            color: #223;
+        }
+    }
+}
+
+body.touch {
+    button:active {
+        background-color: #eef !important;
+        color: #223;
+    }
+
+    .modal button:active {
+        background-color: #334 !important;
+        color: #dde;
+
+        &.catastrophic {
+            background-color: #e44 !important;
+            color: #223;
+        }
+    }
+}
+
+input {
+    font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+
+    &::placeholder {
+        font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
     }
 }

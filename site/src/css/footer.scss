@@ -51,11 +51,19 @@ footer {
                 &:last-child {
                     margin-right: 0px;
                 }
-
-                &:hover {
-                    color: #99a;
-                }
             }
         }
+    }
+}
+
+body:not(.touch) {
+    .links a:hover {
+        color: #99a;
+    }
+}
+
+body.touch {
+    .links a:active {
+        color: #99a;
     }
 }

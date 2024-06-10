@@ -1,6 +1,13 @@
+const username = document.getElementById('name')
 const deletebtn = document.querySelector('.delete')
 const profileshape = document.querySelector('.profile .select select')
 const img = document.querySelector('.profile .img img')
+
+username.addEventListener('input', e => {
+    e.target.setCustomValidity('')
+    
+    if (e.target.value.trim().length > 25) return e.target.setCustomValidity('Your username must be 25 characters or less.\nPreceding or trailing whitespace will be trimmed.')
+})
 
 profileshape.addEventListener('change', e => {
     img.className = e.target.value
@@ -12,8 +19,8 @@ deletebtn.addEventListener('click', async e => {
     const cover = document.createElement('div')
     cover.className = 'cover'
 
-    const confirmation = document.createElement('div')
-    confirmation.className = 'confirmation'
+    const modal = document.createElement('div')
+    modal.className = 'modal'
 
     const header = document.createElement('h1')
     header.innerText = 'Confirmation'
@@ -29,15 +36,15 @@ deletebtn.addEventListener('click', async e => {
 
     const yes = document.createElement('button')
     yes.innerText = 'I\'m sure'
-    yes.className = 'yes'
+    yes.className = 'catastrophic'
 
     const no = document.createElement('button')
     no.innerText = 'Nevermind'
 
     input.append(yes, no)
     body.appendChild(disclaimer)
-    confirmation.append(header, body, input)
-    cover.appendChild(confirmation)
+    modal.append(header, body, input)
+    cover.appendChild(modal)
     document.body.appendChild(cover)
 
     await frame()
@@ -46,7 +53,7 @@ deletebtn.addEventListener('click', async e => {
         if (e.target != cover && e.target != no) return
 
         cover.classList.remove('visible')
-        confirmation.classList.remove('visible')
+        modal.classList.remove('visible')
 
         await ms(200)
 
@@ -55,10 +62,10 @@ deletebtn.addEventListener('click', async e => {
 
     cover.addEventListener('click', hide)
     no.addEventListener('click', hide)
-    yes.addEventListener('click', () => {
+    yes.addEventListener('click', async () => {
         deletebtn.parentElement.submit()
     })
 
     cover.classList.add('visible')
-    confirmation.classList.add('visible')
+    modal.classList.add('visible')
 })

@@ -15,7 +15,7 @@ main {
     border-radius: 20px;
     flex-direction: column;
 
-    &> h1, p {
+    > h1, p {
         margin: 0px;
         margin-bottom: 20px;
         text-align: center;
@@ -32,7 +32,7 @@ main {
         flex-direction: column;
         width: 100%;
 
-        & > label:not(:first-of-type) {
+        > label:not(:first-of-type) {
             margin-top: 10px;
         }
 
@@ -259,12 +259,12 @@ main {
     border-radius: 20px;
     flex-direction: column;
 
-    &> h1, p {
+    > h1, p {
         margin: 0px;
         text-align: center;
     }
 
-    &> h1 {
+    > h1 {
         margin-bottom: 20px;
     }
 
@@ -312,7 +312,7 @@ main {
         .form .video {
             flex-direction: column;
     
-            & > span {
+            > span {
                 margin-top: 15px !important;
     
                 &:first-child {

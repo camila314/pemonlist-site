@@ -75,33 +75,35 @@
                     </span>
                 </div>
             </div>
-            <div class="records">
-                <h1>Records</h1>
-                <div class="table">
-                    {% for record in player.records %}
-                        <div>
-                            <a href="/level/{{ record.level.level_id }}">
-                                <span class="placement">#{{ record.level.placement }}</span>
-                                <span class="level">{{ record.level.name }}</span>
-                            </a>
-                            <hr class="divider">
-                            <a href="
-                                {% if 'https://' in record.video_id %}
-                                    {{ record.video_id }}
-                                {% else %}
-                                    https://youtu.be/{{ record.video_id }}
-                                {% endif %}
-                            " target="_blank">
-                                <span class="time">
-                                    {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+            {% if player.records %}
+                <div class="records">
+                    <h1>Records</h1>
+                    <div class="table">
+                        {% for record in player.records %}
+                            <div>
+                                <a href="/level/{{ record.level.level_id }}">
+                                    <span class="placement">#{{ record.level.placement }}</span>
+                                    <span class="level">{{ record.level.name }}</span>
+                                </a>
+                                <hr class="divider">
+                                <a href="
+                                    {% if 'https://' in record.video_id %}
+                                        {{ record.video_id }}
+                                    {% else %}
+                                        https://youtu.be/{{ record.video_id }}
+                                    {% endif %}
+                                " target="_blank">
+                                    <span class="time">
+                                        {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+                                    </span>
+                                    <span class="rank">#{{ record.rank }}</span>
+                                </a>
                                 </span>
-                                <span class="rank">#{{ record.rank }}</span>
-                            </a>
-                            </span>
-                        </div>
-                    {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
+                {% endif %}
         </div>
     </main>
     <!---->

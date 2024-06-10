@@ -76,7 +76,7 @@ level.addEventListener('change', e => {
     const option = document.querySelector(`option[value="${e.target.value}"]`)
     if (!option) return e.target.setCustomValidity('Please input a valid level name.')
     
-    document.getElementById('levelid').value = option.attributes['attr-level-id'].value
+    document.getElementById('levelid').value = option.dataset.levelId
 })
 
 let processingTimeout = false

@@ -169,75 +169,15 @@ main {
     }
 }
 
-.cover {
-    position: absolute;
-    inset: 0px;
-    background-color: #1120;
-    transition: background-color 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
-
-    &.visible {
-        background-color: #1128;
+.modal {
+    .disclaimer {
+        color: #99a;
+        font-size: small;
+        margin-top: 10px !important;
     }
-
-    .confirmation {
-        position: absolute;
-        padding: 20px;
-        font-size: medium;
-        border-radius: 20px;
-        background-color: #334;
-        transition: all 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
-        z-index: 1;
-        left: 50%;
-        top: 50%;
-        white-space: normal;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: stretch;
-        flex-direction: column;
-        opacity: 0;
-        transform: translate(-50%, -54%) scale(0.95);
-        width: 350px;
-        max-width: calc(100% - 80px);
     
-        &.visible {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        h1, p {
-            margin: 0px;
-            text-align: center;
-        }
-
-        .disclaimer {
-            color: #99a;
-            font-size: small;
-            margin-top: 10px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        span {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            button {
-                width: 35%;
-                border: 1px solid #556;
-                background-color: #334;
-                cursor: pointer;
-                color: #dde;
-
-                &.yes {
-                    border-color: #e44;
-                }
-            }
-        }
+    button.yes {
+        border-color: #e44;
     }
 }
 
@@ -246,29 +186,11 @@ body:not(.touch) {
         background-color: #e44;
         color: #223;
     }
-
-    .confirmation button:hover {
-        background-color: #334 !important;
-
-        &.yes {
-            background-color: #e44 !important;
-            color: #223;
-        }
-    }
 }
 
 body.touch {
     .delete:active {
         background-color: #e44;
         color: #223;
-    }
-
-    .confirmation button:active {
-        background-color: #334 !important;
-
-        &.yes {
-            background-color: #e44 !important;
-            color: #223;
-        }
     }
 }

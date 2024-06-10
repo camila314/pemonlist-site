@@ -54,11 +54,13 @@ impl Token for edgedb_tokio::Client {
                             rank
                         } order by .level.placement),
                         unverified_records := (select .unverified_entries {
+                            id,
                             level: { name, level_id, placement },
                             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
                             time_ms := (select to_str(.time, \"MS\")),
                             video_id,
-                            status
+                            status,
+                            reason
                         } order by .level.placement),
                         rank,
                         device
@@ -68,7 +70,6 @@ impl Token for edgedb_tokio::Client {
         ", &(token_string,)).await.unwrap().parse().unwrap()
     }
 }
-
 
 async fn index(State(state): State<AppState>) -> Html<String> {
     let mut ctx = Context::new();
@@ -82,7 +83,8 @@ async fn index(State(state): State<AppState>) -> Html<String> {
             name := (select .player.name),
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
             time_ms := (select to_str(.time, \"MS\"))
-        } filter .status = Status.Approved  order by .time limit 1)
+        } filter .status = Status.Approved  order by .time limit 1),
+        placement
     } order by .placement", &()).await.unwrap().parse().unwrap();
 
     ctx.insert("levels", &levels);
@@ -285,7 +287,8 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
     let entry: Value = state.database.query_json("
         select Entry { id, faster := .time > <duration><str>$0 } filter
             .video_id = <str>$1 and
-            .level = (select Level filter .level_id = <int64><str>$2)
+            .level = (select Level filter .level_id = <int64><str>$2) and
+            .status != Status.Denied
     ", &(
         &body.timeplain,
         video_id,
@@ -296,46 +299,24 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
         return Ok(state.template.render("duplicate.html", &Context::new()).unwrap().into());
     }
 
-    if entry[0]["id"].is_null() {
-        state.database.execute("
-            insert Entry {
-                status := Status.Waiting,
-                video_id := <str>$0,
-                raw_video := <str>$1,
-                player := <Player><uuid><str>$2,
-                level := (select Level filter .level_id = <int64><str>$3),
-                time := <duration><str>$4,
-                mobile := <bool>$5
-            }
-        ", &(
-            video_id,
-            &body.raw,
-            account[0]["account"]["player"]["id"].as_str().unwrap(),
-            &body.levelid,
-            &body.timeplain,
-            &body.device == "mobile"
-        )).await.unwrap();
-    } else {
-        state.database.execute("
-            update Entry filter .id = <uuid><str>$0 set {
-                status := Status.Waiting,
-                video_id := <str>$1,
-                raw_video := <str>$2,
-                player := <Player><uuid><str>$3,
-                level := (select Level filter .level_id = <int64><str>$4),
-                time := <duration><str>$5,
-                mobile := <bool>$6
-            }
-        ", &(
-            entry[0]["id"].as_str().unwrap(),
-            video_id,
-            &body.raw,
-            account[0]["account"]["player"]["id"].as_str().unwrap(),
-            &body.levelid,
-            &body.timeplain,
-            &body.device == "mobile"
-        )).await.unwrap();
-    }
+    state.database.execute("
+        insert Entry {
+            status := Status.Waiting,
+            video_id := <str>$0,
+            raw_video := <str>$1,
+            player := <Player><uuid><str>$2,
+            level := (select Level filter .level_id = <int64><str>$3),
+            time := <duration><str>$4,
+            mobile := <bool>$5
+        }
+    ", &(
+        video_id,
+        &body.raw,
+        account[0]["account"]["player"]["id"].as_str().unwrap(),
+        &body.levelid,
+        &body.timeplain,
+        &body.device == "mobile"
+    )).await.unwrap();
 
     Ok(state.template.render("submitted.html", &Context::new()).unwrap().into())
 }
@@ -493,6 +474,47 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
     Err((jar, Redirect::to(&"/account")))
 }
 
+#[derive(Deserialize)]
+struct AccountUpdate {
+    method: String,
+    id: Option<String>
+}
+
+async fn update_account(State(state): State<AppState>, jar: CookieJar, Form(body): Form<AccountUpdate>) -> Redirect {
+    let token: &str;
+
+    match jar.get("token") {
+        Some(ref cookie) => {
+            token = cookie.value()
+        }
+
+        None => {
+            return Redirect::to("/account")
+        }
+    }
+
+    let info = state.database.query_json("
+        select AuthToken {
+            account: { id, mod }
+        } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+    ", &(token,)).await.unwrap().parse::<Value>().unwrap();
+
+    if info[0]["account"]["id"].is_null() {
+        return Redirect::to("/account");
+    }
+
+    match body.method.clone().as_str() {
+        "deleterecord" => {
+            state.database.execute("
+                delete Entry filter .id = <uuid><str>$0
+            ", &(&body.id.unwrap(),)).await.unwrap()
+        }
+        _ => {}
+    }
+
+    Redirect::to("/account")
+}
+
 async fn setup(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
     let mut ctx = Context::new();
 
@@ -551,13 +573,17 @@ async fn setup_account(State(state): State<AppState>, jar: CookieJar, Form(mut b
         return Redirect::to("/account")
     }
 
+    if body.username.clone().trim().len() > 25 {
+        return Redirect::to("/account/setup");
+    }
+
     let player: Value = state.database.query_json("
         insert Player {
             name := <str>$0,
             device := <Device><str>$1
         }
     ", &(
-        &body.username,
+        body.username.clone().trim(),
         format!("{}{}", &body.device.remove(0).to_uppercase(), &body.device)
     )).await.unwrap().parse().unwrap();
 
@@ -602,11 +628,11 @@ async fn migrate(State(state): State<AppState>, info: Option<Query<SetupInfoQuer
         Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
-            if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
+            // if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
                 ctx.insert("account", &token[0]["account"]);
 
                 return Ok(state.template.render("migrate.html", &ctx).unwrap().into());
-            }
+            // }
         }
 
         None => {}
@@ -798,7 +824,7 @@ async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Ht
                         } limit 1)
                     },
                     level: { name, placement, video_id, level_id }
-                } filter .status != Status.Approved and .status != Status.Denied order by .created_at desc
+                } filter .status != Status.Approved and .status != Status.Denied order by .created_at asc
             ", &()).await.unwrap().parse::<Value>().unwrap();
 
             ctx.insert("records", &records.as_array().unwrap());
@@ -820,7 +846,8 @@ async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Ht
 struct EntryEdit {
     entryid: String,
     time: String,
-    status: String
+    status: String,
+    reason: String
 }
 
 async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut body): Form<EntryEdit>) -> Redirect {
@@ -850,16 +877,53 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
         return Redirect::to("/");
     }
 
-    state.database.execute("
-        update Entry filter .id = <uuid><str>$0 set {
-            time := <duration><str>$1,
-            status := <Status><str>$2
-        }
+    let entry: Value = state.database.query_json("
+        select Entry { level: { id }, player: { id } } filter .id = <uuid><str>$0
+    ", &(&body.entryid,)).await.unwrap().parse().unwrap();
+
+    let approved: Value = state.database.query_json("
+        select Entry { id, time, faster := .time > <duration><str>$0 } filter
+            .level.id = <uuid><str>$1 and
+            .player.id = <uuid><str>$2 and
+            .status = Status.Approved
     ", &(
-        &body.entryid,
         &body.time,
-        format!("{}{}", &body.status.remove(0).to_uppercase(), &body.status)
-    )).await.unwrap();
+        entry[0]["level"]["id"].as_str().unwrap(),
+        entry[0]["player"]["id"].as_str().unwrap()
+    )).await.unwrap().parse().unwrap();
+
+    if !approved[0]["id"].is_null() && approved[0]["faster"].as_bool().unwrap() && &body.status == "approved" {
+        state.database.execute("
+            update Entry filter .id = <uuid><str>$0 set {
+                created_at := datetime_of_statement(),
+                time := <duration><str>$1,
+                status := Status.Approved
+            };
+            delete Entry filter .id = <uuid><str>$2
+        ", &(
+            approved[0]["id"].as_str().unwrap(),
+            &body.time,
+            &body.entryid
+        )).await.unwrap();
+    } else {
+        state.database.execute("
+            update Entry filter .id = <uuid><str>$0 set {
+                time := <duration><str>$1,
+                status := <Status><str>$2,
+                reason := <str>$3
+            };
+            delete Entry filter
+                .player.id = <uuid><str>$4 and
+                .level.id = <uuid><str>$5
+        ", &(
+            &body.entryid,
+            &body.time,
+            format!("{}{}", &body.status.remove(0).to_uppercase(), &body.status),
+            &body.reason,
+            entry[0]["level"]["id"].as_str().unwrap(),
+            entry[0]["player"]["id"].as_str().unwrap()
+        )).await.unwrap();
+    }
 
     let records: i64 = state.database.query_required_single_json("
         select count((select Entry filter .status = Status.Approved))
@@ -912,7 +976,7 @@ async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html
                         avatar,
                         username
                     }
-                } filter .account.status = AccountStatus.Migrating order by .created_at desc
+                } filter .account.status = AccountStatus.Migrating order by .created_at asc
             ", &()).await.unwrap().parse::<Value>().unwrap();
 
             ctx.insert("requests", &records.as_array().unwrap());
@@ -930,7 +994,7 @@ async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html
     Err(Redirect::to("/account"))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 struct UserEdit {
     migrationid: String,
     status: String
@@ -1007,6 +1071,161 @@ async fn update_user(State(state): State<AppState>, jar: CookieJar, Form(body): 
     Redirect::to("/mod/users")
 }
 
+async fn mod_levels(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let mut ctx = Context::new();
+
+    match jar.get("token") {
+        Some (ref cookie) => {
+            let token = state.database.get_info_from_token(cookie.value()).await;
+
+            let levels = state.database.query_json("
+                select Level {
+                    id, name, placement, video_id, level_id, creator, verifier: { name }
+                } order by .placement
+            ", &()).await.unwrap().parse::<Value>().unwrap();
+
+            ctx.insert("levels", &levels.as_array().unwrap());
+
+            let players = state.database.query_json("
+                select Player {
+                    id, name
+                } order by .name
+            ", &()).await.unwrap().parse::<Value>().unwrap();
+
+            ctx.insert("players", &players.as_array().unwrap());
+
+            if !token[0]["account"].is_null() && token[0]["account"]["mod"].as_bool().unwrap() {
+                ctx.insert("account", &token[0]["account"]);
+
+                return Ok(state.template.render("modlevels.html", &ctx).unwrap().into());
+            }
+        }
+
+        None => {}
+    }
+
+    Err(Redirect::to("/account"))
+}
+
+#[derive(Deserialize)]
+struct LevelData {
+    creator: String,
+    id: String,
+    levelid: String,
+    name: String,
+    placement: u64,
+    verifiername: String,
+    videoid: String,
+    method: String
+}
+
+async fn edit_level(State(state): State<AppState>, jar: CookieJar, Form(body): Form<LevelData>) -> Redirect {
+    let token: &str;
+
+    match jar.get("token") {
+        Some (ref cookie) => {
+            token = cookie.value();
+        }
+
+        None => {
+            return Redirect::to("/account");
+        }
+    }
+
+    let info = state.database.query_json("
+        select AuthToken {
+            account: { id, mod }
+        } filter .token = <str>$0 and .expires > <datetime>datetime_of_statement()
+    ", &(token,)).await.unwrap().parse::<Value>().unwrap();
+
+    if info[0]["account"]["id"].is_null() {
+        return Redirect::to("/account");
+    }
+
+    if info[0]["account"]["mod"].as_bool() == Some(false) {
+        return Redirect::to("/");
+    }
+
+    state.database.execute("
+        insert Player { name := <str>$0 } unless conflict on .name;
+    ", &(body.verifiername.clone(),)).await.unwrap();
+
+    match body.method.clone().as_str() {
+        "editlevel" => {
+            let level = state.database.query_json("
+                select Level { placement } filter .id = <uuid><str>$0
+            ", &(&body.id,)).await.unwrap().parse::<Value>().unwrap();
+
+            state.database.execute("
+                update Level filter .id = <uuid><str>$0 set {
+                    creator := <str>$1,
+                    level_id := <int32><str>$2,
+                    name := <str>$3,
+                    verifier := (select Player filter .name = <str>$4),
+                    video_id := <str>$5
+                }
+            ", &(
+                &body.id,
+                &body.creator,
+                &body.levelid,
+                &body.name,
+                &body.verifiername,
+                &body.videoid
+            )).await.unwrap();
+
+            if level[0]["placement"].as_u64().unwrap() > body.placement {
+                state.database.execute("
+                    update Level filter .placement >= <int32><str>$0 set { placement := .placement + 1 };
+                    update Level filter .placement = <int32><str>$1 + 1 set { placement := <int32><str>$0 };
+                    update Level filter .placement > <int32><str>$1 set { placement := .placement - 1 };
+                ", &(
+                    body.placement.to_string(),
+                    level[0]["placement"].as_u64().unwrap().to_string()
+                )).await.unwrap();
+            }
+
+            if level[0]["placement"].as_u64().unwrap() < body.placement {
+                state.database.execute("
+                    update Level filter .placement > <int32><str>$0 set { placement := .placement + 1 };
+                    update Level filter .placement = <int32><str>$1 set { placement := <int32><str>$0 + 1 };
+                    update Level filter .placement >= <int32><str>$1 set { placement := .placement - 1 };
+                ", &(
+                    body.placement.to_string(),
+                    level[0]["placement"].as_u64().unwrap().to_string()
+                )).await.unwrap();
+            }
+        }
+
+        "addlevel" => {
+            state.database.execute("
+                update Level filter .placement >= <int32><str>$0 set { placement := .placement + 1 };
+            ", &(body.placement.to_string(),)).await.unwrap();
+
+            state.database.execute("
+                insert Level {
+                    creator := <str>$0,
+                    level_id := <int32><str>$1,
+                    name := <str>$2,
+                    placement := <int32><str>$3,
+                    verifier := (select Player filter .name = <str>$4),
+                    video_id := <str>$5
+                }
+            ", &(
+                &body.creator,
+                &body.levelid,
+                &body.name,
+                body.placement.to_string(),
+                &body.verifiername,
+                &body.videoid
+            )).await.unwrap();
+        }
+
+        _ => {}
+    } 
+
+    Redirect::to("/mod/levels")
+}
+
 async fn settings(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
     let mut ctx = Context::new();
 
@@ -1065,6 +1284,10 @@ async fn account_settings(State(state): State<AppState>, jar: CookieJar, Form(bo
             let mut device = body.device.clone().unwrap();
             let mut profileshape = body.profileshape.clone().unwrap();
 
+            if body.name.clone().unwrap().trim().len() > 25 {
+                return Redirect::to("/account/settings");
+            }
+
             state.database.execute("
                 update Player filter .id = <uuid><str>$0 set {
                     name := <str>$1,
@@ -1075,7 +1298,7 @@ async fn account_settings(State(state): State<AppState>, jar: CookieJar, Form(bo
                 }
             ", &(
                 info[0]["account"]["player"]["id"].as_str().unwrap(),
-                &body.name.unwrap(),
+                body.name.clone().unwrap().trim(),
                 format!("{}{}", device.remove(0).to_uppercase(), &device),
                 info[0]["account"]["id"].as_str().unwrap(),
                 format!("{}{}", profileshape.remove(0).to_uppercase(), &profileshape)
@@ -1131,6 +1354,7 @@ async fn main() {
         .route("/submit", get(submit))
         .route("/submit", post(submit_record))
         .route("/account", get(account))
+        .route("/account", post(update_account))
         .route("/account/settings", get(settings))
         .route("/account/settings", post(account_settings))
         .route("/account/setup", get(setup))
@@ -1142,6 +1366,8 @@ async fn main() {
         .route("/mod/records", post(edit_record))
         .route("/mod/users", get(mod_users))
         .route("/mod/users", post(update_user))
+        .route("/mod/levels", get(mod_levels))
+        .route("/mod/levels", post(edit_level))
         .route("/terms", get(terms))
         .route("/privacy", get(privacy))
         .route("/rules", get(rules))

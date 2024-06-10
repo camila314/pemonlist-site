@@ -2,6 +2,10 @@ main {
     align-items: flex-start !important;
 }
 
+.select a:nth-child(2) {
+    background-color: #556;
+}
+
 .request {
     display: flex;
     justify-content: space-between;

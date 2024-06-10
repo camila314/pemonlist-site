@@ -18,6 +18,23 @@
             margin-left: 10px;
         }
     }
+
+    .pages {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+
+        a {
+            color: #99a;
+            text-decoration: none;
+            font-size: 20px;
+            margin-left: 5px;
+
+            &:hover {
+                color: #ccd;
+            }
+        }
+    }
 }
 
 .migration {
@@ -179,5 +196,101 @@
                 }
             }
         }
+    }
+}
+
+.table div {
+    .reason {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        padding: 3px;
+        border-radius: 100%;
+        border: none;
+        font-size: 15px;
+        background-color: #112;
+        color: #dde;
+        transform: translate(50%, -50%);
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .status {
+        position: relative;
+        width: 40px;
+        user-select: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        text-decoration: none;
+        color: #dde;
+        align-self: center;
+        cursor: help;
+         
+        .tooltip {
+            font-family: 'Whitney', Arial, Helvetica, sans-serif, 'Material Symbols Outlined';
+            position: absolute;
+            padding: 5px 7px;
+            font-size: 12px;
+            border-radius: 5px;
+            background-color: #112;
+            transform: translateY(0px) scale(0.95);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+            z-index: 1;
+            bottom: 26px;
+            height: unset !important;
+            width: 130px;
+            white-space: normal;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &:hover {
+            .tooltip {
+                opacity: 1;
+                transform: translateY(-3px) scale(1);
+            }
+        }
+    }
+}
+
+body:not(.touch) {
+    .table div:hover .reason {
+        display: flex;
+        opacity: 1;
+    }
+}
+
+body.touch {
+    .table .reason {
+        display: flex;
+        opacity: 0.5;
+        right: 3px !important;
+        top: 6px !important;
+
+        &:active {
+            opacity: 1;
+        }
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .table .reason {
+        padding: 2px !important;
+        font-size: 13px !important;
+        right: 2px !important;
+        top: 2px !important;
+    }
+}
+
+.modal {
+    p.empty {
+        color: #99a;
+        font-style: italic;
     }
 }

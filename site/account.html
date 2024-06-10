@@ -130,41 +130,21 @@
                 </div>
             {% endif %}
             {% if account.player %}
-                {% if account.player.records %}
-                    <div class="records">
-                        <h1>Records</h1>
-                        <div class="table">
-                            {% for record in account.player.records %}
-                                <div>
-                                    <a href="/level/{{ record.level.level_id }}">
-                                        <span class="placement">#{{ record.level.placement }}</span>
-                                        <span class="level">{{ record.level.name }}</span>
-                                    </a>
-                                    <hr class="divider">
-                                    <a href="
-                                        {% if 'https://' in record.video_id %}
-                                            {{ record.video_id }}
-                                        {% else %}
-                                            https://youtu.be/{{ record.video_id }}
-                                        {% endif %}
-                                    " target="_blank">
-                                        <span class="time">
-                                            {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
-                                        </span>
-                                        <span class="rank">#{{ record.rank }}</span>
-                                    </a>
-                                    </span>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
                 {% if account.player.unverified_records %}
                     <div class="unverified">
                         <h1>Pending Records</h1>
                         <div class="table">
                             {% for record in account.player.unverified_records %}
                                 <div>
+                                    {% if record.status == 'Denied' %}
+                                        <span class="reason material-symbols-outlined" data-reason="
+                                            {%- if record.reason -%}
+                                                {{ record.reason }}
+                                            {%- endif -%}
+                                        " data-id="{{ record.id }}">
+                                            question_mark
+                                        </span>
+                                    {% endif %}
                                     <a href="/level/{{ record.level.level_id }}">
                                         <span class="placement">#{{ record.level.placement }}</span>
                                         <span class="level">{{ record.level.name }}</span>
@@ -181,7 +161,11 @@
                                             {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
                                         </span>
                                     </a>
-                                    <span class="status material-symbols-outlined">
+                                    <span class="
+                                        {% if record.status == 'Denied' %}
+                                            denied
+                                        {% endif %}
+                                    status material-symbols-outlined">
                                         {% if record.status == 'Submitted' %}
                                             schedule
                                         {% elif record.status == 'Waiting' %}
@@ -206,6 +190,35 @@
                                                 Record has been denied.
                                             {% endif %}
                                         </div>
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% if account.player.records %}
+                    <div class="records">
+                        <h1>Records</h1>
+                        <div class="table">
+                            {% for record in account.player.records %}
+                                <div>
+                                    <a href="/level/{{ record.level.level_id }}">
+                                        <span class="placement">#{{ record.level.placement }}</span>
+                                        <span class="level">{{ record.level.name }}</span>
+                                    </a>
+                                    <hr class="divider">
+                                    <a href="
+                                        {% if 'https://' in record.video_id %}
+                                            {{ record.video_id }}
+                                        {% else %}
+                                            https://youtu.be/{{ record.video_id }}
+                                        {% endif %}
+                                    " target="_blank">
+                                        <span class="time">
+                                            {{ record.time_format }}<span class="ms">.{{ record.time_ms }}</span>
+                                        </span>
+                                        <span class="rank">#{{ record.rank }}</span>
+                                    </a>
                                     </span>
                                 </div>
                             {% endfor %}

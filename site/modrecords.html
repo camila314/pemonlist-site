@@ -16,7 +16,7 @@
             <div class="select">
                 <a href="/mod/records">Records</a>
                 <a href="/mod/users">Users</a>
-                <a href="/mod/level">Levels</a>
+                <a href="/mod/levels">Levels</a>
             </div>
             {% for record in records %}
                 <div class="record">
@@ -72,7 +72,7 @@
                                 <h1>{{ record.level.name }}</h1>
                                 <p>#{{ record.level.placement }} - {{ record.level.level_id }}</p>
                             </a>
-                            <input type="text" name="time" value="{{ record.time_format }}.{{ record.time_ms }}" id="time" required>
+                            <input type="text" name="time" value="{{ record.time_format }}.{{ record.time_ms }}" id="time" required autocomplete="none">
                         </div>
                         <div class="submit">
                             <select name="status">
@@ -97,6 +97,7 @@
                                     {%- endif -%}
                                 >Approved</option>
                             </select>
+                            <input type="hidden" name="reason" placeholder="Reason for denial" required autocomplete="off">
                             <input type="submit" value="Update Record" disabled>
                         </div>
                     </form>

@@ -96,7 +96,8 @@ module default {
 
 		required link player -> Player;
 		required link level -> Level;
-		rank := getTimeRank(<Entry>.id)
+		rank := getTimeRank(<Entry>.id);
+		property reason -> str;
 	}
 
 	scalar type ChangeType extending enum<Add, Edit, Remove>;
@@ -125,7 +126,6 @@ module default {
 		};
 		required property video_id -> str;
 		required property placement -> int32 {
-			constraint exclusive;
 			default := (count(Level) + 1);
 		};
 

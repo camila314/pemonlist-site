@@ -11,7 +11,6 @@
     {% include "template/nav.html" %}
     <!---->
     <main>
-        <!-- <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" autoplay="1" controls="0"></iframe> -->
         <div class="container">
             <div class="form">
                 <h1>Submit</h1>
@@ -21,17 +20,17 @@
                         <span>
                             <label for="time">Time</label>
                             <div class="timewrapper">
-                                <div type="text" name="time" id="time" data-placeholder="0:00:00.000" contenteditable></div>
+                                <div type="text" name="time" id="time" data-placeholder="0:00:00.000" contenteditable autocomplete="none"></div>
                             </div>
-                            <input type="text" name="timeplain" id="timeplain" required>
+                            <input type="text" name="timeplain" id="timeplain" required autocomplete="none">
                         </span>
                         <span>
                             <label for="level">Level</label>
-                            <input type="text" list="levels" name="level" id="level" required>
+                            <input type="text" list="levels" name="level" id="level" required autocomplete="none" multiple>
                             <input type="hidden" name="levelid" id="levelid">
                             <datalist id="levels">
                                 {% for level in levels %}
-                                    <option label="#{{ level.placement }} - {{ level.level_id }}" value="{{ level.name }}" attr-level-id="{{ level.level_id }}"></option>
+                                    <option label="#{{ level.placement }} - {{ level.level_id }}" value="{{ level.name }}" data-level-id="{{ level.level_id }}"></option>
                                 {% endfor %}
                             </datalist>
                         </span>
