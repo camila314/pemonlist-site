@@ -1,3 +1,7 @@
+.container > div:not(.search) {
+    margin-top: 20px;
+}
+
 .players {
     padding: 40px;
     background-color: #334;

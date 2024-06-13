@@ -2,7 +2,7 @@ hr {
     margin: 0px;
 }
 
-.container div:not(.search) {
+.container > div:not(.search) {
     margin-top: 20px;
 }
 

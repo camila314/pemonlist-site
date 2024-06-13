@@ -11,6 +11,8 @@ String.prototype.highlight = function(term) {
 }
 
 document.querySelector('.search textarea').addEventListener('input', event => {
+    // search algorithm
+
     const start = performance.now()
 
     const term = event.target.value.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&') // escape special regex chars [https://stackoverflow.com/a/3561711]
@@ -51,10 +53,19 @@ document.querySelector('.search textarea').addEventListener('input', event => {
     document.querySelector('.empty').classList.toggle('hidden', !empty)
 
     const elapsed = performance.now() - start
-    const status = term == '' ? 'refresh' : `term "${term}"`
+    const status = !term ? 'refresh' : `term "${term}"`
 
     if (elapsed > 30) searchLogger.warn(`${status} took ${elapsed}ms`)
     else searchLogger.log(`${status} took ${elapsed}ms`)
+
+    // stats
+
+    searchInfo.classList.toggle('visible', term)
+    if (!term) return
+
+    const results = document.querySelectorAll('.container > div:not(.search):not(.empty):not(.hidden)')
+
+    searchInfo.innerHTML = `<b>${results.length}</b> result${results.length == 1 ? '' : 's'} in <b>${Math.round(elapsed) / 100}</b> seconds`
 })
 
 const imgLogger = new Logger('List', 'ImageLoader')

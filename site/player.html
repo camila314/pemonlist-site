@@ -75,6 +75,37 @@
                     </span>
                 </div>
             </div>
+            {% if player.verifications %}
+                <div class="verifications">
+                    <h1>Verifications</h1>
+                    <div class="table">
+                        {% for verification in player.verifications %}
+                            <div>
+                                <a href="/level/{{ verification.level_id }}">
+                                    <span class="placement">#{{ verification.placement }}</span>
+                                    <span class="level">{{ verification.name }}</span>
+                                </a>
+                                <hr class="divider">
+                                <a href="
+                                    {% if 'https://' in verification.video_id %}
+                                        {{ verification.video_id }}
+                                    {% else %}
+                                        https://youtu.be/{{ verification.video_id }}
+                                    {% endif %}
+                                " target="_blank">
+                                    <span class="link">
+                                        Video Link
+                                    </span>
+                                    <span class="open material-symbols-outlined">
+                                        open_in_new
+                                    </span>
+                                </a>
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
             {% if player.records %}
                 <div class="records">
                     <h1>Records</h1>

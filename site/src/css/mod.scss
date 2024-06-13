@@ -26,6 +26,18 @@ main {
     }
 }
 
+.stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 15px;
+    background-color: #334;
+    border-radius: 20px;
+    margin-top: 20px;
+    white-space: pre-wrap;
+}
+
 @media screen and (max-width: 850px) {
     .select {
         flex-direction: column;

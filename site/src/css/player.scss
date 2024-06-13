@@ -105,7 +105,7 @@
     }
 }
 
-.records, .unverified {
+.records, .unverified, .verifications {
     padding: 20px;
     background-color: #334;
     border-radius: 20px;
@@ -166,6 +166,11 @@
                     width: 55px;
                     user-select: none;
                 }
+
+                .open {
+                    width: 55px;
+                    user-select: none;
+                }
         
                 .level {
                     justify-content: flex-start;
@@ -178,6 +183,13 @@
                     -webkit-box-orient: vertical;
                     max-height: 38px;
                     overflow-wrap: anywhere;
+                }
+
+                .link {
+                    padding-left: 10px;
+                    flex-shrink: 0;
+                    justify-content: flex-end;
+                    margin-right: -10px;
                 }
     
                 .time {
@@ -195,8 +207,10 @@
     }
 }
 
+
+
 body:not(.touch) {
-    .records, .unverified {
+    .records, .unverified, .verifications {
         .table div:hover {
             background-color: #334;
         }
@@ -204,7 +218,7 @@ body:not(.touch) {
 }
 
 body.touch {
-    .records, .unverified {
+    .records, .unverified, .verifications {
         .table div:active {
             background-color: #334;
         }
@@ -212,7 +226,7 @@ body.touch {
 }
 
 @media screen and (max-width: 700px) {
-    .records, .unverified {
+    .records, .unverified, .verifications {
         .table {
             width: calc(100% - 40px) !important;
             margin-bottom: 0px !important;
@@ -236,7 +250,7 @@ body.touch {
                     }
                 }
 
-                .status {
+                .status, .open {
                     width: 30px !important;
                     font-size: large !important;
                     margin-left: -5px;

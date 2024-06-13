@@ -18,19 +18,20 @@
                 <a href="/mod/users">Users</a>
                 <a href="/mod/levels">Levels</a>
             </div>
+            <div class="stats"><b>{{ records | length }}</b> record{% if records | length != 1 %}s{% endif %} in <b>{{ elapsed }}</b> seconds</div>
             {% for record in records %}
                 <div class="record">
                     <span>
                         <div class="user">
                             <a href="/player/{{ record.player.name }}" target="_blank" class="player">
                                 {% if record.player.account %}
-                                    <img src="{{ record.player.account.image }}=s48-c" referrerpolicy="no-referrer" alt="{{ record.player.name }}'s profile picture" class="{{ record.player.account.profile_shape }}">
+                                    <img src="{{ record.player.account.image }}=s48-c" referrerpolicy="no-referrer" alt="{{ record.player.name }}'s profile picture" class="{{ record.player.account.profile_shape }}" loading="lazy">
                                 {% endif %}
                                 <p>{{ record.player.name }}</p>
                             </a>
                             {% if record.player.account.discord %}
                                 <a href="https://discordapp.com/users/{{ record.player.account.discord.user_id }}" target="_blank" class="discord">
-                                    <img src="https://cdn.discordapp.com/avatars/{{ record.player.account.discord.user_id }}/{{ record.player.account.discord.avatar }}.webp?size=48" referrerpolicy="no-referrer" alt="{{ record.player.account.discord.global_name }}'s Discord profile picture">
+                                    <img src="https://cdn.discordapp.com/avatars/{{ record.player.account.discord.user_id }}/{{ record.player.account.discord.avatar }}.webp?size=48" referrerpolicy="no-referrer" alt="{{ record.player.account.discord.global_name }}'s Discord profile picture" loading="lazy">
                                     <p>{{ record.player.account.discord.global_name }} <span class="username">@{{ record.player.account.discord.username }}</span></p>
                                 </a>
                             {% endif %}
@@ -54,12 +55,12 @@
                                         <a href="{{ record.video_id }}" target="_blank">View video <span class="material-symbols-outlined">open_in_new</span></a>
                                     {% else %}
                                         <iframe src="https://www.youtube-nocookie.com/embed/{{ record.video_id }}/" frameborder="0" allow="fullscreen" allowfullscreen="allowfullscreen" loading="lazy" style="display: none"></iframe>
-                                        <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview">
+                                        <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview" loading="lazy">
                                     {% endif %}
                                 {% else %}
                                     <a href="" target="_blank" style="display: none">View video<span class="material-symbols-outlined">open_in_new</span></a>
                                     <iframe src="" frameborder="0" allow="fullscreen" allowfullscreen="allowfullscreen" loading="lazy" style="display: none"></iframe>
-                                    <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview">
+                                    <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview" loading="lazy">
                                 {% endif %}
                                 <img src="/src/img/youtube.svg" alt="YouTube" class="open">
                             </span>

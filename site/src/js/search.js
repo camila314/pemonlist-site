@@ -1,4 +1,5 @@
 const searchBar = document.querySelector('.search textarea')
+const searchInfo = document.querySelector('.search .info')
 
 ;(async function() {
     if (!searchBar) return

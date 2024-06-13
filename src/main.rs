@@ -18,6 +18,7 @@ use std::sync::RwLock;
 use std::thread;
 use tera::{Context, Tera};
 use time::OffsetDateTime;
+use std::time::Instant;
 use tower_http::services::{ServeDir, ServeFile};
 use url::form_urlencoded;
 
@@ -45,7 +46,7 @@ impl Token for edgedb_tokio::Client {
                         id, 
                         name,
                         points,
-                        verifications := (select Level { name } filter .verifier = <Player>AuthToken.account.player.id),
+                        verifications := (select Level { name, level_id, placement, video_id } filter .verifier = <Player>AuthToken.account.player.id),
                         records := (select .entries {
                             level: { name, level_id, placement },
                             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
@@ -178,7 +179,7 @@ async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): P
     let player: Value = state.database.query_json("select Player {
         name,
         points,
-        verifications := (select Level { name } filter .verifier = <Player>Player.id),
+        verifications := (select Level { name, level_id, placement, video_id } filter .verifier = <Player>Player.id),
         records := (select .entries {
             level: { name, level_id, placement },
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
@@ -628,11 +629,11 @@ async fn migrate(State(state): State<AppState>, info: Option<Query<SetupInfoQuer
         Some (ref cookie) => {
             let token = state.database.get_info_from_token(cookie.value()).await;
 
-            // if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
+            if !token[0]["account"].is_null() && token[0]["account"]["status"].as_str() == Some("None") {
                 ctx.insert("account", &token[0]["account"]);
 
                 return Ok(state.template.render("migrate.html", &ctx).unwrap().into());
-            // }
+            }
         }
 
         None => {}
@@ -800,6 +801,8 @@ async fn modpage(State(state): State<AppState>, jar: CookieJar) -> Result<Html<S
 }
 
 async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let start = Instant::now();
+
     let mut ctx = Context::new();
 
     match jar.get("token") {
@@ -831,6 +834,7 @@ async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Ht
 
             if !token[0]["account"].is_null() && token[0]["account"]["mod"].as_bool().unwrap() {
                 ctx.insert("account", &token[0]["account"]);
+                ctx.insert("elapsed", &((start.clone().elapsed().as_secs_f64() * 100.).round() / 100.));
 
                 return Ok(state.template.render("modrecords.html", &ctx).unwrap().into());
             }
@@ -954,6 +958,8 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
 }
 
 async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html<String>, Redirect> {
+    let start = Instant::now();
+
     let mut ctx = Context::new();
 
     match jar.get("token") {
@@ -983,6 +989,7 @@ async fn mod_users(State(state): State<AppState>, jar: CookieJar) -> Result<Html
 
             if !token[0]["account"].is_null() && token[0]["account"]["mod"].as_bool().unwrap() {
                 ctx.insert("account", &token[0]["account"]);
+                ctx.insert("elapsed", &((start.clone().elapsed().as_secs_f64() * 100.).round() / 100.));
 
                 return Ok(state.template.render("modusers.html", &ctx).unwrap().into());
             }

@@ -18,6 +18,7 @@
                 <a href="/mod/users">Users</a>
                 <a href="/mod/levels">Levels</a>
             </div>
+            <div class="stats"><b>{{ requests | length }}</b> request{% if requests | length != 1 %}s{% endif %} in <b>{{ elapsed }}</b> seconds</div>
             {% for request in requests %}
                 <div class="request">
                     <span>

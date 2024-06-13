@@ -7,6 +7,7 @@
     background-color: #334;
     position: relative;
     overflow: hidden;
+    font-size: medium;
 
     .test {
         position: absolute;
@@ -34,11 +35,16 @@
         background-color: transparent;
         padding: 20px;
         padding-left: calc(24px + 40px);
-        font-size: medium;
+        font-size: inherit;
         font-family: inherit;
         display: flex;
         justify-content: flex-start;
         align-items: center;
+        transition: padding-bottom 200ms ease-out;
+
+        &:has(~ .info.visible) {
+            padding-bottom: calc(1em + 20px);
+        }
 
         &:focus-visible {
             border: none;
@@ -48,6 +54,35 @@
         &::placeholder {
             color: #778;
             user-select: none;
+        }
+    }
+
+    .info {
+        position: absolute;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        margin-top: 0px !important;
+        padding-left: 64px;
+        padding-right: 20px;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        pointer-events: none;
+        white-space: pre-wrap;
+        transition: opacity 200ms ease-out;
+        opacity: 0;
+        color: #99a;
+        margin-bottom: 10px;
+
+        b {
+            color: #ccd;
+        }
+
+        &.visible {
+            opacity: 1;
         }
     }
 }

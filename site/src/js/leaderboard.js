@@ -13,6 +13,8 @@ String.prototype.highlight = function(term) {
 }
 
 document.querySelector('.search textarea').addEventListener('input', event => {
+    // search algorithm
+
     const start = performance.now()
 
     const term = event.target.value.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&') // escape special regex chars [https://stackoverflow.com/a/3561711]
@@ -51,4 +53,13 @@ document.querySelector('.search textarea').addEventListener('input', event => {
 
     if (elapsed > 30) boardLogger.warn(`${status} took ${elapsed}ms`)
     else boardLogger.log(`${status} took ${elapsed}ms`)
+
+    // stats
+
+    searchInfo.classList.toggle('visible', term)
+    if (!term) return
+
+    const results = document.querySelectorAll('.players .table > a:not(.hidden)')
+
+    searchInfo.innerHTML = `<b>${results.length}</b> result${results.length == 1 ? '' : 's'} in <b>${Math.round(elapsed) / 100}</b> seconds`
 })
