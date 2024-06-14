@@ -195,5 +195,7 @@ input {
 
     &::placeholder {
         font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+        color: #778;
+        user-select: none;
     }
 }

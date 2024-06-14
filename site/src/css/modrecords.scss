@@ -195,7 +195,7 @@ main {
                 color: #dde;
                 height: 24px;
                 transition: background-color 70ms ease-out;
-                font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+                font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
                 font-size: medium;
                 text-align: center;
                 margin-top: -4px;
@@ -254,10 +254,6 @@ main {
                 &[disabled] {
                     opacity: 0.5;
                     cursor: not-allowed;
-                }
-
-                &::placeholder {
-                    color: #778;
                 }
             }
         }

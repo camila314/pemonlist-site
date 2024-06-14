@@ -46,7 +46,7 @@ impl Token for edgedb_tokio::Client {
                         id, 
                         name,
                         points,
-                        verifications := (select Level { name, level_id, placement, video_id } filter .verifier = <Player>AuthToken.account.player.id),
+                        verifications: { name, level_id, placement, video_id },
                         records := (select .entries {
                             level: { name, level_id, placement },
                             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
@@ -102,10 +102,9 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
 
     if players.clone().as_array().unwrap().is_empty() {
         players = state.database.query_json("select Player {
-            name,
-            points,
+            id,
             rank,
-            device
+            points
         } filter .points > 0 order by .points desc", &()).await.unwrap().parse().unwrap();
 
         let mut guard = LEADERBOARD_CACHE.write().unwrap();
@@ -116,12 +115,12 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
         ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
 
         if records != RECORDS.read().unwrap().clone() {
+            let threadstate = state.clone();
             thread::spawn(move || {
-                let players = state.database.query_json("select Player {
-                    name,
-                    points,
+                let players = threadstate.database.query_json("select Player {
+                    id,
                     rank,
-                    device
+                    points
                 } filter .points > 0 order by .points desc", &());
 
                 let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
@@ -137,7 +136,33 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
         }
     }
 
+    let leaderboard: Value = state.database.query_json("select Player {
+        id,
+        name,
+        device
+    }", &()).await.unwrap().parse().unwrap();
+
+    let mut i = 0;
+
+    if let Some(players_arr) = players.clone().as_array() {
+        if let Some(leaderboard_arr) = leaderboard.as_array() {
+            for player in players_arr {
+    
+                for leaderboard_spot in leaderboard_arr {
+                    if leaderboard_spot["id"].as_str().unwrap() == player["id"].as_str().unwrap() {
+                        players[i]["name"] = leaderboard_spot["name"].clone();
+                        players[i]["device"] = leaderboard_spot["device"].clone();
+                        break;
+                    }
+                }
+                
+                i += 1;
+            }
+        }
+    }
+
     ctx.insert("players", &players.clone());
+
     state.template.render("leaderboard.html", &ctx).unwrap().into()
 }
 
@@ -179,7 +204,7 @@ async fn player(State(state): State<AppState>, jar: CookieJar, Path(username): P
     let player: Value = state.database.query_json("select Player {
         name,
         points,
-        verifications := (select Level { name, level_id, placement, video_id } filter .verifier = <Player>Player.id),
+        verifications: { name, level_id, placement, video_id },
         records := (select .entries {
             level: { name, level_id, placement },
             time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
@@ -249,7 +274,7 @@ async fn submit(State(state): State<AppState>, jar: CookieJar) -> Result<Html<St
 
 #[derive(Deserialize)]
 struct RecordInfo {
-    timeplain: String,
+    time: String,
     levelid: String,
     videoid: String,
     raw: String,
@@ -291,7 +316,7 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
             .level = (select Level filter .level_id = <int64><str>$2) and
             .status != Status.Denied
     ", &(
-        &body.timeplain,
+        &body.time,
         video_id,
         &body.levelid
     )).await.unwrap().parse().unwrap();
@@ -315,7 +340,7 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
         &body.raw,
         account[0]["account"]["player"]["id"].as_str().unwrap(),
         &body.levelid,
-        &body.timeplain,
+        &body.time,
         &body.device == "mobile"
     )).await.unwrap();
 

@@ -85,49 +85,12 @@ main {
                 user-select: none;
                 width: calc(50% - 5px);
 
-                .timewrapper {
-                    border: 1px solid #556;
-                    border-radius: 4px;
-                    overflow: hidden;
+                #time {
+                    font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
 
-                    #time:empty:before {
-                        content: attr(data-placeholder);
-                        color: #778;
-                        user-select: none;
-                        cursor: text;
+                    &::placeholder {
+                        font-family: 'Droid Sans Mono', 'Courier New', Courier, monospace;
                     }
-            
-                    #time {
-                        padding: 3px 0px;
-                        border: solid 7px transparent;
-                        background-color: #334;
-                        color: #dde;
-                        transition: background-color 70ms ease-out;
-                        font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
-                        font-size: medium;
-                        display: flex;
-                        align-items: center;
-                        overflow-x: scroll;
-                        overflow-y: hidden;
-                        height: 18px;
-                        white-space: pre;
-                        -ms-overflow-style: none;
-                        scrollbar-width: none;
-                        
-                        &::-webkit-scrollbar { 
-                            display: none;
-                        }
-                    }
-                }
-
-                #timeplain {
-                    padding: 0px;
-                    margin: 0px;
-                    height: 1px;
-                    border: none;
-                    outline: none;
-                    pointer-events: none;
-                    z-index: -1;
                 }
             }
         }
@@ -149,11 +112,6 @@ main {
                 &:first-child {
                     flex-grow: 1;
                     margin-right: 10px;
-
-                    input::placeholder {
-                        color: #778;
-                        user-select: none;
-                    }
 
                     label:not(:first-child) {
                         margin-top: 15px;

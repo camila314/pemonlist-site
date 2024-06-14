@@ -13,8 +13,9 @@ module default {
 		};
 
 		multi link entries := (select .<player[is Entry] filter .status = Status.Approved);
+		multi link verifications := (select .<verifier[is Level] order by .placement);
 		multi link unverified_entries := (select .<player[is Entry] filter .status != Status.Approved);
-		points := <int32>sum((select .entries).level.points);
+		points := <int32>sum((select .entries).level.points) + <int32>sum((select .verifications).points);
 		rank := getPlayerRank(<Player>.id);
 		required property device -> Device {
 			default := Device.Both;

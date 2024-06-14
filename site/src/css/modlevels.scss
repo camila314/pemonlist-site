@@ -69,11 +69,6 @@ main {
                 border: none;
                 border-radius: 20px;
                 background-color: #334;
-    
-                &::placeholder {
-                    color: #778;
-                    user-select: none;
-                }
             }
         }
 
@@ -117,11 +112,6 @@ main {
                 color: #eef;
                 background-color: #445;
                 text-align: center;
-
-                &::placeholder {
-                    color: #778;
-                    user-select: none;
-                }
             }
 
             h1 {
@@ -321,10 +311,6 @@ main {
                 &[disabled] {
                     opacity: 0.5;
                     cursor: not-allowed;
-                }
-
-                &::placeholder {
-                    color: #778;
                 }
             }
         }

@@ -13,61 +13,16 @@ document.querySelector('.beside span:first-of-type').addEventListener('click', (
     time.focus()
 })
 
-// https://stackoverflow.com/a/72129181
-time.addEventListener('paste', function (e) {
-    e.preventDefault()
-
-    const text = e.clipboardData
-        ? (e.originalEvent || e).clipboardData.getData('text/plain')
-        :
-        window.clipboardData
-        ? window.clipboardData.getData('Text')
-        : ''
-
-    if (document.queryCommandSupported('insertText')) {
-        document.execCommand('insertText', false, text)
-    } else {
-        const range = document.getSelection().getRangeAt(0)
-        range.deleteContents()
-
-        const textNode = document.createTextNode(text)
-        range.insertNode(textNode)
-        range.selectNodeContents(textNode)
-        range.collapse(false)
-
-        const selection = window.getSelection()
-        selection.removeAllRanges()
-        selection.addRange(range)
-    }
-})
+function checkValidityOfTime(time) {
+    return /^(?:\d{1,2}:)?(?:\d{1,2}:)?\d{2}(?:\.\d{3})?$/.test(time)
+}
 
 time.addEventListener('input', e => {
-    timeplain.setCustomValidity('')
+    e.target.setCustomValidity('')
 
-    timeplain.value = e.target.innerText
+    if (!e.target.value.trim()) return
 
-    if (e.target.innerText.length == 0) return
-
-    let time = e.target.innerText.split(':')
-    time.push(...time.pop().split('.'))
-
-    let valid = true
-    time.forEach((e, i) => {
-        let test = /^\d+$/.test(e)
-        if (!test) return valid = false
-        time[i] = parseInt(e)
-        if (time[i] < 0) return valid = false
-    })
-
-    if (!valid) return timeplain.setCustomValidity('Please enter a valid time format.')
-
-    if ([...time].reverse()[0].length < 3) return timeplain.setCustomValidity('Please add milliseconds.')
-
-    time.map((e, i) => {
-        if (e == 0) time.shift()
-    })
-
-    console.log(time)
+    if (!checkValidityOfTime(e.target.value)) e.target.setCustomValidity('Please enter a valid time format.')
 })
 
 level.addEventListener('change', e => {
