@@ -1136,31 +1136,6 @@ async fn mod_levels(State(state): State<AppState>, jar: CookieJar) -> Result<Htm
         None => {}
     }
 
-    let records: i64 = state.database.query_required_single_json("
-        select count((select Entry filter .status = Status.Approved))
-    ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
-
-    if records != RECORDS.read().unwrap().clone() {
-        let threadstate = state.clone();
-        thread::spawn(move || {
-            let players = threadstate.database.query_json("select Player {
-                id,
-                rank,
-                points
-            } filter .points > 0 order by .points desc", &());
-
-            let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
-
-            let mut guard = LEADERBOARD_CACHE.write().unwrap();
-            *guard = new_players.clone();
-            drop(guard);
-
-            let mut guard = RECORDS.write().unwrap();
-            *guard = records.clone();
-            drop(guard);
-        });
-    }
-
     Err(Redirect::to("/account"))
 }
 
@@ -1279,6 +1254,31 @@ async fn edit_level(State(state): State<AppState>, jar: CookieJar, Form(body): F
 
         _ => {}
     } 
+
+    let records: i64 = state.database.query_required_single_json("
+        select count((select Entry filter .status = Status.Approved))
+    ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
+
+    if records != RECORDS.read().unwrap().clone() {
+        let threadstate = state.clone();
+        thread::spawn(move || {
+            let players = threadstate.database.query_json("select Player {
+                id,
+                rank,
+                points
+            } filter .points > 0 order by .points desc", &());
+
+            let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
+
+            let mut guard = LEADERBOARD_CACHE.write().unwrap();
+            *guard = new_players.clone();
+            drop(guard);
+
+            let mut guard = RECORDS.write().unwrap();
+            *guard = records.clone();
+            drop(guard);
+        });
+    }
 
     Redirect::to("/mod/levels")
 }
