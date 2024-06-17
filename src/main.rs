@@ -1,9 +1,22 @@
 use axum::{
-    extract::{Form, Host, Path, Query, State},
-    http::uri::Uri,
-    response::{Html, Redirect},
-    routing::{get, post},
-    Router
+    body::{ to_bytes, Body },
+    extract::{
+        Form,
+        Host,
+        Path,
+        Query,
+        Request,
+        State
+    }, http::{
+        uri::Uri,
+        HeaderValue, Response
+    }, middleware::Next, response::{
+        Html,
+        Redirect
+    }, routing::{
+        get,
+        post
+    }, Router
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use chrono::Utc;
@@ -21,6 +34,7 @@ use time::OffsetDateTime;
 use std::time::Instant;
 use tower_http::services::{ServeDir, ServeFile};
 use url::form_urlencoded;
+use adler::adler32;
 
 #[derive(Clone)]
 struct AppState {
@@ -1443,7 +1457,26 @@ async fn main() {
             (StatusCode::NOT_FOUND, Html::<String>::from(state.template.render("fallback.html", &ctx).unwrap()))
         })
 
-        .with_state(state);
+        .with_state(state)
+
+        .layer(axum::middleware::from_fn(|request: Request, next: Next| async move {
+            let mut response = next.run(request).await;
+
+            response.headers_mut().append("Cache-Control", HeaderValue::from_str("no-cache").unwrap());
+
+            let (parts, body) = response.into_parts();
+
+            let bytes = to_bytes(body, usize::MAX).await.unwrap();
+            let hash = adler32(bytes.as_ref()).unwrap();
+
+            let mut joined_response = Response::from_parts(parts, Body::from(bytes));
+
+            if hash != 1 as u32 {
+                joined_response.headers_mut().append("ETag", HeaderValue::from_str(format!("W/\"{hash:x}\"").as_str()).unwrap());
+            }
+
+            joined_response
+        }));
 
     // Set up 
 

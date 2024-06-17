@@ -6,3 +6,4 @@ Cargo.lock
 .env
 out.db
 errcode.txt
+changelog.txt
