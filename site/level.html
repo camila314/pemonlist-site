@@ -24,10 +24,10 @@
                         <h3>Creator</h3>
                         <p>{{ level.creator }}</p>
                     </span>
-                    <span>
+                    <a href="/player/{{ level.verifier.name }}" target="_blank">
                         <h3>Verifier</h3>
                         <p>{{ level.verifier.name }}</p>
-                    </span>
+                    </a>
                 </div>
                 <section>
                     <iframe src="https://www.youtube-nocookie.com/embed/{{ level.video_id }}/" frameborder="0" allow="fullscreen" allowfullscreen="allowfullscreen"></iframe>
