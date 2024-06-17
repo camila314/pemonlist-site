@@ -9,7 +9,7 @@ records.forEach(r => {
     const raw = r.querySelector('.video .select :last-child')
 
     img.addEventListener('click', e => {
-        iframe.src = `https://www.youtube-nocookie.com/embed/${getVideoIDFromURL(e.target.src)}/`
+        iframe.src = `https://www.youtube-nocookie.com/embed/${getVideoIDFromURL(e.target.src)}?autoplay=1`
         e.target.style.display = 'none'
         iframe.style.display = ''
     })
@@ -20,7 +20,7 @@ records.forEach(r => {
         const videourl = video.attributes['data-url'].value
         const rawid = getVideoIDFromURL(raw.attributes['data-url'].value)
         const rawurl = rawid ?
-            `https://www.youtube-nocookie.com/embed/${rawid}/`
+            `https://www.youtube-nocookie.com/embed/${rawid}/?enablejsapi`
             : raw.attributes['data-url'].value
         const imgurl = `https://i1.ytimg.com/vi/${getVideoIDFromURL(videourl)}/hqdefault.jpg`
         const rawimg = `https://i1.ytimg.com/vi/${rawid}/hqdefault.jpg`

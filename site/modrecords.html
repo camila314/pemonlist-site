@@ -43,7 +43,7 @@
                                         {%- if 'https://' in record.video_id -%}
                                             {{ record.video_id }}
                                         {%- else -%}
-                                            https://www.youtube-nocookie.com/embed/{{ record.video_id }}/
+                                            https://www.youtube-nocookie.com/embed/{{ record.video_id }}?autoplay=1
                                         {%- endif -%}
                                     " class="selected">Video</button>
                                     <button data-url="{{ record.raw_video }}">Raw</button>
@@ -54,12 +54,12 @@
                                     {% if 'https://' in record.video_id %}
                                         <a href="{{ record.video_id }}" target="_blank">View video <span class="material-symbols-outlined">open_in_new</span></a>
                                     {% else %}
-                                        <iframe src="https://www.youtube-nocookie.com/embed/{{ record.video_id }}/" frameborder="0" allow="fullscreen" allowfullscreen="allowfullscreen" loading="lazy" style="display: none"></iframe>
+                                        <iframe src="https://www.youtube-nocookie.com/embed/{{ record.video_id }}?autoplay=1" frameborder="0" autoplay allow="fullscreen" allowfullscreen="allowfullscreen" loading="lazy" style="display: none"></iframe>
                                         <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview" loading="lazy">
                                     {% endif %}
                                 {% else %}
                                     <a href="" target="_blank" style="display: none">View video<span class="material-symbols-outlined">open_in_new</span></a>
-                                    <iframe src="" frameborder="0" allow="fullscreen" allowfullscreen="allowfullscreen" loading="lazy" style="display: none"></iframe>
+                                    <iframe src="" frameborder="0" autoplay allow="fullscreen" allowfullscreen="allowfullscreen" loading="lazy" style="display: none"></iframe>
                                     <img src="https://i1.ytimg.com/vi/{{ record.video_id }}/hqdefault.jpg" alt="Video preview" loading="lazy">
                                 {% endif %}
                                 <img src="/src/img/youtube.svg" alt="YouTube" class="open">
