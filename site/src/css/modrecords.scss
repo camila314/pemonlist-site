@@ -298,17 +298,17 @@ main.touch {
 
 @media screen and (max-width: 1300px) and (min-width: 600px) {
     .record {
-        justify-content: space-around;
         span, form {
             flex-direction: column;
-            width: 45%;
+            width: calc(50% - 10px);
+            margin: 10px 0px;
             
             div {
                 margin-right: 0px !important;
 
                 &.user {
-                    align-self: stretch;
                     margin-bottom: 20px;
+                    align-self: stretch;
 
                     a {
                         width: calc(100% - 20px) !important;
@@ -324,6 +324,10 @@ main.touch {
                     margin: 0px;
                     align-self: center;
                     width: 100% !important;
+
+                    .preview {
+                        margin: 0px;
+                    }
                 }
 
                 &.info {
@@ -352,6 +356,7 @@ main.touch {
             align-items: center;
             flex-direction: column;
             width: calc(100% - 20px);
+            margin: 0px;
 
             div {
                 margin-right: 0px !important;
