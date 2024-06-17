@@ -296,7 +296,50 @@ main.touch {
     }
 }
 
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 1300px) and (min-width: 600px) {
+    .record {
+        justify-content: space-around;
+        span, form {
+            flex-direction: column;
+            width: 45%;
+            
+            div {
+                margin-right: 0px !important;
+
+                &.user {
+                    align-self: stretch;
+                    margin-bottom: 20px;
+
+                    a {
+                        width: calc(100% - 20px) !important;
+                        justify-content: center !important;
+
+                        p {
+                            width: unset !important;
+                        }
+                    }
+                }
+
+                &.video {
+                    margin: 0px;
+                    align-self: center;
+                    width: 100% !important;
+                }
+
+                &.info {
+                    width: 100%;
+                    margin-bottom: 20px;
+                }
+
+                &.submit {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 850px) {
     .record {
         justify-content: center;
         align-items: center;
@@ -312,13 +355,10 @@ main.touch {
 
             div {
                 margin-right: 0px !important;
-                
-                &:not(:last-of-type) {
-                    margin-bottom: 10px;
-                }
 
                 &.user {
                     align-self: stretch;
+                    margin-bottom: 20px;
 
                     a {
                         width: calc(100% - 20px) !important;
@@ -333,8 +373,9 @@ main.touch {
                 &.video {
                     margin-top: 0px;
                     align-self: center;
-                    width: 500px !important;
+                    width: 600px !important;
                     max-width: 100%;
+                    margin-bottom: 20px;
                 }
             }
         }
@@ -344,6 +385,10 @@ main.touch {
 
             div {
                 width: 100% !important;
+
+                &.info {
+                    margin-bottom: 20px;
+                }
             }
         }
     }
