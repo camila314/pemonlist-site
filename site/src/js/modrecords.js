@@ -95,15 +95,11 @@ document.querySelectorAll('.record select').forEach(s =>
     s.addEventListener('change', e => {
         const submit = s.parentElement.parentElement.querySelector('.submit input[type="submit"]')
         submit.disabled = true
-
-        console.log(s)
         
         if (s.value != s.querySelector('option[selected=""]').value) return submit.disabled = false
 
         const sibling = s.parentElement.nextElementSibling ?? s.parentElement.previousElementSibling
         const other = sibling.querySelector('select')
-
-        console.log(other)
 
         if (other.value != other.querySelector('option[selected=""]').value) return submit.disabled = false
     })
