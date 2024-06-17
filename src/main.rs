@@ -108,7 +108,7 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
             id,
             rank,
             points
-        } filter .points > 0 order by .points desc", &()).await.unwrap().parse().unwrap();
+        } filter (select count(.entries)) != 0 order by .points desc", &()).await.unwrap().parse().unwrap();
 
         let mut guard = LEADERBOARD_CACHE.write().unwrap();
         *guard = players.clone();
@@ -118,13 +118,13 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
         ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
 
         if records != RECORDS.read().unwrap().clone() {
-            let threadstate = state.clone();
+            let thread_state = state.clone();
             thread::spawn(move || {
-                let players = threadstate.database.query_json("select Player {
+                let players = thread_state.database.query_json("select Player {
                     id,
                     rank,
                     points
-                } filter .points > 0 order by .points desc", &());
+                } filter (select count(.entries)) != 0 order by .points desc", &());
 
                 let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
 
@@ -962,13 +962,13 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
     ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
 
     if records != RECORDS.read().unwrap().clone() {
-        let threadstate = state.clone();
+        let thread_state = state.clone();
         thread::spawn(move || {
-            let players = threadstate.database.query_json("select Player {
+            let players = thread_state.database.query_json("select Player {
                 id,
                 rank,
                 points
-            } filter .points > 0 order by .points desc", &());
+            } filter (select count(.entries)) != 0 order by .points desc", &());
 
             let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
 
@@ -1263,13 +1263,13 @@ async fn edit_level(State(state): State<AppState>, jar: CookieJar, Form(body): F
     ", &()).await.unwrap().parse::<Value>().unwrap().as_i64().unwrap();
 
     if records != RECORDS.read().unwrap().clone() {
-        let threadstate = state.clone();
+        let thread_state = state.clone();
         thread::spawn(move || {
-            let players = threadstate.database.query_json("select Player {
+            let players = thread_state.database.query_json("select Player {
                 id,
                 rank,
                 points
-            } filter .points > 0 order by .points desc", &());
+            } filter (select count(.entries)) != 0 order by .points desc", &());
 
             let new_players = block_on(players).unwrap().parse::<Value>().unwrap();
 
