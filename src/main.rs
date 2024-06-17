@@ -1,22 +1,11 @@
 use axum::{
     body::{ to_bytes, Body },
-    extract::{
-        Form,
-        Host,
-        Path,
-        Query,
-        Request,
-        State
-    }, http::{
-        uri::Uri,
-        HeaderValue, Response
-    }, middleware::Next, response::{
-        Html,
-        Redirect
-    }, routing::{
-        get,
-        post
-    }, Router
+    extract::{ Form, Host, Path, Query, Request, State },
+    http::{ uri::Uri, HeaderValue, Response },
+    middleware::Next,
+    response::{ Html, Redirect },
+    routing::{ get, post },
+    Router
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use chrono::Utc;
