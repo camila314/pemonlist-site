@@ -91,13 +91,29 @@ records.forEach(r => {
     })()
 })
 
+document.querySelectorAll('.record select').forEach(s =>
+    s.addEventListener('change', e => {
+        const submit = s.parentElement.parentElement.querySelector('.submit input[type="submit"]')
+        submit.disabled = true
+
+        console.log(s)
+        
+        if (s.value != s.querySelector('option[selected=""]').value) return submit.disabled = false
+
+        const sibling = s.parentElement.nextElementSibling ?? s.parentElement.previousElementSibling
+        const other = sibling.querySelector('select')
+
+        console.log(other)
+
+        if (other.value != other.querySelector('option[selected=""]').value) return submit.disabled = false
+    })
+)
+
 document.querySelectorAll('.submit select').forEach(s => s.addEventListener('change', e => {
     const submit = e.target.parentElement.lastElementChild
-    const selected = e.target.querySelector('option[selected=""]').value
     const denied = e.target.value == 'denied'
-    const reason = e.target.parentElement.querySelector('input[name="reason"]')
+    const reason = submit.previousElementSibling
 
-    submit.disabled = selected == e.target.value
     reason.type = denied ? 'text' : 'hidden'
 }))
 

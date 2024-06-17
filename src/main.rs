@@ -878,6 +878,7 @@ async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Ht
 struct EntryEdit {
     entryid: String,
     time: String,
+    device: String,
     status: String,
     reason: String
 }
@@ -929,29 +930,33 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
             update Entry filter .id = <uuid><str>$0 set {
                 created_at := datetime_of_statement(),
                 time := <duration><str>$1,
-                status := Status.Approved
+                status := Status.Approved,
+                mobile := $2
             };
             delete Entry filter .id = <uuid><str>$2
         ", &(
             approved[0]["id"].as_str().unwrap(),
             &body.time,
-            &body.entryid
+            &body.entryid,
+            &body.device == "mobile"
         )).await.unwrap();
     } else {
         state.database.execute("
             update Entry filter .id = <uuid><str>$0 set {
                 time := <duration><str>$1,
                 status := <Status><str>$2,
-                reason := <str>$3
+                reason := <str>$3,
+                device := $4
             };
             delete Entry filter
-                .player.id = <uuid><str>$4 and
-                .level.id = <uuid><str>$5
+                .player.id = <uuid><str>$5 and
+                .level.id = <uuid><str>$6
         ", &(
             &body.entryid,
             &body.time,
             format!("{}{}", &body.status.remove(0).to_uppercase(), &body.status),
             &body.reason,
+            &body.device == "mobile",
             entry[0]["level"]["id"].as_str().unwrap(),
             entry[0]["player"]["id"].as_str().unwrap()
         )).await.unwrap();

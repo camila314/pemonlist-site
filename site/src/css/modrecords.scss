@@ -21,6 +21,23 @@ main {
         align-items: center;
         max-width: 700px;
 
+        select {
+            padding: 7px;
+            height: 40px;
+            background-color: #334;
+            border: 1px solid #556;
+            border-radius: 4px;
+            color: #dde;
+            font-size: medium;
+            font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
+
+            option {
+                background-color: #223;
+                color: #dde;
+                height: 17px;
+            }
+        }
+
         .user {
             display: flex;
             flex-direction: column;
@@ -199,6 +216,7 @@ main {
                 font-size: medium;
                 text-align: center;
                 margin-top: -4px;
+                margin-bottom: 10px;
 
                 &:hover, &:focus-visible {
                     border-color: #556;
@@ -215,23 +233,6 @@ main {
 
             > :not(:last-child) {
                 margin-bottom: 10px;
-            }
-
-            select {
-                padding: 7px;
-                height: 40px;
-                background-color: #334;
-                border: 1px solid #556;
-                border-radius: 4px;
-                color: #dde;
-                font-size: medium;
-                font-family: "Whitney", Arial, Helvetica, sans-serif, "Material Symbols Outlined";
-
-                option {
-                    background-color: #223;
-                    color: #dde;
-                    height: 17px;
-                }
             }
 
             input {
@@ -339,6 +340,10 @@ main.touch {
                     width: 100%;
                 }
             }
+        }
+
+        form {
+            margin-top: 20px;
         }
     }
 }
