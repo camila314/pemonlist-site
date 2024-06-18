@@ -23,7 +23,7 @@
                         </span>
                         <span>
                             <label for="level">Level</label>
-                            <input type="text" list="levels" name="level" id="level" required autocomplete="none" multiple>
+                            <input type="text" list="levels" name="level" id="level" placeholder="Level Name" required autocomplete="none" multiple>
                             <input type="hidden" name="levelid" id="levelid">
                             <datalist id="levels">
                                 {% for level in levels %}
@@ -58,6 +58,7 @@
                         <option value="desktop">Desktop</option>
                         <option value="mobile">Mobile</option>
                     </select>
+                    <textarea name="notes" id="notes" placeholder="Additional Notes (optional)" rows="3"></textarea>
                     <hr>
                     <input type="submit" value="Submit Record">
                 </form>

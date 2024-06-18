@@ -281,7 +281,8 @@ struct RecordInfo {
     levelid: String,
     videoid: String,
     raw: String,
-    device: String
+    device: String,
+    notes: String
 }
 
 async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body): Form<RecordInfo>) -> Result<Html<String>, Redirect> {
@@ -336,7 +337,8 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
             player := <Player><uuid><str>$2,
             level := (select Level filter .level_id = <int64><str>$3),
             time := <duration><str>$4,
-            mobile := <bool>$5
+            mobile := <bool>$5,
+            notes := <str>$6
         }
     ", &(
         video_id,
@@ -344,7 +346,8 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
         account[0]["account"]["player"]["id"].as_str().unwrap(),
         &body.levelid,
         &body.time,
-        &body.device == "mobile"
+        &body.device == "mobile",
+        &body.notes
     )).await.unwrap();
 
     Ok(state.template.render("submitted.html", &Context::new()).unwrap().into())
@@ -838,7 +841,8 @@ async fn mod_records(State(state): State<AppState>, jar: CookieJar) -> Result<Ht
                             discord: { global_name, user_id, username, avatar }
                         } limit 1)
                     },
-                    level: { name, placement, video_id, level_id }
+                    level: { name, placement, video_id, level_id },
+                    notes
                 } filter .status != Status.Approved and .status != Status.Denied order by .created_at asc
             ", &()).await.unwrap().parse::<Value>().unwrap();
 

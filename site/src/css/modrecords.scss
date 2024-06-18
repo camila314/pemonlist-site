@@ -222,6 +222,21 @@ main {
                     border-color: #556;
                 }
             }
+
+            #notes {
+                resize: none;
+                color: #dde;
+                background-color: #223;
+                border: 1px solid #112;
+                border-radius: 4px;
+                padding: 10px;
+                margin-top: 10px;
+
+                &::placeholder {
+                    color: #667;
+                    font-style: italic;
+                }
+            }
         }
 
         .submit {

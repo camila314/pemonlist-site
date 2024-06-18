@@ -99,6 +99,7 @@ module default {
 		required link level -> Level;
 		rank := getTimeRank(<Entry>.id);
 		property reason -> str;
+		property notes -> str;
 	}
 
 	scalar type ChangeType extending enum<Add, Edit, Remove>;
