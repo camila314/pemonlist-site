@@ -1,4 +1,4 @@
-const query = window.matchMedia('(max-width: 1012px)')
+const query = window.matchMedia('(max-width: 920px)')
 query.addEventListener('change', () => {
     document.querySelector('nav button.overflow').classList.remove('enabled')
     document.querySelector('nav span.overflow').classList.remove('enabled')
