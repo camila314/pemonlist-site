@@ -350,22 +350,6 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
     Ok(state.template.render("submitted.html", &Context::new()).unwrap().into())
 }
 
-async fn terms(State(state): State<AppState>) -> Html<String> {
-    state.template.render("terms.html", &Context::new()).unwrap().into()
-}
-
-async fn privacy(State(state): State<AppState>) -> Html<String> {
-    state.template.render("privacy.html", &Context::new()).unwrap().into()
-}
-
-async fn rules(State(state): State<AppState>) -> Html<String> {
-    state.template.render("rules.html", &Context::new()).unwrap().into()
-}
-
-async fn oauth(State(state): State<AppState>) -> Html<String> {
-    state.template.render("oauth.html", &Context::new()).unwrap().into()
-}
-
 #[derive(Deserialize)]
 struct Oauth2 {
     code: String
@@ -1433,10 +1417,21 @@ async fn main() {
         .route("/mod/users", post(update_user))
         .route("/mod/levels", get(mod_levels))
         .route("/mod/levels", post(edit_level))
-        .route("/terms", get(terms))
-        .route("/privacy", get(privacy))
-        .route("/rules", get(rules))
-        .route("/oauth", get(oauth))
+        .route("/terms", get(|State(state): State<AppState>| async move {
+            Html::<String>::from(state.template.render("terms.html", &Context::new()).unwrap())
+        }))
+        .route("/privacy", get(|State(state): State<AppState>| async move {
+            Html::<String>::from(state.template.render("privacy.html", &Context::new()).unwrap())
+        }))
+        .route("/rules", get(|State(state): State<AppState>| async move {
+            Html::<String>::from(state.template.render("rules.html", &Context::new()).unwrap())
+        }))
+        .route("/oauth", get(|State(state): State<AppState>| async move {
+            Html::<String>::from(state.template.render("oauth.html", &Context::new()).unwrap())
+        }))
+        .route("/credits", get(|State(state): State<AppState>| async move {
+            Html::<String>::from(state.template.render("credits.html", &Context::new()).unwrap())
+        }))
 
         .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
         .route_service("/robots.txt", ServeFile::new("site/robots.txt"))
