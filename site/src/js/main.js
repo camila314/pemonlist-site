@@ -121,7 +121,26 @@ const ms = async (ms) => await new Promise(r => setTimeout(r, ms))
 const frame = async () => await new Promise(r => requestAnimationFrame(r))
 
 const cookies = {}
-document.cookie.split('; ').forEach(c => cookies[c.split('=')[0]] = decodeURIComponent(c.split('=')[1]))
+document.cookie.split('; ').forEach(c => {
+    let value = c.split('=')[1]
+
+    if (!isNaN(value)) value = parseFloat(value)
+    else switch (value) {
+        case 'true':
+        case 'false':
+            value = value == 'true'
+            break
+        default: 
+            decodeURIComponent(value)
+    }
+
+    cookies[c.split('=')[0]] = value
+})
+
+cookies.add = (name, value, expires = 2147483647) => {
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`
+    cookies[name] = value
+}
 
 // fix level datalist duplicates
 
@@ -155,3 +174,39 @@ function createFormAndPost(action, payload = {}) {
     document.body.appendChild(form)
     form.submit()
 }
+
+// cookies/terms warning
+window.addEventListener('load', async () => {
+    if (cookies.agree) return
+
+    const warning = document.createElement('div')
+    warning.className = 'warning'
+
+    if (document.body.scrollHeight > window.innerHeight && !document.body.className.trim()) warning.classList.add('scrollbar')
+
+    const text = document.createElement('span')
+    text.innerHTML = '<p>By using this website you agree to the use of cookies, and to the <a href="/terms" class="proper">Terms & Conditions</a> and <a href="/privacy" class="proper">Privacy Policy</a>.</p><p>We will never intentionally track you or sell your data, no matter what.</p>'
+
+    const ok = document.createElement('button')
+    ok.innerText = 'Got it'
+
+    warning.append(text, ok)
+    document.body.appendChild(warning)
+
+    ok.addEventListener('click', async () => {
+        warning.classList.remove('visible')
+
+        await ms(300)
+
+        warning.remove()
+        cookies.add('agree', true)
+    })
+
+    await frame()
+
+    warning.classList.add('visible')
+
+    await ms(300)
+
+    if (document.body.scrollHeight > window.innerHeight && !document.body.className.trim()) warning.classList.add('scrollbar')
+})

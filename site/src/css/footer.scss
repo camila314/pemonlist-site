@@ -9,6 +9,12 @@ footer {
     flex-shrink: 0;
     font-size: small;
     padding: 10px 0px;
+    padding-bottom: 10px;
+    transition: padding-bottom 300ms ease-out;
+
+    &:has(~ .warning.visible) {
+        padding-bottom: 110px;
+    }
 
     span {
         margin: 0px 10px;
