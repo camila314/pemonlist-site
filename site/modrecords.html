@@ -76,12 +76,12 @@
                             <input type="text" name="time" value="{{ record.time_format }}.{{ record.time_ms }}" id="time" required autocomplete="none">
                             <select name="device">
                                 <option value="desktop"
-                                    {%- if record.mobile -%}
+                                    {%- if not record.mobile -%}
                                         selected
                                     {%- endif -%}
                                 >Desktop</option>
                                 <option value="mobile"
-                                    {%- if not record.mobile -%}
+                                    {%- if record.mobile -%}
                                         selected
                                     {%- endif -%}
                                 >Mobile</option>
