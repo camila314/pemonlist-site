@@ -919,7 +919,7 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
                 created_at := datetime_of_statement(),
                 time := <duration><str>$1,
                 status := Status.Approved,
-                mobile := $2
+                mobile := <bool>$2
             };
             delete Entry filter .id = <uuid><str>$2
         ", &(
@@ -934,7 +934,7 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
                 time := <duration><str>$1,
                 status := <Status><str>$2,
                 reason := <str>$3,
-                mobile := $4
+                mobile := <bool>$4
             };
             delete Entry filter
                 .player.id = <uuid><str>$5 and
