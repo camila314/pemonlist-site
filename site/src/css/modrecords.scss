@@ -190,7 +190,6 @@ main {
                 color: #dde;
                 text-decoration: none;
                 margin-bottom: 10px;
-                margin-top: -10px;
                 overflow-wrap: anywhere;
                 white-space: break-spaces;
 
@@ -243,7 +242,6 @@ main {
             display: flex;
             flex-direction: column;
             width: 250px;
-            align-self: stretch;
             justify-content: space-between;
 
             > :not(:last-child) {
@@ -273,6 +271,10 @@ main {
                 }
             }
         }
+    }
+
+    form {
+        margin: 10px 0px;
     }
 }
 
@@ -356,10 +358,6 @@ main.touch {
                 }
             }
         }
-
-        form {
-            margin-top: 20px;
-        }
     }
 }
 
@@ -407,6 +405,7 @@ main.touch {
 
         form {
             margin: 10px;
+            margin-top: 0px;
 
             div {
                 width: 100% !important;
