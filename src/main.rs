@@ -3,7 +3,7 @@ use axum::{
     extract::{ Form, Host, Path, Query, Request, State },
     http::{ uri::Uri, HeaderValue, Response },
     middleware::Next,
-    response::{ Html, Redirect },
+    response::{ Html, Redirect, Json },
     routing::{ get, post },
     Router
 };
@@ -1390,6 +1390,57 @@ async fn account_settings(State(state): State<AppState>, jar: CookieJar, Form(bo
     Redirect::to("/account/settings")
 }
 
+async fn api_list(State(state): State<AppState>) -> Json<Value> {
+    state.database.query_json("select Level {
+        placement,
+        level_id,
+        name,
+        creator,
+        verifier: { id, name },
+        video_id,
+        top_record := (select .entries {
+            player: {
+                id,
+                name
+            },
+            timestamp_milliseconds := (select duration_get(<cal::relative_duration>.time, \"milliseconds\")),
+            formatted_time := (select to_str(.time, \"FMHH24:MI:SS.MS\"))
+        } filter .status = Status.Approved  order by .time limit 1)
+    } order by .placement", &()).await.unwrap().parse::<Value>().unwrap().into()
+}
+
+async fn api_level(State(state): State<AppState>, Path(level_id): Path<u64>) -> (StatusCode, Json<Value>) {
+    let level = state.database.query_json("select Level {
+        placement,
+        level_id,
+        name,
+        creator,
+        verifier: { id, name },
+        video_id,
+        points,
+        records := (select .entries {
+            player: {
+                id,
+                name
+            },
+            timestamp_milliseconds := (select duration_get(<cal::relative_duration>.time, \"milliseconds\")),
+            formatted_time := (select to_str(.time, \"FMHH24:MI:SS.MS\")),
+            video_id,
+            mobile,
+            rank
+        } filter .status = Status.Approved order by .time)
+    } filter .level_id = <int64>$0", &(level_id as i64,)).await.unwrap().parse::<Value>().unwrap();
+
+    if level[0]["level_id"].is_null() {
+        return (StatusCode::BAD_REQUEST, json!({
+            "error": true,
+            "code": "bad_level_id"
+        }).into())
+    }
+
+    (StatusCode::OK, level[0].clone().into())
+}
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
@@ -1437,17 +1488,27 @@ async fn main() {
             Html::<String>::from(state.template.render("credits.html", &Context::new()).unwrap())
         }))
 
+        .route("/api/list", get(api_list))
+        .route("/api/level/:id", get(api_level))
+
         .route_service("/favicon.ico", ServeFile::new("site/meta/favicon.ico"))
         .route_service("/robots.txt", ServeFile::new("site/robots.txt"))
 
         .nest_service("/src", ServeDir::new("site/src"))
         .nest_service("/meta", ServeDir::new("site/meta"))
 
-        .fallback(|State(state): State<AppState>| async move {    
+        .fallback(|State(state): State<AppState>, request: Request<Body>| async move {    
             let mut ctx = Context::new();
             ctx.insert("status", "404: Not Found");
+
+            if request.uri().to_string().starts_with("/api") {
+                return Err((StatusCode::NOT_FOUND, Json(json!({
+                    "error": true,
+                    "code": "not_found"
+                }))))
+            }
             
-            (StatusCode::NOT_FOUND, Html::<String>::from(state.template.render("fallback.html", &ctx).unwrap()))
+            Ok((StatusCode::NOT_FOUND, Html::<String>::from(state.template.render("fallback.html", &ctx).unwrap())))
         })
 
         .with_state(state)
