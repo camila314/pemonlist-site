@@ -1,0 +1,10 @@
+name: test
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: List
+      run: sudo apt list openssl
