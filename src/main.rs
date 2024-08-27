@@ -1445,9 +1445,11 @@ async fn api_level(State(state): State<AppState>, Path(level_id): Path<u64>) -> 
 async fn main() {
     dotenv().ok();
 
+    let t = edgedb_tokio::Builder::new().instance("pemonlist/database").unwrap().build_env().await.unwrap();
+
     let state = AppState { 
         template: Tera::new("site/*.html").unwrap(),
-        database: edgedb_tokio::create_client().await.unwrap(),
+        database: edgedb_tokio::Client::new(&t),
     };
 
     let app = Router::new()
