@@ -104,11 +104,18 @@ async fn leaderboard(State(state): State<AppState>) -> Html<String> {
     let mut players = LEADERBOARD_CACHE.read().unwrap().clone();
 
     if players.clone().as_array().unwrap().is_empty() {
+        // TODO: FIX THIS
         players = state.database.query_json("select Player {
             id,
-            rank,
+            rank := <int32>3,
             points
         } filter (select count(.entries)) != 0 order by .points desc", &()).await.unwrap().parse().unwrap();
+
+        let mut i = 0;
+        for vp in players.as_array_mut().unwrap() {
+            i += 1;
+            vp["rank"] = json!(i);
+        }
 
         let mut guard = LEADERBOARD_CACHE.write().unwrap();
         *guard = players.clone();
