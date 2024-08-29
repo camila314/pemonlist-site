@@ -75,21 +75,28 @@ impl Token for edgedb_tokio::Client {
     }
 }
 
+static INDEX_CACHE: RwLock<Value> = RwLock::new(json!([]));
 async fn index(State(state): State<AppState>) -> Html<String> {
     let mut ctx = Context::new();
 
-    let levels: Value = state.database.query_json("select Level {
-        name,
-        creator,
-        video_id,
-        level_id,
-        record := (select .entries {
-            name := (select .player.name),
-            time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
-            time_ms := (select to_str(.time, \"MS\"))
-        } filter .status = Status.Approved  order by .time limit 1),
-        placement
-    } order by .placement", &()).await.unwrap().parse().unwrap();
+    let mut levels = INDEX_CACHE.read().unwrap().clone();
+
+    if levels.as_array().unwrap().is_empty() {
+        levels = state.database.query_json("select Level {
+            name,
+            creator,
+            video_id,
+            level_id,
+            record := (select .entries {
+                name := (select .player.name),
+                time_format := (select to_str(.time, \"FMHH24:MI:SS\")),
+                time_ms := (select to_str(.time, \"MS\"))
+            } filter .status = Status.Approved  order by .time limit 1),
+            placement
+        } order by .placement", &()).await.unwrap().parse().unwrap();
+
+        *INDEX_CACHE.write().unwrap() = levels.clone();
+    }
 
     ctx.insert("levels", &levels);
     state.template.render("index.html", &ctx).unwrap().into()
@@ -357,6 +364,7 @@ async fn submit_record(State(state): State<AppState>, jar: CookieJar, Form(body)
         &body.notes
     )).await.unwrap();
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Ok(state.template.render("submitted.html", &Context::new()).unwrap().into())
 }
 
@@ -494,6 +502,7 @@ async fn account(State(state): State<AppState>, oauth2: Option<Query<Oauth2>>, m
         }
     ", &(token.as_str(), account_uuid.as_str().unwrap())).await.unwrap();
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Err((jar, Redirect::to(&"/account")))
 }
 
@@ -530,7 +539,8 @@ async fn update_account(State(state): State<AppState>, jar: CookieJar, Form(body
         "deleterecord" => {
             state.database.execute("
                 delete Entry filter .id = <uuid><str>$0
-            ", &(&body.id.unwrap(),)).await.unwrap()
+            ", &(&body.id.unwrap(),)).await.unwrap();
+            *INDEX_CACHE.write().unwrap() = json!([]);
         }
         _ => {}
     }
@@ -622,6 +632,7 @@ async fn setup_account(State(state): State<AppState>, jar: CookieJar, Form(mut b
         format!("{}{}", &body.profileshape.remove(0).to_uppercase(), &body.profileshape)
     )).await.unwrap();
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Redirect::to("/account")
 }
 
@@ -799,6 +810,7 @@ async fn migrate_account(State(state): State<AppState>, jar: CookieJar, Host(hos
         format!("{}{}", &body.device.remove(0).to_uppercase(), &body.device)
     )).await.unwrap();
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Redirect::to("/account")
 }
 
@@ -982,6 +994,7 @@ async fn edit_record(State(state): State<AppState>, jar: CookieJar, Form(mut bod
         });
     }
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Redirect::to("/mod/records")
 }
 
@@ -1103,6 +1116,7 @@ async fn update_user(State(state): State<AppState>, jar: CookieJar, Form(body): 
         _ => {}
     }
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Redirect::to("/mod/users")
 }
 
@@ -1139,6 +1153,7 @@ async fn mod_levels(State(state): State<AppState>, jar: CookieJar) -> Result<Htm
         None => {}
     }
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Err(Redirect::to("/account"))
 }
 
@@ -1283,6 +1298,7 @@ async fn edit_level(State(state): State<AppState>, jar: CookieJar, Form(body): F
         });
     }
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Redirect::to("/mod/levels")
 }
 
@@ -1394,6 +1410,7 @@ async fn account_settings(State(state): State<AppState>, jar: CookieJar, Form(bo
         _ => {}
     }
 
+    *INDEX_CACHE.write().unwrap() = json!([]);
     Redirect::to("/account/settings")
 }
 
