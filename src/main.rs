@@ -104,6 +104,7 @@ async fn index(State(state): State<AppState>) -> Html<String> {
 
 static LEADERBOARD_CACHE: RwLock<Value> = RwLock::new(json!([]));
 static RECORDS: RwLock<i64> = RwLock::new(0);
+static LIST_CACHE: RwLock<Value> = RwLock::new(json!([]));
 
 async fn leaderboard(State(state): State<AppState>) -> Html<String> {
     let mut ctx = Context::new();
@@ -1415,22 +1416,31 @@ async fn account_settings(State(state): State<AppState>, jar: CookieJar, Form(bo
 }
 
 async fn api_list(State(state): State<AppState>) -> Json<Value> {
-    state.database.query_json("select Level {
-        placement,
-        level_id,
-        name,
-        creator,
-        verifier: { id, name },
-        video_id,
-        top_record := (select .entries {
-            player: {
-                id,
-                name
-            },
-            timestamp_milliseconds := (select duration_get(<cal::relative_duration>.time, \"milliseconds\")),
-            formatted_time := (select to_str(.time, \"FMHH24:MI:SS.MS\"))
-        } filter .status = Status.Approved  order by .time limit 1)
-    } order by .placement", &()).await.unwrap().parse::<Value>().unwrap().into()
+
+    let mut list = LIST_CACHE.read().unwrap().clone();
+
+    if list.as_array().unwrap().is_empty() {
+        list = state.database.query_json("select Level {
+            placement,
+            level_id,
+            name,
+            creator,
+            verifier: { id, name },
+            video_id,
+            top_record := (select .entries {
+                player: {
+                    id,
+                    name
+                },
+                timestamp_milliseconds := (select duration_get(<cal::relative_duration>.time, \"milliseconds\")),
+                formatted_time := (select to_str(.time, \"FMHH24:MI:SS.MS\"))
+            } filter .status = Status.Approved  order by .time limit 1)
+        } order by .placement", &()).await.unwrap().parse::<Value>().unwrap();
+
+        *LIST_CACHE.write().unwrap() = list.clone();
+    }
+
+    list.into()
 }
 
 async fn api_level(State(state): State<AppState>, Path(level_id): Path<u64>) -> (StatusCode, Json<Value>) {
@@ -1542,7 +1552,7 @@ async fn main() {
         .layer(axum::middleware::from_fn(|request: Request, next: Next| async move {
             let mut response = next.run(request).await;
 
-            response.headers_mut().append("Cache-Control", HeaderValue::from_str("no-cache").unwrap());
+            //response.headers_mut().append("Cache-Control", HeaderValue::from_str("no-cache").unwrap());
 
             let (parts, body) = response.into_parts();
 
