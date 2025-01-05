@@ -1,0 +1,24 @@
+{
+  "name": "pemonlist",
+  "version": "1.0.0",
+  "description": "pemonlist site",
+  "main": "src/main.ts",
+  "scripts": {
+    "test": "bun --watch src/main.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "edgedb": "^1.5.12",
+    "express": "^5.0.1",
+    "nunjucks": "^3.2.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.14",
+    "@types/express": "^5.0.0",
+    "@types/nunjucks": "^3.2.6",
+    "discord-oauth2": "^2.12.1",
+    "google-auth-library": "^9.15.0"
+  }
+}

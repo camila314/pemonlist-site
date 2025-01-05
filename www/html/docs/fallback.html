@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!---->
+    {% include "template/docmeta.html" %}
+    <!---->
+    <link rel="stylesheet" href="/static/css/min/fallback.min.css">
+</head>
+<body>
+    <!---->
+    {% include "template/docnav.html" %}
+    <!---->
+    <main>
+        <div class="container">
+            <h1>{{ translation.fallback[0] }}</h1>
+            <span>
+                <p>{{ translation.fallback[1] }}</p>
+                <p>{{ translation.fallback[2] }}</p>
+                <pre>{{ status }}</pre>
+            </span>
+        </div>
+    </main>
+    <!---->
+    {% include "template/footer.html" %}
+    <!---->
+</body>
+
+<!---->
+{% include "template/include.html" %}
+<!---->
+
+</html>
