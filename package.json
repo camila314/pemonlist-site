@@ -6,7 +6,7 @@
   "scripts": {
     "test": "bun --watch src/main.ts"
   },
-  "author": "",
+  "author": "camila314",
   "license": "ISC",
   "dependencies": {
     "cookie-parser": "^1.4.7",
