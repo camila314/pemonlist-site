@@ -44,7 +44,7 @@ app.post('/mod/addlevel', requireMod, async (req, res) => {
             creator := <str>$creator,
             level_id := <int32><str>$level_id,
             name := <str>$level_name,
-            placement := <int32>$placement,
+            placement := <int32><str>$placement,
             verifier := (
                 insert Player {
                     name := <str>$verifier
@@ -57,7 +57,7 @@ app.post('/mod/addlevel', requireMod, async (req, res) => {
         creator: req.body.creator,
         level_id: req.body.levelid,
         level_name: req.body.name,
-        placement: parseInt(req.body.placement),
+        placement: req.body.placement,
         video_id: req.body.videoid
     });
 
@@ -80,7 +80,7 @@ app.post('/mod/editlevel', requireMod, async (req, res) => {
                         } unless conflict on .name else (select Player)
                     ),
                     video_id := <str>$video_id,
-                    placement := <int32>$placement
+                    placement := <int32><str>$placement
                 }) { placement }),
                 new_placement := new_level.placement
             select (
@@ -103,7 +103,7 @@ app.post('/mod/editlevel', requireMod, async (req, res) => {
         level_id: req.body.levelid,
         level_name: req.body.name,
         video_id: req.body.videoid,
-        placement: parseInt(req.body.placement)
+        placement: req.body.placement
     });
 
     res.redirect('/mod/levels');
@@ -151,24 +151,21 @@ app.get('/mod/records', requireMod, async (req, res) => {
 });
 app.post('/mod/records', requireMod, async (req, res) => {
     await db.execute(`
-        with entry := (select <Entry><uuid><str>$entry_id { level, player })
-        select (
-            (update entry set {
-                time := <duration><str>$time,
-                status := <Status><str>$status,
-                mobile := <bool>$mobile,
-                mod := <Account><uuid><str>$mod,
-                reason := <str>$reason,
-            }),
+        update Entry filter .id = <uuid><str>$entry_id set {
+            time := <duration><str>$time,
+            status := <Status><str>$status,
+            mobile := <bool>$mobile,
+            mod := <Account><uuid><str>$mod,
+            reason := <str>$reason,
+        };
 
-            (delete Entry filter
-                .level = entry.level and
-                .player = entry.player and
-                .status = Status.Approved and
-                .status = <Status><str>$status
-                .id != $entry_id)
-            )
-        );
+        with entry := (select Entry { level, player } filter .id = <uuid><str>$entry_id)
+        delete Entry filter
+            .level = entry.level and
+            .player = entry.player and
+            .status = Status.Approved and
+            .status = <Status><str>$status and
+            .id != <uuid><str>$entry_id;
     `, {
         time: req.body.time,
         status: req.body.status.replace(/(.)(?=.+)/, a=>a.toUpperCase()),

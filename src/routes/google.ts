@@ -10,7 +10,7 @@ const oauth2Client = new googleapis.OAuth2Client(
 );
 
 app.get('/api/auth/google', async (req, res) => {
-	const redirect = `${req.protocol}://${req.headers.host}/api/auth/google`;
+	const redirect = `https://${req.headers.host}/api/auth/google`;
 	const authUrl = oauth2Client.generateAuthUrl({
 		access_type: 'offline',
 		scope: 'email',

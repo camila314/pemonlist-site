@@ -154,10 +154,8 @@ app.get('/account/setup', requireLogin, async (req, res) => {
 	res.render('account/setup');
 });
 app.post('/account/setup', requireLogin, async (req, res) => {
-	console.log("WHAT");
 	const name = ((req.body.username || "") as string).trim();
 	if (name.length == 0 || name.length > 25) {
-		console.log("what...", name);
 		return res.redirect('/account/setup');
 	}
 

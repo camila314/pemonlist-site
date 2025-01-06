@@ -131,7 +131,7 @@
                 </div>
             {% endif %}
             {% if account.player %}
-                {% if account.player.unverified_records %}
+                {% if account.player.unverified_records | length %}
                     <div class="unverified">
                         <h1>{{ translation.account.pending.pending }}</h1>
                         <div class="table">
@@ -197,7 +197,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if account.player.verifications %}
+                {% if account.player.verifications | length %}
                     <div class="verifications">
                         <h1>{{ translation.account.verifications }}</h1>
                         <div class="table">
@@ -228,7 +228,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if account.player.records %}
+                {% if account.player.records | length %}
                     <div class="records">
                         <h1>{{ translation.account.records }}</h1>
                         <div class="table">

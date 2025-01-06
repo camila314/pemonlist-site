@@ -75,7 +75,7 @@
                     </span>
                 </div>
             </div>
-            {% if player.verifications %}
+            {% if player.verifications | length %}
                 <div class="verifications">
                     <h1>{{ translation.player.verifications }}</h1>
                     <div class="table">
@@ -106,7 +106,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if player.records %}
+            {% if player.records | length %}
                 <div class="records">
                     <h1>{{ translation.player.records }}</h1>
                     <div class="table">
